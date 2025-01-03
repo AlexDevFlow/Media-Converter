@@ -54,8 +54,8 @@ A media conversion tool that integrates directly into your Linux file manager. C
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/alexdevflow/mediamorphosis.git
-cd mediamorphosis
+git clone https://github.com/alexdevflow/media-converter.git
+cd media-converter
 ```
 
 2. Run the installation script:
