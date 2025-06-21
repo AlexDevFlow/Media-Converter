@@ -12,10 +12,7 @@ A media conversion tool that integrates directly into your Linux file manager. C
 
 - 🏠 Fully local
 - 🎯 Direct integration with Nautilus file manager
-- 📊 Real-time progress tracking for each file
-- 🎵 Wide range of audio formats supported
-- 🎬 Comprehensive video format support
-- 🚀 Parallel conversion processing
+- 📊 Real-time progress tracking
 
 ## Supported Formats
 
@@ -26,10 +23,12 @@ A media conversion tool that integrates directly into your Linux file manager. C
 - FLAC (Free Lossless Audio Codec)
 - OGG (Ogg Vorbis Audio)
 - M4A (MPEG-4 Audio)
-- WMA (Windows Media Audio)
 - OPUS (Opus Audio)
+- WMA (Windows Media Audio)
+- ALAC (Apple Lossless Audio Codec)
 - AC3 (Dolby Digital Audio)
 - AMR (Adaptive Multi-Rate Audio)
+- AIFF (Audio Interchange File Format)
 
 ### Video Formats
 - MP4 (MPEG-4 Video)
@@ -42,13 +41,58 @@ A media conversion tool that integrates directly into your Linux file manager. C
 - M4V (MPEG-4 Video)
 - 3GP (3GPP Video)
 - TS (MPEG Transport Stream)
+- OGV (Ogg Video)
+- VOB (DVD Video Object)
+
+### Image Formats
+- JPG (JPEG Image)
+- PNG (Portable Network Graphics)
+- WebP (WebP Image)
+- GIF (Graphics Interchange Format)
+- TIFF (Tagged Image File Format)
+- BMP (Bitmap Image)
+- HEIF (High Efficiency Image Format)
+- ICO (Icon Image)
+
+### Document Formats
+- PDF (Portable Document Format)
+- DOCX (Microsoft Word Document)
+- ODT (OpenDocument Text)
+- RTF (Rich Text Format)
+- TXT (Plain Text)
+
+### Subtitle Formats
+- SRT (SubRip Subtitle)
+- ASS (Advanced SubStation Alpha)
+
+### Archive Formats
+- ZIP (ZIP Archive)
+- TAR (Tar Archive)
+- TAR.GZ (Gzip Tar Archive)
+- TAR.BZ2 (Bzip2 Tar Archive)
 
 ## Requirements
 
 - Linux-based operating system
 - Nautilus file manager
-- FFmpeg
-- Zenity
+- FFmpeg and FFprobe (for audio, video, image, and subtitle processing)
+- Zenity (for GUI dialogs)
+- Unzip (for ZIP archive extraction)
+- Tar (for TAR, TAR.GZ, and TAR.BZ2 archive extraction)
+- LibreOffice and Unoconv (for document conversions)
+- Ghostscript (for PDF processing)
+- Optional: libheif (for HEIF image format support)
+
+## Requirements
+- Linux-based operating system
+- Nautilus file manager
+- FFmpeg and FFprobe (for audio, video, image, and subtitle processing)
+- Zenity (for GUI dialogs)
+- Unzip (for ZIP archive extraction)
+- Tar (for TAR, TAR.GZ, and TAR.BZ2 archive extraction)
+- LibreOffice and Unoconv (for document conversions)
+- Ghostscript (for PDF processing)
+- Optional: libheif (for HEIF image format support)
 
 ## Installation
 
@@ -71,8 +115,8 @@ nautilus -q
 
 ## Usage
 
-1. Right-click on one or more media files in Nautilus
-2. Navigate to Scripts → Media Converter → [Audio/Video]
+1. Right-click on one file in Nautilus
+2. Navigate to Scripts → Media Converter → [Audio/Video/...]
 3. Select your desired output format
 4. Monitor the conversion progress
 5. Find the converted files in the same directory as the originals
