@@ -2,6 +2,10 @@
 
 Linux port of [File Converter](https://github.com/Tichau/FileConverter) by Tichau. Right-click files in your file manager, pick a format, convert.
 
+## Support the project :D
+
+If you find this useful, you can [buy me a coffee](https://paypal.me/alextrysh).
+
 ## Quick Start
 
 ### Download the binary
