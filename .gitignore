@@ -1,0 +1,20 @@
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# PyInstaller (fileconverter.spec is tracked — needed for CI)
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fileconverter"
+version = "1.0.0"
+description = "Linux port of File Converter — right-click context menu file conversion"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML>=6.0",
+    "PyGObject>=3.42",
+]
+
+[project.scripts]
+fileconverter = "fileconverter.cli:main"
+fileconverter-pick = "fileconverter.ui.preset_picker:main"
+fileconverter-install = "fileconverter.integration.install:main"
+
+[tool.setuptools.packages.find]
+include = ["fileconverter*"]

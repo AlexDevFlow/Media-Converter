@@ -1,149 +1,296 @@
-# Media Converter
+# File Converter for Linux
 
-![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Linux-green.svg)
-![Nautilus](https://img.shields.io/badge/integration-Nautilus-orange.svg)
+Linux port of [File Converter](https://github.com/Tichau/FileConverter) by Tichau. Right-click files in your file manager, pick a format, convert.
 
-A media conversion tool that integrates directly into your Linux file manager. Convert audio and video files with just a few clicks, supporting multiple files and formats simultaneously.
+## Quick Start
 
-⚠️**Please be aware**: This project is currently in its early stages. As such, you may encounter bugs or errors. I encourage you to use it with caution and at your own discretion. Thank you for your understanding!⚠️
+### Download the binary
 
-## Features
+1. Download `fileconverter` from the [Releases page](https://github.com/AlexDevFlow/Media-Converter/releases)
+2. Open a terminal where you downloaded it:
 
-- 🏠 Fully local
-- 🎯 Direct integration with Nautilus file manager
-- 📊 Real-time progress tracking
-
-## Supported Formats
-
-### Audio Formats
-- MP3 (MPEG Layer-3 Audio)
-- AAC (Advanced Audio Coding)
-- WAV (Waveform Audio)
-- FLAC (Free Lossless Audio Codec)
-- OGG (Ogg Vorbis Audio)
-- M4A (MPEG-4 Audio)
-- OPUS (Opus Audio)
-- WMA (Windows Media Audio)
-- ALAC (Apple Lossless Audio Codec)
-- AC3 (Dolby Digital Audio)
-- AMR (Adaptive Multi-Rate Audio)
-- AIFF (Audio Interchange File Format)
-
-### Video Formats
-- MP4 (MPEG-4 Video)
-- MKV (Matroska Video)
-- AVI (Audio Video Interleave)
-- WebM (WebM Video)
-- MOV (QuickTime Video)
-- FLV (Flash Video)
-- WMV (Windows Media Video)
-- M4V (MPEG-4 Video)
-- 3GP (3GPP Video)
-- TS (MPEG Transport Stream)
-- OGV (Ogg Video)
-- VOB (DVD Video Object)
-
-### Image Formats
-- JPG (JPEG Image)
-- PNG (Portable Network Graphics)
-- WebP (WebP Image)
-- GIF (Graphics Interchange Format)
-- TIFF (Tagged Image File Format)
-- BMP (Bitmap Image)
-- HEIF (High Efficiency Image Format)
-- ICO (Icon Image)
-
-### Document Formats
-- PDF (Portable Document Format)
-- DOCX (Microsoft Word Document)
-- ODT (OpenDocument Text)
-- RTF (Rich Text Format)
-- TXT (Plain Text)
-
-### Subtitle Formats
-- SRT (SubRip Subtitle)
-- ASS (Advanced SubStation Alpha)
-
-### Archive Formats
-- ZIP (ZIP Archive)
-- TAR (Tar Archive)
-- TAR.GZ (Gzip Tar Archive)
-- TAR.BZ2 (Bzip2 Tar Archive)
-
-## Requirements
-
-- Linux-based operating system
-- Nautilus file manager
-- FFmpeg and FFprobe (for audio, video, image, and subtitle processing)
-- Zenity (for GUI dialogs)
-- Unzip (for ZIP archive extraction)
-- Tar (for TAR, TAR.GZ, and TAR.BZ2 archive extraction)
-- LibreOffice and Unoconv (for document conversions)
-- Ghostscript (for PDF processing)
-- Optional: libheif (for HEIF image format support)
-
-## Requirements
-- Linux-based operating system
-- Nautilus file manager
-- FFmpeg and FFprobe (for audio, video, image, and subtitle processing)
-- Zenity (for GUI dialogs)
-- Unzip (for ZIP archive extraction)
-- Tar (for TAR, TAR.GZ, and TAR.BZ2 archive extraction)
-- LibreOffice and Unoconv (for document conversions)
-- Ghostscript (for PDF processing)
-- Optional: libheif (for HEIF image format support)
-
-## Installation
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/alexdevflow/media-converter.git
-cd media-converter
+chmod +x fileconverter
+./fileconverter
 ```
 
-2. Run the installation script:
+First run walks you through setup automatically.
+
+### Run from source
+
 ```bash
-chmod +x install.sh    # Make the installation script executable
+git clone https://github.com/AlexDevFlow/Media-Converter.git
+cd Media-Converter
 ./install.sh
 ```
 
-3. Restart Nautilus:
+Requires Python 3.10+ and PyYAML (`python3-yaml` on most distros).
+
+## How It Works
+
+Right-click files in your file manager. A **File Converter** submenu shows conversion options filtered to the selected file types.
+
+```
+Right-click video.mkv >
+  File Converter
+  ├── To Mp4
+  ├── To Mp4 (low quality)
+  ├── To Mkv
+  ├── To Webm
+  ├── To Gif
+  ├── To Mp3
+  ├── To Ogg
+  ├── ...
+  └── Configure presets...
+```
+
+A progress window shows conversion status with estimated time remaining. Multiple files convert in parallel.
+
+## Supported Formats
+
+### Input (62 formats)
+
+| Category | Formats |
+|----------|---------|
+| **Video** | 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, vob, webm, wmv |
+| **Audio** | aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma |
+| **Image** | arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf |
+| **Document** | doc, docx, odt, pdf, ppt, pptx, odp, ods, xls, xlsx |
+
+### Output (17 formats)
+
+| Category | Formats |
+|----------|---------|
+| **Video** | MP4, MKV, WebM, OGV, AVI |
+| **Audio** | MP3, AAC, OGG, FLAC, WAV |
+| **Image** | PNG, JPG, WebP, AVIF, ICO |
+| **Document** | PDF, GIF |
+
+## Dependencies
+
+The installer checks for these and tells you what to install.
+
+| Tool | Used for | Required? |
+|------|----------|-----------|
+| **FFmpeg** | Video and audio conversion | Yes |
+| **ImageMagick** | Image conversion, PDF to image | Yes |
+| **Ghostscript** | PDF processing | Recommended |
+| **LibreOffice** | Office documents (docx, xlsx, pptx) | Optional |
+
+### Install commands by distro
+
+**Ubuntu / Debian:**
 ```bash
-nautilus -q
+sudo apt install ffmpeg imagemagick ghostscript libreoffice
+```
+
+**Fedora:**
+```bash
+# ffmpeg-free lacks H.264/H.265 encoders. For video presets, install the full
+# ffmpeg from RPM Fusion (https://rpmfusion.org/Configuration) instead:
+sudo dnf install ffmpeg ImageMagick ghostscript libreoffice-writer libreoffice-calc libreoffice-impress
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S ffmpeg imagemagick ghostscript libreoffice-still
+```
+
+**openSUSE:**
+```bash
+sudo zypper install ffmpeg ImageMagick ghostscript libreoffice
+```
+
+For the Nautilus right-click menu (GNOME/Ubuntu), you also need:
+
+```bash
+# Ubuntu/Debian
+sudo apt install python3-nautilus
+
+# Fedora
+sudo dnf install nautilus-python
+
+# Arch
+sudo pacman -S python-nautilus
 ```
 
 ## Usage
 
-1. Right-click on one file in Nautilus
-2. Navigate to Scripts → Media Converter → [Audio/Video/...]
-3. Select your desired output format
-4. Monitor the conversion progress
-5. Find the converted files in the same directory as the originals
+### Context menu
 
-## Contributing
+Right-click files in your file manager. The submenu only shows presets compatible with the selected files.
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Supported file managers:
+- **Nautilus** (GNOME/Ubuntu)
+- **Nemo** (Cinnamon/Linux Mint)
+- **Dolphin** (KDE)
+- **Thunar** (XFCE)
+- **PCManFM** (LXDE/LXQt)
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Terminal
+
+```bash
+# Convert a single file
+fileconverter --conversion-preset "To Mp4" video.mkv
+
+# Convert multiple files
+fileconverter --conversion-preset "To Mp3" *.wav
+
+# Use a file list
+fileconverter --conversion-preset "To Jpg" --input-files list.txt
+
+# Open settings
+fileconverter --settings
+
+# Re-run setup
+fileconverter --install
+
+# Remove everything
+fileconverter --uninstall
+```
+
+## Default Presets
+
+| Preset | Output | Notes |
+|--------|--------|-------|
+| To Mp4 | MP4 | H.264, quality 30, AAC audio |
+| To Mp4 (low quality) | MP4 | H.264, quality 20, lower bitrate |
+| To Mkv | MKV | H.264, quality 30, AAC audio |
+| To Webm | WebM | VP9 codec |
+| To Ogv | OGV | Theora codec |
+| To Avi | AVI | MPEG-4/XviD |
+| To Gif | GIF | 15fps, palette-optimized |
+| To Gif (low quality) | GIF | 10fps, 75% scale |
+| To Mp3 | MP3 | VBR ~190kbps |
+| To Mp3 (low quality) | MP3 | VBR ~100kbps |
+| To Aac | AAC | VBR ~155kbps |
+| To Ogg | OGG | Vorbis ~160kbps |
+| To Flac | FLAC | Lossless, max compression |
+| To Wav | WAV | 16-bit PCM |
+| To Png | PNG | Lossless |
+| To Jpg | JPG | Quality 85 |
+| To Webp | WebP | Quality 85 |
+| To Avif | AVIF | Quality 80 |
+| To Pdf | PDF | From images or documents |
+
+All presets are customizable in the settings window or directly in `~/.config/fileconverter/settings.yaml`.
+
+## Settings
+
+```bash
+fileconverter --settings
+```
+
+Or from the context menu: **File Converter > Configure presets...**
+
+### What you can configure
+
+**Global:** max simultaneous conversions, auto-close window, hardware acceleration (Off / Auto / NVENC / VAAPI).
+
+**Per-preset:** output format, input file types, video quality/encoding speed/scale/rotation, audio bitrate/VBR/CBR/channels, image quality/scale/rotation, output filename template, post-conversion action, custom FFmpeg command override.
+
+### Config file
+
+Settings are stored in YAML at `~/.config/fileconverter/settings.yaml`. Example preset:
+
+```yaml
+presets:
+  - name: "Video/To Mp4 (720p)"
+    output_type: mp4
+    input_types: [avi, mkv, mov, mp4, webm, wmv]
+    output_template: "(p)(f)"
+    input_post_action: none
+    settings:
+      enable_audio: true
+      video_quality: 28
+      video_encoding_speed: medium
+      video_scale: 0.5
+      audio_bitrate: 128
+```
+
+### Output filename templates
+
+| Variable | Meaning |
+|----------|---------|
+| `(p)` or `(path)` | Parent directory of input file |
+| `(f)` or `(filename)` | Input filename without extension |
+| `(F)` | Input filename uppercase |
+| `(o)` or `(outputext)` | Output extension |
+| `(i)` or `(inputext)` | Input extension |
+| `(p:d)` | ~/Documents/ |
+| `(p:m)` | ~/Music/ |
+| `(p:v)` | ~/Videos/ |
+| `(p:p)` | ~/Pictures/ |
+| `(d0)`, `(d1)` | Directory hierarchy levels |
+| `(n:i)` | File number in batch |
+| `(n:c)` | Total files in batch |
+| `(d:FORMAT)` | Current date/time |
+
+Default template is `(p)(f)` (same folder, same name, new extension). If the output file already exists, a number is appended automatically: `file (2).mp4`.
+
+## Hardware Acceleration
+
+GPU-accelerated video encoding for MP4 and MKV output:
+
+| Mode | GPU | Notes |
+|------|-----|-------|
+| **Off** | None | Software encoding (default, always works) |
+| **Auto** | Auto-detect | Probes your system, picks the best available |
+| **NVENC** | NVIDIA | Requires NVIDIA GPU + drivers |
+| **VAAPI** | AMD / Intel | Works with Mesa drivers on most Linux systems |
+
+```yaml
+hardware_acceleration: auto  # off | auto | nvenc | vaapi
+```
+
+If hardware encoding fails, the app falls back to software encoding automatically.
+
+## Building From Source
+
+```bash
+git clone https://github.com/AlexDevFlow/Media-Converter.git
+cd Media-Converter
+./install.sh
+```
+
+To build the standalone binary:
+
+```bash
+./build.sh
+```
+
+Produces `dist/fileconverter`, a standalone executable that bundles Python and all dependencies.
+
+## Uninstalling
+
+```bash
+fileconverter --uninstall
+```
+
+Removes context menu entries, desktop entry, launcher scripts, and config directory. Does not remove the binary itself.
+
+## Troubleshooting
+
+**The context menu doesn't appear after install.**
+Restart your file manager: `nautilus -q` (for GNOME). Then reopen it.
+
+**"No compatible presets" when right-clicking.**
+The file extension isn't in any preset's input list. Open settings and add it, or use the terminal.
+
+**Custom FFmpeg commands.**
+In a preset's settings, set `enable_ffmpeg_custom_command: true` and `ffmpeg_custom_command: "<your args>"`. The command is inserted between `-i input` and the output path.
+
+**Preset folders in the context menu.**
+Use `/` in the preset name. `Video/To Mp4` creates a "Video" submenu containing "To Mp4".
+
+**Wayland support.**
+Yes. GTK 4 supports Wayland natively.
+
+## Credits
+
+- Original [File Converter](https://github.com/Tichau/FileConverter) by Adrien Allard (Tichau)
+- [FFmpeg](https://ffmpeg.org/), [ImageMagick](https://imagemagick.org/), [Ghostscript](https://ghostscript.com/), [LibreOffice](https://www.libreoffice.org/)
 
 ## License
 
-This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- FFmpeg team for their amazing media processing framework 💝
-- GNOME team for Nautilus file manager and the ease of adding such feature 💯
-- All contributors who will help improve this tool 🤗
-
-## Support
-
-If you encounter any issues or have questions, please file an issue on the GitHub repository.
-
----
-Made with ❤️ for the Linux community
+GPLv3. Same as the original File Converter.

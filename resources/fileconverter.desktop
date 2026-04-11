@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=File Converter Settings
+Comment=Configure File Converter conversion presets
+Exec=fileconverter --settings
+Icon=preferences-system
+Categories=Utility;Settings;
+Terminal=false

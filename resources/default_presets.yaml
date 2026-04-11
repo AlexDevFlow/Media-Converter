@@ -1,0 +1,207 @@
+version: 1
+max_simultaneous_conversions: 2
+exit_when_done: true
+exit_delay_seconds: 3
+
+presets:
+  # ── Video ──
+  - name: "To Mp4"
+    output_type: mp4
+    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 30
+      video_encoding_speed: medium
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 155
+
+  - name: "To Mp4 (low quality)"
+    output_type: mp4
+    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 20
+      video_encoding_speed: medium
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 96
+
+  - name: "To Mkv"
+    output_type: mkv
+    input_types: [3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv, gif]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 30
+      video_encoding_speed: medium
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 155
+
+  - name: "To Webm"
+    output_type: webm
+    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 40
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 160
+
+  - name: "To Ogv"
+    output_type: ogv
+    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 8
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 160
+
+  - name: "To Avi"
+    output_type: avi
+    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 27
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 190
+
+  # ── GIF ──
+  - name: "To Gif"
+    output_type: gif
+    input_types: [xcf, gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv, arw, bmp, cr2, dds, dng, exr, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      video_scale: 1.0
+      video_rotation: 0
+      video_frames_per_second: 15
+
+  - name: "To Gif (low quality)"
+    output_type: gif
+    input_types: [xcf, gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv, arw, bmp, cr2, dds, dng, exr, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      video_scale: 0.75
+      video_rotation: 0
+      video_frames_per_second: 10
+
+  # ── Audio ──
+  - name: "To Mp3"
+    output_type: mp3
+    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_encoding_mode: mp3vbr
+      audio_bitrate: 190
+      audio_channel_count: 0
+
+  - name: "To Mp3 (low quality)"
+    output_type: mp3
+    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_encoding_mode: mp3vbr
+      audio_bitrate: 100
+      audio_channel_count: 0
+
+  - name: "To Aac"
+    output_type: aac
+    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_bitrate: 155
+      audio_channel_count: 0
+
+  - name: "To Ogg"
+    output_type: ogg
+    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_bitrate: 160
+      audio_channel_count: 0
+
+  - name: "To Flac"
+    output_type: flac
+    input_types: [wav, ape, wma, aiff, flac]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_channel_count: 0
+
+  - name: "To Wav"
+    output_type: wav
+    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_encoding_mode: wav16
+      audio_channel_count: 0
+
+  # ── Image ──
+  - name: "To Png"
+    output_type: png
+    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_scale: 1.0
+      image_rotation: 0
+
+  - name: "To Jpg"
+    output_type: jpg
+    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_quality: 85
+      image_scale: 1.0
+      image_rotation: 0
+
+  - name: "To Webp"
+    output_type: webp
+    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_quality: 85
+      image_scale: 1.0
+      image_rotation: 0
+
+  - name: "To Avif"
+    output_type: avif
+    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_quality: 80
+      image_scale: 1.0
+      image_rotation: 0
+
+  # ── Document ──
+  - name: "To Pdf"
+    output_type: pdf
+    input_types: [doc, docx, odt, xls, xlsx, ods, ppt, pptx, odp, arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_scale: 1.0
