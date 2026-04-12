@@ -277,11 +277,11 @@ class FFmpegJob(ConversionJob):
         )
         # Pass 1: palette
         args1 = base + ["-i", self.input_path, "-vf", f"{tf_fps},palettegen", palette]
-        self._passes.append(_FFmpegPass("Indexing colors", args1, file_to_delete=palette))
+        self._passes.append(_FFmpegPass("Indexing colors", args1))
         # Pass 2: gif
         args2 = base + ["-i", self.input_path, "-i", palette,
                          "-lavfi", f"{tf_fps},paletteuse", self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args2))
+        self._passes.append(_FFmpegPass("Conversion", args2, file_to_delete=palette))
 
     def _build_ico(self, base: list[str]) -> None:
         args = base + ["-i", self.input_path, self.output_path]
@@ -417,39 +417,41 @@ class FFmpegJob(ConversionJob):
 
     def _run_passes(self) -> None:
         ffmpeg = self._find_ffmpeg()
-        for i, p in enumerate(self._passes):
-            if self.cancel_requested:
-                return
-            self.user_state = p.name
-            cmd = [ffmpeg] + p.arguments
-            proc = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                text=True, bufsize=1,
-            )
-            last_lines = []
-            try:
-                for line in proc.stderr:
-                    if self.cancel_requested:
-                        proc.kill()
-                        proc.wait()
-                        return
-                    last_lines.append(line.rstrip())
-                    if len(last_lines) > 10:
-                        last_lines.pop(0)
-                    self._parse_output(last_lines[-1])
-                proc.wait()
-            except Exception:
-                proc.kill()
-                proc.wait()
-                raise
+        files_to_clean = [p.file_to_delete for p in self._passes if p.file_to_delete]
+        try:
+            for i, p in enumerate(self._passes):
+                if self.cancel_requested:
+                    return
+                self.user_state = p.name
+                cmd = [ffmpeg] + p.arguments
+                proc = subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    text=True, bufsize=1,
+                )
+                last_lines = []
+                try:
+                    for line in proc.stderr:
+                        if self.cancel_requested:
+                            proc.kill()
+                            proc.wait()
+                            return
+                        last_lines.append(line.rstrip())
+                        if len(last_lines) > 10:
+                            last_lines.pop(0)
+                        self._parse_output(last_lines[-1])
+                    proc.wait()
+                except Exception:
+                    proc.kill()
+                    proc.wait()
+                    raise
 
-            if proc.returncode != 0 and not self.cancel_requested:
-                err = "\n".join(last_lines)
-                raise RuntimeError(f"ffmpeg exited with code {proc.returncode}: {err}")
-
-            # Clean intermediate files
-            if p.file_to_delete and os.path.exists(p.file_to_delete):
-                os.remove(p.file_to_delete)
+                if proc.returncode != 0 and not self.cancel_requested:
+                    err = "\n".join(last_lines)
+                    raise RuntimeError(f"ffmpeg exited with code {proc.returncode}: {err}")
+        finally:
+            for f in files_to_clean:
+                if os.path.exists(f):
+                    os.remove(f)
 
     def _parse_output(self, line: str) -> None:
         m = _DURATION_RE.search(line)
