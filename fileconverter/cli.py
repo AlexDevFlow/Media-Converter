@@ -96,7 +96,7 @@ def main() -> None:
         try:
             from fileconverter.ui.settings_window import run_settings
             run_settings()
-        except ImportError:
+        except (ImportError, ValueError):
             print("GTK 4 is required for the settings window.", file=sys.stderr)
             sys.exit(1)
         return
@@ -161,7 +161,7 @@ def main() -> None:
     try:
         from fileconverter.ui.progress_window import run_with_progress
         run_with_progress(jobs, settings)
-    except ImportError:
+    except (ImportError, ValueError):
         if args.verbose:
             print("GTK not available, running headless.", file=sys.stderr)
         _run_headless(jobs, settings.max_simultaneous_conversions)
