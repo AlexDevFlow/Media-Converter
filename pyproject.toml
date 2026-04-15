@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fileconverter"
-version = "1.0.1"
+version = "1.0.2"
 description = "Linux port of File Converter — right-click context menu file conversion"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.10"

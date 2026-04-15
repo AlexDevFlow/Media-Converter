@@ -199,9 +199,12 @@ class SettingsWindow(Gtk.ApplicationWindow):
 
         max_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
         max_box.append(Gtk.Label(label="Max jobs:", xalign=0, hexpand=True))
-        adj = Gtk.Adjustment(value=settings.max_simultaneous_conversions,
-                             lower=1, upper=16, step_increment=1)
-        self.max_spin = Gtk.SpinButton(adjustment=adj, digits=0)
+        self._max_adj = Gtk.Adjustment(value=settings.max_simultaneous_conversions,
+                                       lower=1, upper=16, step_increment=1,
+                                       page_increment=1)
+        self.max_spin = Gtk.SpinButton(adjustment=self._max_adj, digits=0,
+                                       numeric=True, climb_rate=1)
+        self.max_spin.set_value(settings.max_simultaneous_conversions)
         self.max_spin.connect("value-changed", self._on_max_changed)
         max_box.append(self.max_spin)
         global_box.append(max_box)
@@ -258,6 +261,8 @@ class SettingsWindow(Gtk.ApplicationWindow):
 
         self.set_child(paned)
         self._refresh_preset_list()
+        # Prevent the SpinButton from grabbing initial focus
+        self.preset_listbox.grab_focus()
 
     def _refresh_preset_list(self):
         while True:

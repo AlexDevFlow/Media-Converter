@@ -156,7 +156,7 @@ class FFmpegJob(ConversionJob):
 
     def _build_arguments(self) -> None:
         """Build ffmpeg argument lists for each pass."""
-        base = ["-n", "-progress", "pipe:1"]
+        base = ["-n"]
         preset = self.preset
 
         custom_enabled = preset.get_setting_bool("enable_ffmpeg_custom_command", False)
@@ -425,7 +425,7 @@ class FFmpegJob(ConversionJob):
                 self.user_state = p.name
                 cmd = [ffmpeg] + p.arguments
                 proc = subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
                     text=True, bufsize=1,
                 )
                 last_lines = []
