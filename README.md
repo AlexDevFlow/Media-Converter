@@ -189,7 +189,7 @@ Or from the context menu: **File Converter > Configure presets...**
 
 ### What you can configure
 
-**Global:** max simultaneous conversions, auto-close window, hardware acceleration (Off / Auto / NVENC / VAAPI).
+**Global:** max simultaneous conversions, auto-close window, hardware acceleration (Off / Auto / NVENC / VAAPI), UI language.
 
 **Per-preset:** output format, input file types, video quality/encoding speed/scale/rotation, audio bitrate/VBR/CBR/channels, image quality/scale/rotation, output filename template, post-conversion action, custom FFmpeg command override.
 
@@ -231,6 +231,14 @@ presets:
 | `(d:FORMAT)` | Current date/time |
 
 Default template is `(p)(f)` (same folder, same name, new extension). If the output file already exists, a number is appended automatically: `file (2).mp4`.
+
+## Languages
+
+The UI is available in 29 languages. On first launch it picks your system language automatically; you can override it from **Settings → Language** (the setting is saved in `~/.config/fileconverter/settings.yaml` and the window rebuilds instantly in the new language).
+
+Shipped locales: Arabic, Chinese (Simplified & Traditional), Czech, Dutch, English, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Persian, Polish, Portuguese (Brazil & Portugal), Romanian, Russian, Serbian (Cyrillic & Latin), Spanish, Swedish, Thai, Turkish, Ukrainian, Vietnamese.
+
+To add or update a translation, edit [`locales/build.py`](locales/build.py) and run `python3 locales/build.py`. That regenerates each `.po` and compiles `.mo` catalogs into `locales/<lang>/LC_MESSAGES/`.
 
 ## Hardware Acceleration
 
