@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: hu_HU
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: hu_HU\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Hozzáadás"
+
+msgid "After conversion:"
+msgstr "Konvertálás után:"
+
+msgid "Language:"
+msgstr "Nyelv:"
+
+msgid "System default"
+msgstr "Rendszer alapértelmezett"
+
+msgid "System default ({name})"
+msgstr "Rendszer alapértelmezett ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Hang bitráta"
+
+msgid "Auto-close when done"
+msgstr "Automatikus bezárás befejezéskor"
+
+msgid "Auto-detect"
+msgstr "Automatikus felismerés"
+
+msgid "Available presets:"
+msgstr "Elérhető beállítások:"
+
+msgid "Cancel"
+msgstr "Mégse"
+
+msgid "Cancelled"
+msgstr "Megszakítva"
+
+msgid "Cancelling..."
+msgstr "Megszakítás..."
+
+msgid "Complete"
+msgstr "Kész"
+
+msgid "Conversion"
+msgstr "Konvertálás"
+
+msgid "Conversion settings:"
+msgstr "Konvertálási beállítások:"
+
+msgid "Convert"
+msgstr "Konvertálás"
+
+msgid "Convert files"
+msgstr "Fájlok konvertálása"
+
+msgid "Converting document..."
+msgstr "Dokumentum konvertálása..."
+
+msgid "Converting to image..."
+msgstr "Képpé konvertálás..."
+
+msgid "Converting..."
+msgstr "Konvertálás..."
+
+msgid "Creating GIF..."
+msgstr "GIF létrehozása..."
+
+msgid "Done"
+msgstr "Kész"
+
+msgid "Done: {name} → {path}"
+msgstr "Kész: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Hang engedélyezése"
+
+msgid "Encoding Speed"
+msgstr "Kódolási sebesség"
+
+msgid "Error reading input file list: {error}"
+msgstr "Hiba a fájllista olvasásakor: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Hiba: a --conversion-preset kötelező."
+
+msgid "Error: file not found: {path}"
+msgstr "Hiba: fájl nem található: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Hiba: nincs bemeneti fájl megadva."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Hiba: '{name}' beállítás nem található."
+
+msgid "Exporting to PDF..."
+msgstr "Exportálás PDF-be..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "SIKERTELEN: {name} — {error}"
+
+msgid "Failed"
+msgstr "Sikertelen"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Beállítás kiválasztása"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Beállítások"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Beállítások (mentve)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Beállítások *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "A File Converter még nincs beállítva. Telepítés indítása..."
+
+msgid "GPU accel:"
+msgstr "GPU gyorsítás:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "A beállítások ablakhoz GTK 4 szükséges."
+
+msgid "GTK not available, running headless."
+msgstr "GTK nem elérhető, felület nélkül fut."
+
+msgid "Global"
+msgstr "Általános"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW sikertelen, újrapróbálás szoftveresen..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Hardveres gyorsítás: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Képminőség (0-100)"
+
+msgid "Image Scale"
+msgstr "Kép méretaránya"
+
+msgid "Indexing colors"
+msgstr "Színek indexelése"
+
+msgid "Input types:"
+msgstr "Bemeneti típusok:"
+
+msgid "Keep open"
+msgstr "Nyitva tartás"
+
+msgid "Max jobs:"
+msgstr "Max. feladat:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Név:"
+
+msgid "New Preset"
+msgstr "Új beállítás"
+
+msgid "No compatible presets"
+msgstr "Nincs kompatibilis beállítás"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Egyetlen beállítás sem támogatja az összes kiválasztott típust: {types}"
+
+msgid "Off"
+msgstr "Ki"
+
+msgid "Open settings"
+msgstr "Beállítások megnyitása"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Vagy kattints jobb gombbal a fájlkezelőben!"
+
+msgid "Output template:"
+msgstr "Kimeneti sablon:"
+
+msgid "Output:"
+msgstr "Kimenet:"
+
+msgid "Page {current}/{total}"
+msgstr "{current}/{total}. oldal"
+
+msgid "Preparing image..."
+msgstr "Kép előkészítése..."
+
+msgid "Preparing..."
+msgstr "Előkészítés..."
+
+msgid "Presets"
+msgstr "Beállítások"
+
+msgid "Queued..."
+msgstr "Sorban..."
+
+msgid "Re-run setup"
+msgstr "Telepítés újrafuttatása"
+
+msgid "Remove"
+msgstr "Eltávolítás"
+
+msgid "Remove integration"
+msgstr "Integráció eltávolítása"
+
+msgid "Rotation (degrees)"
+msgstr "Forgatás (fok)"
+
+msgid "Save"
+msgstr "Mentés"
+
+msgid "Select a preset to edit"
+msgstr "Válassz beállítást a szerkesztéshez"
+
+msgid "Unknown error"
+msgstr "Ismeretlen hiba"
+
+msgid "Usage:"
+msgstr "Használat:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Változók: (p) útvonal, (f) fájlnév, (o) kim. kiterj., (i) bem. kiterj."
+
+msgid "Video Quality (0-63)"
+msgstr "Videóminőség (0-63)"
+
+msgid "Video Scale"
+msgstr "Videó méretaránya"
+
+msgid "Waiting..."
+msgstr "Várakozás..."
+
+msgid "{count} file selected"
+msgstr "{count} fájl kiválasztva"
+
+msgid "{count} files selected"
+msgstr "{count} fájl kiválasztva"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} kész"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} kész, {failed} sikertelen"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Hátralévő: {minutes}p {seconds}mp"
+
+msgid "{seconds}s remaining"
+msgstr "Hátralévő: {seconds}mp"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — bezárás {seconds}mp múlva"
+

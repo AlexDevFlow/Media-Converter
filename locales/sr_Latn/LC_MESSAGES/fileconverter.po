@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: sr_Latn
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: sr_Latn\n"
+"Language: sr_Latn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Dodaj"
+
+msgid "After conversion:"
+msgstr "Posle konverzije:"
+
+msgid "Language:"
+msgstr "Jezik:"
+
+msgid "System default"
+msgstr "Podrazumevano (sistem)"
+
+msgid "System default ({name})"
+msgstr "Podrazumevano ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Bitska stopa zvuka"
+
+msgid "Auto-close when done"
+msgstr "Automatski zatvori po završetku"
+
+msgid "Auto-detect"
+msgstr "Automatska detekcija"
+
+msgid "Available presets:"
+msgstr "Dostupna podešavanja:"
+
+msgid "Cancel"
+msgstr "Otkaži"
+
+msgid "Cancelled"
+msgstr "Otkazano"
+
+msgid "Cancelling..."
+msgstr "Otkazivanje..."
+
+msgid "Complete"
+msgstr "Završeno"
+
+msgid "Conversion"
+msgstr "Konverzija"
+
+msgid "Conversion settings:"
+msgstr "Podešavanja konverzije:"
+
+msgid "Convert"
+msgstr "Konvertuj"
+
+msgid "Convert files"
+msgstr "Konvertuj datoteke"
+
+msgid "Converting document..."
+msgstr "Konvertovanje dokumenta..."
+
+msgid "Converting to image..."
+msgstr "Konvertovanje u sliku..."
+
+msgid "Converting..."
+msgstr "Konvertovanje..."
+
+msgid "Creating GIF..."
+msgstr "Kreiranje GIF-a..."
+
+msgid "Done"
+msgstr "Gotovo"
+
+msgid "Done: {name} → {path}"
+msgstr "Gotovo: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Omogući zvuk"
+
+msgid "Encoding Speed"
+msgstr "Brzina kodiranja"
+
+msgid "Error reading input file list: {error}"
+msgstr "Greška pri čitanju liste datoteka: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Greška: --conversion-preset je obavezan."
+
+msgid "Error: file not found: {path}"
+msgstr "Greška: datoteka nije pronađena: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Greška: nisu navedene ulazne datoteke."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Greška: podešavanje „{name}“ nije pronađeno."
+
+msgid "Exporting to PDF..."
+msgstr "Izvoz u PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "NEUSPEH: {name} — {error}"
+
+msgid "Failed"
+msgstr "Neuspeh"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Izaberi podešavanje"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Podešavanja"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Podešavanja (sačuvano)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Podešavanja *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter još uvek nije podešen. Pokretanje instalacije..."
+
+msgid "GPU accel:"
+msgstr "Ubrzanje GPU-a:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "GTK 4 je potreban za prozor podešavanja."
+
+msgid "GTK not available, running headless."
+msgstr "GTK nije dostupan, pokretanje bez interfejsa."
+
+msgid "Global"
+msgstr "Opšte"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW neuspeo, pokušavam softverski..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Hardversko ubrzanje: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Kvalitet slike (0-100)"
+
+msgid "Image Scale"
+msgstr "Skaliranje slike"
+
+msgid "Indexing colors"
+msgstr "Indeksiranje boja"
+
+msgid "Input types:"
+msgstr "Ulazni tipovi:"
+
+msgid "Keep open"
+msgstr "Zadrži otvoreno"
+
+msgid "Max jobs:"
+msgstr "Maks. poslova:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Ime:"
+
+msgid "New Preset"
+msgstr "Novo podešavanje"
+
+msgid "No compatible presets"
+msgstr "Nema kompatibilnih podešavanja"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Nijedno podešavanje ne podržava sve izabrane tipove: {types}"
+
+msgid "Off"
+msgstr "Isključeno"
+
+msgid "Open settings"
+msgstr "Otvori podešavanja"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Ili kliknite desnim tasterom na datoteke u menadžeru datoteka!"
+
+msgid "Output template:"
+msgstr "Šablon izlaza:"
+
+msgid "Output:"
+msgstr "Izlaz:"
+
+msgid "Page {current}/{total}"
+msgstr "Stranica {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Priprema slike..."
+
+msgid "Preparing..."
+msgstr "Priprema..."
+
+msgid "Presets"
+msgstr "Podešavanja"
+
+msgid "Queued..."
+msgstr "U redu..."
+
+msgid "Re-run setup"
+msgstr "Pokreni instalaciju ponovo"
+
+msgid "Remove"
+msgstr "Ukloni"
+
+msgid "Remove integration"
+msgstr "Ukloni integraciju"
+
+msgid "Rotation (degrees)"
+msgstr "Rotacija (stepeni)"
+
+msgid "Save"
+msgstr "Sačuvaj"
+
+msgid "Select a preset to edit"
+msgstr "Izaberi podešavanje za uređivanje"
+
+msgid "Unknown error"
+msgstr "Nepoznata greška"
+
+msgid "Usage:"
+msgstr "Upotreba:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Promenljive: (p) putanja, (f) ime datoteke, (o) izl. ekt., (i) ul. ekt."
+
+msgid "Video Quality (0-63)"
+msgstr "Kvalitet videa (0-63)"
+
+msgid "Video Scale"
+msgstr "Skaliranje videa"
+
+msgid "Waiting..."
+msgstr "Čekanje..."
+
+msgid "{count} file selected"
+msgstr "Izabrana {count} datoteka"
+
+msgid "{count} files selected"
+msgstr "Izabrano datoteka: {count}"
+
+msgid "{done}/{total} completed"
+msgstr "Završeno {done}/{total}"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "Završeno {done}/{total}, neuspešnih: {failed}"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Preostaje {minutes}m {seconds}s"
+
+msgid "{seconds}s remaining"
+msgstr "Preostaje {seconds}s"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — zatvaranje za {seconds}s"
+

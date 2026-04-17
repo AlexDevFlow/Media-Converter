@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: it_IT
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: it_IT\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "After conversion:"
+msgstr "Dopo la conversione:"
+
+msgid "Language:"
+msgstr "Lingua:"
+
+msgid "System default"
+msgstr "Predefinita del sistema"
+
+msgid "System default ({name})"
+msgstr "Predefinita del sistema ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Bitrate audio"
+
+msgid "Auto-close when done"
+msgstr "Chiudi automaticamente al termine"
+
+msgid "Auto-detect"
+msgstr "Rileva automaticamente"
+
+msgid "Available presets:"
+msgstr "Preset disponibili:"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Cancelled"
+msgstr "Annullato"
+
+msgid "Cancelling..."
+msgstr "Annullamento..."
+
+msgid "Complete"
+msgstr "Completato"
+
+msgid "Conversion"
+msgstr "Conversione"
+
+msgid "Conversion settings:"
+msgstr "Impostazioni di conversione:"
+
+msgid "Convert"
+msgstr "Converti"
+
+msgid "Convert files"
+msgstr "Converti file"
+
+msgid "Converting document..."
+msgstr "Conversione documento..."
+
+msgid "Converting to image..."
+msgstr "Conversione in immagine..."
+
+msgid "Converting..."
+msgstr "Conversione in corso..."
+
+msgid "Creating GIF..."
+msgstr "Creazione GIF..."
+
+msgid "Done"
+msgstr "Fatto"
+
+msgid "Done: {name} → {path}"
+msgstr "Fatto: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Abilita audio"
+
+msgid "Encoding Speed"
+msgstr "Velocità di codifica"
+
+msgid "Error reading input file list: {error}"
+msgstr "Errore nella lettura dell'elenco di file: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Errore: --conversion-preset è obbligatorio."
+
+msgid "Error: file not found: {path}"
+msgstr "Errore: file non trovato: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Errore: nessun file di input specificato."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Errore: preset '{name}' non trovato."
+
+msgid "Exporting to PDF..."
+msgstr "Esportazione in PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "FALLITO: {name} — {error}"
+
+msgid "Failed"
+msgstr "Fallito"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Seleziona preset"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Impostazioni"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Impostazioni (salvate)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Impostazioni *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter non è ancora configurato. Avvio dell'installazione..."
+
+msgid "GPU accel:"
+msgstr "Accelerazione GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "GTK 4 è richiesto per la finestra delle impostazioni."
+
+msgid "GTK not available, running headless."
+msgstr "GTK non disponibile, esecuzione senza interfaccia."
+
+msgid "Global"
+msgstr "Globale"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW fallito, riprovo con software..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Accelerazione hardware: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Qualità immagine (0-100)"
+
+msgid "Image Scale"
+msgstr "Scala immagine"
+
+msgid "Indexing colors"
+msgstr "Indicizzazione colori"
+
+msgid "Input types:"
+msgstr "Tipi di input:"
+
+msgid "Keep open"
+msgstr "Mantieni aperta"
+
+msgid "Max jobs:"
+msgstr "Processi massimi:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Nome:"
+
+msgid "New Preset"
+msgstr "Nuovo preset"
+
+msgid "No compatible presets"
+msgstr "Nessun preset compatibile"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Nessun preset supporta tutti i tipi di file selezionati: {types}"
+
+msgid "Off"
+msgstr "Disattivato"
+
+msgid "Open settings"
+msgstr "Apri impostazioni"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Oppure fai clic destro sui file nel tuo file manager!"
+
+msgid "Output template:"
+msgstr "Modello di output:"
+
+msgid "Output:"
+msgstr "Output:"
+
+msgid "Page {current}/{total}"
+msgstr "Pagina {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Preparazione immagine..."
+
+msgid "Preparing..."
+msgstr "Preparazione..."
+
+msgid "Presets"
+msgstr "Preset"
+
+msgid "Queued..."
+msgstr "In coda..."
+
+msgid "Re-run setup"
+msgstr "Riavvia installazione"
+
+msgid "Remove"
+msgstr "Rimuovi"
+
+msgid "Remove integration"
+msgstr "Rimuovi integrazione"
+
+msgid "Rotation (degrees)"
+msgstr "Rotazione (gradi)"
+
+msgid "Save"
+msgstr "Salva"
+
+msgid "Select a preset to edit"
+msgstr "Seleziona un preset da modificare"
+
+msgid "Unknown error"
+msgstr "Errore sconosciuto"
+
+msgid "Usage:"
+msgstr "Uso:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Variabili: (p) percorso, (f) nome file, (o) estensione output, (i) estensione input"
+
+msgid "Video Quality (0-63)"
+msgstr "Qualità video (0-63)"
+
+msgid "Video Scale"
+msgstr "Scala video"
+
+msgid "Waiting..."
+msgstr "In attesa..."
+
+msgid "{count} file selected"
+msgstr "{count} file selezionato"
+
+msgid "{count} files selected"
+msgstr "{count} file selezionati"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} completati"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} completati, {failed} falliti"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "{minutes}m {seconds}s rimanenti"
+
+msgid "{seconds}s remaining"
+msgstr "{seconds}s rimanenti"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — chiusura tra {seconds}s"
+

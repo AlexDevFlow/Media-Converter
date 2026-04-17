@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: zh_TW
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: zh_TW\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "新增"
+
+msgid "After conversion:"
+msgstr "轉換後:"
+
+msgid "Language:"
+msgstr "語言:"
+
+msgid "System default"
+msgstr "系統預設"
+
+msgid "System default ({name})"
+msgstr "系統預設 ({name})"
+
+msgid "Audio Bitrate"
+msgstr "音訊位元率"
+
+msgid "Auto-close when done"
+msgstr "完成後自動關閉"
+
+msgid "Auto-detect"
+msgstr "自動偵測"
+
+msgid "Available presets:"
+msgstr "可用預設:"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Cancelled"
+msgstr "已取消"
+
+msgid "Cancelling..."
+msgstr "正在取消..."
+
+msgid "Complete"
+msgstr "完成"
+
+msgid "Conversion"
+msgstr "轉換"
+
+msgid "Conversion settings:"
+msgstr "轉換設定:"
+
+msgid "Convert"
+msgstr "轉換"
+
+msgid "Convert files"
+msgstr "轉換檔案"
+
+msgid "Converting document..."
+msgstr "正在轉換文件..."
+
+msgid "Converting to image..."
+msgstr "正在轉換為圖片..."
+
+msgid "Converting..."
+msgstr "正在轉換..."
+
+msgid "Creating GIF..."
+msgstr "正在建立 GIF..."
+
+msgid "Done"
+msgstr "完成"
+
+msgid "Done: {name} → {path}"
+msgstr "完成: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "啟用音訊"
+
+msgid "Encoding Speed"
+msgstr "編碼速度"
+
+msgid "Error reading input file list: {error}"
+msgstr "讀取輸入檔案清單錯誤: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "錯誤: 需要 --conversion-preset。"
+
+msgid "Error: file not found: {path}"
+msgstr "錯誤: 找不到檔案: {path}"
+
+msgid "Error: no input files specified."
+msgstr "錯誤: 未指定輸入檔案。"
+
+msgid "Error: preset '{name}' not found."
+msgstr "錯誤: 找不到預設 '{name}'。"
+
+msgid "Exporting to PDF..."
+msgstr "正在匯出 PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "失敗: {name} — {error}"
+
+msgid "Failed"
+msgstr "失敗"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — 選擇預設"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — 設定"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — 設定 (已儲存)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — 設定 *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter 尚未設定。正在執行安裝..."
+
+msgid "GPU accel:"
+msgstr "GPU 加速:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "設定視窗需要 GTK 4。"
+
+msgid "GTK not available, running headless."
+msgstr "GTK 不可用,以無介面方式執行。"
+
+msgid "Global"
+msgstr "全域"
+
+msgid "HW failed, retrying with software..."
+msgstr "硬體失敗,使用軟體重試..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "硬體加速: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "圖片品質 (0-100)"
+
+msgid "Image Scale"
+msgstr "圖片縮放"
+
+msgid "Indexing colors"
+msgstr "正在索引顏色"
+
+msgid "Input types:"
+msgstr "輸入類型:"
+
+msgid "Keep open"
+msgstr "保持開啟"
+
+msgid "Max jobs:"
+msgstr "最大任務數:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "名稱:"
+
+msgid "New Preset"
+msgstr "新增預設"
+
+msgid "No compatible presets"
+msgstr "無相容的預設"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "沒有預設支援所有已選擇的檔案類型: {types}"
+
+msgid "Off"
+msgstr "關閉"
+
+msgid "Open settings"
+msgstr "開啟設定"
+
+msgid "Or right-click files in your file manager!"
+msgstr "或在您的檔案管理器中右鍵點擊檔案!"
+
+msgid "Output template:"
+msgstr "輸出範本:"
+
+msgid "Output:"
+msgstr "輸出:"
+
+msgid "Page {current}/{total}"
+msgstr "第 {current}/{total} 頁"
+
+msgid "Preparing image..."
+msgstr "正在準備圖片..."
+
+msgid "Preparing..."
+msgstr "正在準備..."
+
+msgid "Presets"
+msgstr "預設"
+
+msgid "Queued..."
+msgstr "排隊中..."
+
+msgid "Re-run setup"
+msgstr "重新執行安裝"
+
+msgid "Remove"
+msgstr "移除"
+
+msgid "Remove integration"
+msgstr "移除整合"
+
+msgid "Rotation (degrees)"
+msgstr "旋轉 (度)"
+
+msgid "Save"
+msgstr "儲存"
+
+msgid "Select a preset to edit"
+msgstr "選擇要編輯的預設"
+
+msgid "Unknown error"
+msgstr "未知錯誤"
+
+msgid "Usage:"
+msgstr "用法:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "變數: (p) 路徑, (f) 檔案名稱, (o) 輸出副檔名, (i) 輸入副檔名"
+
+msgid "Video Quality (0-63)"
+msgstr "影片品質 (0-63)"
+
+msgid "Video Scale"
+msgstr "影片縮放"
+
+msgid "Waiting..."
+msgstr "等待中..."
+
+msgid "{count} file selected"
+msgstr "已選擇 {count} 個檔案"
+
+msgid "{count} files selected"
+msgstr "已選擇 {count} 個檔案"
+
+msgid "{done}/{total} completed"
+msgstr "已完成 {done}/{total}"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "已完成 {done}/{total},失敗 {failed}"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "剩餘 {minutes}分 {seconds}秒"
+
+msgid "{seconds}s remaining"
+msgstr "剩餘 {seconds}秒"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — {seconds}秒後關閉"
+

@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: fa_IR
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: fa_IR\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "افزودن"
+
+msgid "After conversion:"
+msgstr "پس از تبدیل:"
+
+msgid "Language:"
+msgstr "زبان:"
+
+msgid "System default"
+msgstr "پیش‌فرض سامانه"
+
+msgid "System default ({name})"
+msgstr "پیش‌فرض سامانه ({name})"
+
+msgid "Audio Bitrate"
+msgstr "بیت‌ریت صدا"
+
+msgid "Auto-close when done"
+msgstr "بستن خودکار پس از پایان"
+
+msgid "Auto-detect"
+msgstr "تشخیص خودکار"
+
+msgid "Available presets:"
+msgstr "پیش‌تنظیم‌های موجود:"
+
+msgid "Cancel"
+msgstr "لغو"
+
+msgid "Cancelled"
+msgstr "لغو شد"
+
+msgid "Cancelling..."
+msgstr "در حال لغو..."
+
+msgid "Complete"
+msgstr "انجام شد"
+
+msgid "Conversion"
+msgstr "تبدیل"
+
+msgid "Conversion settings:"
+msgstr "تنظیمات تبدیل:"
+
+msgid "Convert"
+msgstr "تبدیل"
+
+msgid "Convert files"
+msgstr "تبدیل فایل‌ها"
+
+msgid "Converting document..."
+msgstr "در حال تبدیل سند..."
+
+msgid "Converting to image..."
+msgstr "در حال تبدیل به تصویر..."
+
+msgid "Converting..."
+msgstr "در حال تبدیل..."
+
+msgid "Creating GIF..."
+msgstr "در حال ساخت GIF..."
+
+msgid "Done"
+msgstr "انجام شد"
+
+msgid "Done: {name} → {path}"
+msgstr "انجام شد: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "فعال‌سازی صدا"
+
+msgid "Encoding Speed"
+msgstr "سرعت رمزگذاری"
+
+msgid "Error reading input file list: {error}"
+msgstr "خطا در خواندن فهرست فایل: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "خطا: ‎--conversion-preset لازم است."
+
+msgid "Error: file not found: {path}"
+msgstr "خطا: فایل یافت نشد: {path}"
+
+msgid "Error: no input files specified."
+msgstr "خطا: فایل ورودی مشخص نشده است."
+
+msgid "Error: preset '{name}' not found."
+msgstr "خطا: پیش‌تنظیم «{name}» یافت نشد."
+
+msgid "Exporting to PDF..."
+msgstr "در حال خروجی‌گیری PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "ناموفق: {name} — {error}"
+
+msgid "Failed"
+msgstr "ناموفق"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — انتخاب پیش‌تنظیم"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — تنظیمات"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — تنظیمات (ذخیره شد)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — تنظیمات *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter هنوز راه‌اندازی نشده است. در حال اجرای نصب..."
+
+msgid "GPU accel:"
+msgstr "شتاب‌دهی GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "برای پنجره تنظیمات GTK 4 لازم است."
+
+msgid "GTK not available, running headless."
+msgstr "GTK در دسترس نیست، در حالت بدون رابط اجرا می‌شود."
+
+msgid "Global"
+msgstr "عمومی"
+
+msgid "HW failed, retrying with software..."
+msgstr "سخت‌افزار ناموفق، تلاش مجدد با نرم‌افزار..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "شتاب‌دهی سخت‌افزاری: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "کیفیت تصویر (0-100)"
+
+msgid "Image Scale"
+msgstr "مقیاس تصویر"
+
+msgid "Indexing colors"
+msgstr "نمایه‌سازی رنگ‌ها"
+
+msgid "Input types:"
+msgstr "نوع‌های ورودی:"
+
+msgid "Keep open"
+msgstr "باز بماند"
+
+msgid "Max jobs:"
+msgstr "حداکثر کارها:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "نام:"
+
+msgid "New Preset"
+msgstr "پیش‌تنظیم جدید"
+
+msgid "No compatible presets"
+msgstr "هیچ پیش‌تنظیم سازگاری نیست"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "هیچ پیش‌تنظیمی از همه انواع فایل انتخابی پشتیبانی نمی‌کند: {types}"
+
+msgid "Off"
+msgstr "خاموش"
+
+msgid "Open settings"
+msgstr "باز کردن تنظیمات"
+
+msgid "Or right-click files in your file manager!"
+msgstr "یا در مدیر فایل بر روی فایل‌ها راست‌کلیک کنید!"
+
+msgid "Output template:"
+msgstr "الگوی خروجی:"
+
+msgid "Output:"
+msgstr "خروجی:"
+
+msgid "Page {current}/{total}"
+msgstr "صفحه {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "در حال آماده‌سازی تصویر..."
+
+msgid "Preparing..."
+msgstr "در حال آماده‌سازی..."
+
+msgid "Presets"
+msgstr "پیش‌تنظیم‌ها"
+
+msgid "Queued..."
+msgstr "در صف..."
+
+msgid "Re-run setup"
+msgstr "اجرای مجدد نصب"
+
+msgid "Remove"
+msgstr "حذف"
+
+msgid "Remove integration"
+msgstr "حذف یکپارچگی"
+
+msgid "Rotation (degrees)"
+msgstr "چرخش (درجه)"
+
+msgid "Save"
+msgstr "ذخیره"
+
+msgid "Select a preset to edit"
+msgstr "پیش‌تنظیمی را برای ویرایش انتخاب کنید"
+
+msgid "Unknown error"
+msgstr "خطای ناشناخته"
+
+msgid "Usage:"
+msgstr "کاربرد:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "متغیرها: (p) مسیر، (f) نام فایل، (o) پسوند خروجی، (i) پسوند ورودی"
+
+msgid "Video Quality (0-63)"
+msgstr "کیفیت ویدیو (0-63)"
+
+msgid "Video Scale"
+msgstr "مقیاس ویدیو"
+
+msgid "Waiting..."
+msgstr "در انتظار..."
+
+msgid "{count} file selected"
+msgstr "{count} فایل انتخاب شد"
+
+msgid "{count} files selected"
+msgstr "{count} فایل انتخاب شد"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} انجام شد"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} انجام شد، {failed} ناموفق"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "{minutes}د {seconds}ث باقی‌مانده"
+
+msgid "{seconds}s remaining"
+msgstr "{seconds}ث باقی‌مانده"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — بسته می‌شود در {seconds}ث"
+

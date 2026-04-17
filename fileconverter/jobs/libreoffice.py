@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 
+from fileconverter.i18n import _
 from fileconverter.integration.install import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.jobs.imagemagick import ImageMagickJob
@@ -38,7 +39,7 @@ class LibreOfficeJob(ConversionJob):
 
     def _convert_to_pdf(self, lo: str) -> None:
         """Direct conversion to PDF."""
-        self.user_state = "Converting document..."
+        self.user_state = _("Converting document...")
         self.progress = 0.1
 
         out_dir = os.path.dirname(self.output_path)
@@ -63,7 +64,7 @@ class LibreOfficeJob(ConversionJob):
         """Convert document to PDF first, then to target image format."""
         with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
             # Step 1: Document → PDF
-            self.user_state = "Exporting to PDF..."
+            self.user_state = _("Exporting to PDF...")
             self.progress = 0.1
 
             result = subprocess.run(
@@ -83,7 +84,7 @@ class LibreOfficeJob(ConversionJob):
             self.progress = 0.4
 
             # Step 2: PDF → target format via ImageMagick
-            self.user_state = "Converting to image..."
+            self.user_state = _("Converting to image...")
             img_job = ImageMagickJob(self.preset, tmp_pdf)
             img_job.output_paths = self.output_paths
             img_job._convert_cmd = ImageMagickJob._find_convert()

@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: el_GR
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: el_GR\n"
+"Language: el_GR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Προσθήκη"
+
+msgid "After conversion:"
+msgstr "Μετά τη μετατροπή:"
+
+msgid "Language:"
+msgstr "Γλώσσα:"
+
+msgid "System default"
+msgstr "Προεπιλογή συστήματος"
+
+msgid "System default ({name})"
+msgstr "Προεπιλογή συστήματος ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Ρυθμός bit ήχου"
+
+msgid "Auto-close when done"
+msgstr "Αυτόματο κλείσιμο όταν τελειώσει"
+
+msgid "Auto-detect"
+msgstr "Αυτόματη ανίχνευση"
+
+msgid "Available presets:"
+msgstr "Διαθέσιμες προεπιλογές:"
+
+msgid "Cancel"
+msgstr "Ακύρωση"
+
+msgid "Cancelled"
+msgstr "Ακυρώθηκε"
+
+msgid "Cancelling..."
+msgstr "Ακύρωση..."
+
+msgid "Complete"
+msgstr "Ολοκληρώθηκε"
+
+msgid "Conversion"
+msgstr "Μετατροπή"
+
+msgid "Conversion settings:"
+msgstr "Ρυθμίσεις μετατροπής:"
+
+msgid "Convert"
+msgstr "Μετατροπή"
+
+msgid "Convert files"
+msgstr "Μετατροπή αρχείων"
+
+msgid "Converting document..."
+msgstr "Μετατροπή εγγράφου..."
+
+msgid "Converting to image..."
+msgstr "Μετατροπή σε εικόνα..."
+
+msgid "Converting..."
+msgstr "Μετατροπή..."
+
+msgid "Creating GIF..."
+msgstr "Δημιουργία GIF..."
+
+msgid "Done"
+msgstr "Έτοιμο"
+
+msgid "Done: {name} → {path}"
+msgstr "Έτοιμο: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Ενεργοποίηση ήχου"
+
+msgid "Encoding Speed"
+msgstr "Ταχύτητα κωδικοποίησης"
+
+msgid "Error reading input file list: {error}"
+msgstr "Σφάλμα ανάγνωσης λίστας αρχείων: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Σφάλμα: το --conversion-preset είναι υποχρεωτικό."
+
+msgid "Error: file not found: {path}"
+msgstr "Σφάλμα: δεν βρέθηκε το αρχείο: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Σφάλμα: δεν ορίστηκαν αρχεία εισόδου."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Σφάλμα: δεν βρέθηκε η προεπιλογή '{name}'."
+
+msgid "Exporting to PDF..."
+msgstr "Εξαγωγή σε PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "ΑΠΟΤΥΧΙΑ: {name} — {error}"
+
+msgid "Failed"
+msgstr "Αποτυχία"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Επιλογή προεπιλογής"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Ρυθμίσεις"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Ρυθμίσεις (αποθηκευμένες)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Ρυθμίσεις *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "Το File Converter δεν έχει ρυθμιστεί ακόμα. Εκτέλεση εγκατάστασης..."
+
+msgid "GPU accel:"
+msgstr "Επιτάχυνση GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "Απαιτείται GTK 4 για το παράθυρο ρυθμίσεων."
+
+msgid "GTK not available, running headless."
+msgstr "Το GTK δεν είναι διαθέσιμο, εκτέλεση χωρίς διεπαφή."
+
+msgid "Global"
+msgstr "Γενικά"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW απέτυχε, νέα προσπάθεια με λογισμικό..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Επιτάχυνση υλικού: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Ποιότητα εικόνας (0-100)"
+
+msgid "Image Scale"
+msgstr "Κλίμακα εικόνας"
+
+msgid "Indexing colors"
+msgstr "Ευρετηρίαση χρωμάτων"
+
+msgid "Input types:"
+msgstr "Τύποι εισόδου:"
+
+msgid "Keep open"
+msgstr "Διατήρηση ανοιχτού"
+
+msgid "Max jobs:"
+msgstr "Μέγ. εργασίες:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Όνομα:"
+
+msgid "New Preset"
+msgstr "Νέα προεπιλογή"
+
+msgid "No compatible presets"
+msgstr "Καμία συμβατή προεπιλογή"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Καμία προεπιλογή δεν υποστηρίζει όλους τους επιλεγμένους τύπους: {types}"
+
+msgid "Off"
+msgstr "Ανενεργό"
+
+msgid "Open settings"
+msgstr "Άνοιγμα ρυθμίσεων"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Ή κάντε δεξί κλικ στα αρχεία στον διαχειριστή αρχείων!"
+
+msgid "Output template:"
+msgstr "Πρότυπο εξόδου:"
+
+msgid "Output:"
+msgstr "Έξοδος:"
+
+msgid "Page {current}/{total}"
+msgstr "Σελίδα {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Προετοιμασία εικόνας..."
+
+msgid "Preparing..."
+msgstr "Προετοιμασία..."
+
+msgid "Presets"
+msgstr "Προεπιλογές"
+
+msgid "Queued..."
+msgstr "Στην ουρά..."
+
+msgid "Re-run setup"
+msgstr "Επανεκτέλεση εγκατάστασης"
+
+msgid "Remove"
+msgstr "Αφαίρεση"
+
+msgid "Remove integration"
+msgstr "Αφαίρεση ενσωμάτωσης"
+
+msgid "Rotation (degrees)"
+msgstr "Περιστροφή (μοίρες)"
+
+msgid "Save"
+msgstr "Αποθήκευση"
+
+msgid "Select a preset to edit"
+msgstr "Επιλέξτε προεπιλογή για επεξεργασία"
+
+msgid "Unknown error"
+msgstr "Άγνωστο σφάλμα"
+
+msgid "Usage:"
+msgstr "Χρήση:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Μεταβλητές: (p) διαδρομή, (f) όνομα αρχείου, (o) επέκ. εξόδου, (i) επέκ. εισόδου"
+
+msgid "Video Quality (0-63)"
+msgstr "Ποιότητα βίντεο (0-63)"
+
+msgid "Video Scale"
+msgstr "Κλίμακα βίντεο"
+
+msgid "Waiting..."
+msgstr "Αναμονή..."
+
+msgid "{count} file selected"
+msgstr "{count} αρχείο επιλεγμένο"
+
+msgid "{count} files selected"
+msgstr "{count} αρχεία επιλεγμένα"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} ολοκληρώθηκαν"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} ολοκληρώθηκαν, {failed} απέτυχαν"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Απομένουν {minutes}λ {seconds}δ"
+
+msgid "{seconds}s remaining"
+msgstr "Απομένουν {seconds}δ"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — κλείσιμο σε {seconds}δ"
+

@@ -8,6 +8,7 @@ import time
 from enum import Enum
 from pathlib import Path
 
+from fileconverter.i18n import _
 from fileconverter.path_helpers import generate_output_path, generate_unique_path
 from fileconverter.presets import ConversionPreset
 
@@ -30,7 +31,7 @@ class ConversionJob:
         self.progress: float = 0.0
         self.start_time: float = 0.0
         self.error_message: str = ""
-        self.user_state: str = "Preparing..."
+        self.user_state: str = _("Preparing...")
         self._cancel_requested = False
         self._lock = threading.Lock()
 
@@ -76,22 +77,22 @@ class ConversionJob:
         """Execute the conversion. Called from a worker thread."""
         self.state = ConversionState.IN_PROGRESS
         self.start_time = time.time()
-        self.user_state = "Converting..."
+        self.user_state = _("Converting...")
         try:
             self._convert()
             if self._cancel_requested:
                 self.state = ConversionState.FAILED
-                self.error_message = "Cancelled"
+                self.error_message = _("Cancelled")
                 self._cleanup_outputs()
             else:
                 self.progress = 1.0
                 self.state = ConversionState.DONE
-                self.user_state = "Done"
+                self.user_state = _("Done")
                 self._post_conversion()
         except Exception as e:
             self.state = ConversionState.FAILED
             self.error_message = str(e)
-            self.user_state = "Failed"
+            self.user_state = _("Failed")
             self._cleanup_outputs()
 
     def _get_output_files_count(self) -> int:
@@ -150,4 +151,4 @@ class ConversionJob:
     def _fail(self, message: str) -> None:
         self.state = ConversionState.FAILED
         self.error_message = message
-        self.user_state = "Failed"
+        self.user_state = _("Failed")

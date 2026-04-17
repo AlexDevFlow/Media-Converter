@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: ro_RO
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: ro_RO\n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Adaugă"
+
+msgid "After conversion:"
+msgstr "După conversie:"
+
+msgid "Language:"
+msgstr "Limbă:"
+
+msgid "System default"
+msgstr "Implicit de sistem"
+
+msgid "System default ({name})"
+msgstr "Implicit de sistem ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Rata de biți audio"
+
+msgid "Auto-close when done"
+msgstr "Închide automat la finalizare"
+
+msgid "Auto-detect"
+msgstr "Detectare automată"
+
+msgid "Available presets:"
+msgstr "Presetări disponibile:"
+
+msgid "Cancel"
+msgstr "Anulează"
+
+msgid "Cancelled"
+msgstr "Anulat"
+
+msgid "Cancelling..."
+msgstr "Se anulează..."
+
+msgid "Complete"
+msgstr "Finalizat"
+
+msgid "Conversion"
+msgstr "Conversie"
+
+msgid "Conversion settings:"
+msgstr "Setări de conversie:"
+
+msgid "Convert"
+msgstr "Convertește"
+
+msgid "Convert files"
+msgstr "Convertește fișiere"
+
+msgid "Converting document..."
+msgstr "Se convertește documentul..."
+
+msgid "Converting to image..."
+msgstr "Se convertește în imagine..."
+
+msgid "Converting..."
+msgstr "Se convertește..."
+
+msgid "Creating GIF..."
+msgstr "Se creează GIF..."
+
+msgid "Done"
+msgstr "Gata"
+
+msgid "Done: {name} → {path}"
+msgstr "Gata: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Activează audio"
+
+msgid "Encoding Speed"
+msgstr "Viteză de codificare"
+
+msgid "Error reading input file list: {error}"
+msgstr "Eroare la citirea listei de fișiere: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Eroare: --conversion-preset este obligatoriu."
+
+msgid "Error: file not found: {path}"
+msgstr "Eroare: fișierul nu a fost găsit: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Eroare: nu s-au specificat fișiere de intrare."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Eroare: presetarea '{name}' nu a fost găsită."
+
+msgid "Exporting to PDF..."
+msgstr "Se exportă în PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "EȘUAT: {name} — {error}"
+
+msgid "Failed"
+msgstr "Eșuat"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Alege o presetare"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Setări"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Setări (salvate)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Setări *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter nu este încă configurat. Se rulează instalarea..."
+
+msgid "GPU accel:"
+msgstr "Accelerare GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "GTK 4 este necesar pentru fereastra de setări."
+
+msgid "GTK not available, running headless."
+msgstr "GTK indisponibil, se rulează fără interfață."
+
+msgid "Global"
+msgstr "Global"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW a eșuat, se reîncearcă prin software..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Accelerare hardware: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Calitate imagine (0-100)"
+
+msgid "Image Scale"
+msgstr "Scalare imagine"
+
+msgid "Indexing colors"
+msgstr "Se indexează culorile"
+
+msgid "Input types:"
+msgstr "Tipuri de intrare:"
+
+msgid "Keep open"
+msgstr "Lasă deschis"
+
+msgid "Max jobs:"
+msgstr "Sarcini max.:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Nume:"
+
+msgid "New Preset"
+msgstr "Presetare nouă"
+
+msgid "No compatible presets"
+msgstr "Nicio presetare compatibilă"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Nicio presetare nu acceptă toate tipurile selectate: {types}"
+
+msgid "Off"
+msgstr "Oprit"
+
+msgid "Open settings"
+msgstr "Deschide setările"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Sau dă clic dreapta pe fișiere în managerul tău!"
+
+msgid "Output template:"
+msgstr "Șablon de ieșire:"
+
+msgid "Output:"
+msgstr "Ieșire:"
+
+msgid "Page {current}/{total}"
+msgstr "Pagina {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Se pregătește imaginea..."
+
+msgid "Preparing..."
+msgstr "Se pregătește..."
+
+msgid "Presets"
+msgstr "Presetări"
+
+msgid "Queued..."
+msgstr "În coadă..."
+
+msgid "Re-run setup"
+msgstr "Reia instalarea"
+
+msgid "Remove"
+msgstr "Elimină"
+
+msgid "Remove integration"
+msgstr "Elimină integrarea"
+
+msgid "Rotation (degrees)"
+msgstr "Rotație (grade)"
+
+msgid "Save"
+msgstr "Salvează"
+
+msgid "Select a preset to edit"
+msgstr "Alege o presetare pentru editare"
+
+msgid "Unknown error"
+msgstr "Eroare necunoscută"
+
+msgid "Usage:"
+msgstr "Utilizare:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Variabile: (p) cale, (f) nume fișier, (o) ext. ieșire, (i) ext. intrare"
+
+msgid "Video Quality (0-63)"
+msgstr "Calitate video (0-63)"
+
+msgid "Video Scale"
+msgstr "Scalare video"
+
+msgid "Waiting..."
+msgstr "Se așteaptă..."
+
+msgid "{count} file selected"
+msgstr "{count} fișier selectat"
+
+msgid "{count} files selected"
+msgstr "{count} fișiere selectate"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} finalizate"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} finalizate, {failed} eșuate"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Mai sunt {minutes}m {seconds}s"
+
+msgid "{seconds}s remaining"
+msgstr "Mai sunt {seconds}s"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — se închide în {seconds}s"
+

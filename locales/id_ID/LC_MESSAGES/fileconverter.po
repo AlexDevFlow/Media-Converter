@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: id_ID
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: id_ID\n"
+"Language: id_ID\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Tambah"
+
+msgid "After conversion:"
+msgstr "Setelah konversi:"
+
+msgid "Language:"
+msgstr "Bahasa:"
+
+msgid "System default"
+msgstr "Bawaan sistem"
+
+msgid "System default ({name})"
+msgstr "Bawaan sistem ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Bitrate audio"
+
+msgid "Auto-close when done"
+msgstr "Tutup otomatis saat selesai"
+
+msgid "Auto-detect"
+msgstr "Deteksi otomatis"
+
+msgid "Available presets:"
+msgstr "Preset tersedia:"
+
+msgid "Cancel"
+msgstr "Batal"
+
+msgid "Cancelled"
+msgstr "Dibatalkan"
+
+msgid "Cancelling..."
+msgstr "Membatalkan..."
+
+msgid "Complete"
+msgstr "Selesai"
+
+msgid "Conversion"
+msgstr "Konversi"
+
+msgid "Conversion settings:"
+msgstr "Pengaturan konversi:"
+
+msgid "Convert"
+msgstr "Konversi"
+
+msgid "Convert files"
+msgstr "Konversi berkas"
+
+msgid "Converting document..."
+msgstr "Mengonversi dokumen..."
+
+msgid "Converting to image..."
+msgstr "Mengonversi ke gambar..."
+
+msgid "Converting..."
+msgstr "Mengonversi..."
+
+msgid "Creating GIF..."
+msgstr "Membuat GIF..."
+
+msgid "Done"
+msgstr "Selesai"
+
+msgid "Done: {name} → {path}"
+msgstr "Selesai: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Aktifkan audio"
+
+msgid "Encoding Speed"
+msgstr "Kecepatan enkode"
+
+msgid "Error reading input file list: {error}"
+msgstr "Kesalahan membaca daftar berkas: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Kesalahan: --conversion-preset diperlukan."
+
+msgid "Error: file not found: {path}"
+msgstr "Kesalahan: berkas tidak ditemukan: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Kesalahan: berkas masukan tidak ditentukan."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Kesalahan: preset '{name}' tidak ditemukan."
+
+msgid "Exporting to PDF..."
+msgstr "Mengekspor ke PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "GAGAL: {name} — {error}"
+
+msgid "Failed"
+msgstr "Gagal"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Pilih Preset"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Pengaturan"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Pengaturan (tersimpan)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Pengaturan *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter belum dikonfigurasi. Menjalankan penyiapan..."
+
+msgid "GPU accel:"
+msgstr "Akselerasi GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "GTK 4 diperlukan untuk jendela pengaturan."
+
+msgid "GTK not available, running headless."
+msgstr "GTK tidak tersedia, berjalan tanpa antarmuka."
+
+msgid "Global"
+msgstr "Umum"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW gagal, mencoba lagi dengan perangkat lunak..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Akselerasi perangkat keras: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Kualitas gambar (0-100)"
+
+msgid "Image Scale"
+msgstr "Skala gambar"
+
+msgid "Indexing colors"
+msgstr "Mengindeks warna"
+
+msgid "Input types:"
+msgstr "Jenis masukan:"
+
+msgid "Keep open"
+msgstr "Tetap terbuka"
+
+msgid "Max jobs:"
+msgstr "Pekerjaan maks.:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Nama:"
+
+msgid "New Preset"
+msgstr "Preset baru"
+
+msgid "No compatible presets"
+msgstr "Tidak ada preset kompatibel"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Tidak ada preset yang mendukung semua jenis berkas terpilih: {types}"
+
+msgid "Off"
+msgstr "Mati"
+
+msgid "Open settings"
+msgstr "Buka pengaturan"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Atau klik kanan berkas di pengelola berkas Anda!"
+
+msgid "Output template:"
+msgstr "Templat keluaran:"
+
+msgid "Output:"
+msgstr "Keluaran:"
+
+msgid "Page {current}/{total}"
+msgstr "Halaman {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Menyiapkan gambar..."
+
+msgid "Preparing..."
+msgstr "Menyiapkan..."
+
+msgid "Presets"
+msgstr "Preset"
+
+msgid "Queued..."
+msgstr "Dalam antrian..."
+
+msgid "Re-run setup"
+msgstr "Jalankan penyiapan ulang"
+
+msgid "Remove"
+msgstr "Hapus"
+
+msgid "Remove integration"
+msgstr "Hapus integrasi"
+
+msgid "Rotation (degrees)"
+msgstr "Rotasi (derajat)"
+
+msgid "Save"
+msgstr "Simpan"
+
+msgid "Select a preset to edit"
+msgstr "Pilih preset untuk disunting"
+
+msgid "Unknown error"
+msgstr "Kesalahan tidak diketahui"
+
+msgid "Usage:"
+msgstr "Penggunaan:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Variabel: (p) jalur, (f) nama berkas, (o) ekst. keluaran, (i) ekst. masukan"
+
+msgid "Video Quality (0-63)"
+msgstr "Kualitas video (0-63)"
+
+msgid "Video Scale"
+msgstr "Skala video"
+
+msgid "Waiting..."
+msgstr "Menunggu..."
+
+msgid "{count} file selected"
+msgstr "{count} berkas dipilih"
+
+msgid "{count} files selected"
+msgstr "{count} berkas dipilih"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} selesai"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} selesai, {failed} gagal"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Tersisa {minutes}m {seconds}d"
+
+msgid "{seconds}s remaining"
+msgstr "Tersisa {seconds}d"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — menutup dalam {seconds}d"
+

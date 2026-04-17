@@ -1,5 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import glob
+
+_locale_datas = [(p, f"locales/{p.split('/')[-3]}/LC_MESSAGES") for p in glob.glob('locales/*/LC_MESSAGES/fileconverter.mo')]
+
 a = Analysis(
     ['fileconverter/__main__.py'],
     pathex=[],
@@ -8,12 +12,13 @@ a = Analysis(
         ('resources/default_presets.yaml', 'resources'),
         ('resources/fileconverter.desktop', 'resources'),
         ('fileconverter/integration/nautilus_extension.py', 'fileconverter/integration'),
-    ],
+    ] + _locale_datas,
     hiddenimports=[
         'fileconverter',
         'fileconverter.cli',
         'fileconverter.config',
         'fileconverter.helpers',
+        'fileconverter.i18n',
         'fileconverter.presets',
         'fileconverter.path_helpers',
         'fileconverter.jobs',

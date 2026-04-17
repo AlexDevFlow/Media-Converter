@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: ja_JP
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: ja_JP\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "After conversion:"
+msgstr "変換後:"
+
+msgid "Language:"
+msgstr "言語:"
+
+msgid "System default"
+msgstr "システム既定"
+
+msgid "System default ({name})"
+msgstr "システム既定 ({name})"
+
+msgid "Audio Bitrate"
+msgstr "音声ビットレート"
+
+msgid "Auto-close when done"
+msgstr "完了時に自動で閉じる"
+
+msgid "Auto-detect"
+msgstr "自動検出"
+
+msgid "Available presets:"
+msgstr "利用可能なプリセット:"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Cancelled"
+msgstr "キャンセルされました"
+
+msgid "Cancelling..."
+msgstr "キャンセル中..."
+
+msgid "Complete"
+msgstr "完了"
+
+msgid "Conversion"
+msgstr "変換"
+
+msgid "Conversion settings:"
+msgstr "変換設定:"
+
+msgid "Convert"
+msgstr "変換"
+
+msgid "Convert files"
+msgstr "ファイルを変換"
+
+msgid "Converting document..."
+msgstr "ドキュメントを変換中..."
+
+msgid "Converting to image..."
+msgstr "画像に変換中..."
+
+msgid "Converting..."
+msgstr "変換中..."
+
+msgid "Creating GIF..."
+msgstr "GIF を作成中..."
+
+msgid "Done"
+msgstr "完了"
+
+msgid "Done: {name} → {path}"
+msgstr "完了: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "音声を有効化"
+
+msgid "Encoding Speed"
+msgstr "エンコード速度"
+
+msgid "Error reading input file list: {error}"
+msgstr "入力ファイルリストの読み取りエラー: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "エラー: --conversion-preset が必要です。"
+
+msgid "Error: file not found: {path}"
+msgstr "エラー: ファイルが見つかりません: {path}"
+
+msgid "Error: no input files specified."
+msgstr "エラー: 入力ファイルが指定されていません。"
+
+msgid "Error: preset '{name}' not found."
+msgstr "エラー: プリセット「{name}」が見つかりません。"
+
+msgid "Exporting to PDF..."
+msgstr "PDF にエクスポート中..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "失敗: {name} — {error}"
+
+msgid "Failed"
+msgstr "失敗"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — プリセットを選択"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — 設定"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — 設定 (保存済)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — 設定 *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter はまだセットアップされていません。セットアップを実行中..."
+
+msgid "GPU accel:"
+msgstr "GPU 高速化:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "設定ウィンドウには GTK 4 が必要です。"
+
+msgid "GTK not available, running headless."
+msgstr "GTK が利用できません。ヘッドレスで実行します。"
+
+msgid "Global"
+msgstr "全般"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW 失敗、ソフトウェアで再試行中..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "ハードウェア高速化: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "画像品質 (0-100)"
+
+msgid "Image Scale"
+msgstr "画像スケール"
+
+msgid "Indexing colors"
+msgstr "色をインデックス化"
+
+msgid "Input types:"
+msgstr "入力形式:"
+
+msgid "Keep open"
+msgstr "開いたままにする"
+
+msgid "Max jobs:"
+msgstr "最大ジョブ数:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "名前:"
+
+msgid "New Preset"
+msgstr "新しいプリセット"
+
+msgid "No compatible presets"
+msgstr "互換性のあるプリセットがありません"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "選択されたすべてのファイル形式をサポートするプリセットがありません: {types}"
+
+msgid "Off"
+msgstr "オフ"
+
+msgid "Open settings"
+msgstr "設定を開く"
+
+msgid "Or right-click files in your file manager!"
+msgstr "またはファイルマネージャーでファイルを右クリックしてください!"
+
+msgid "Output template:"
+msgstr "出力テンプレート:"
+
+msgid "Output:"
+msgstr "出力:"
+
+msgid "Page {current}/{total}"
+msgstr "ページ {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "画像を準備中..."
+
+msgid "Preparing..."
+msgstr "準備中..."
+
+msgid "Presets"
+msgstr "プリセット"
+
+msgid "Queued..."
+msgstr "待機中..."
+
+msgid "Re-run setup"
+msgstr "セットアップを再実行"
+
+msgid "Remove"
+msgstr "削除"
+
+msgid "Remove integration"
+msgstr "統合を削除"
+
+msgid "Rotation (degrees)"
+msgstr "回転 (度)"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Select a preset to edit"
+msgstr "編集するプリセットを選択"
+
+msgid "Unknown error"
+msgstr "不明なエラー"
+
+msgid "Usage:"
+msgstr "使い方:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "変数: (p) パス, (f) ファイル名, (o) 出力拡張子, (i) 入力拡張子"
+
+msgid "Video Quality (0-63)"
+msgstr "動画品質 (0-63)"
+
+msgid "Video Scale"
+msgstr "動画スケール"
+
+msgid "Waiting..."
+msgstr "待機中..."
+
+msgid "{count} file selected"
+msgstr "{count} 個のファイルを選択"
+
+msgid "{count} files selected"
+msgstr "{count} 個のファイルを選択"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} 完了"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} 完了、{failed} 失敗"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "残り {minutes}分 {seconds}秒"
+
+msgid "{seconds}s remaining"
+msgstr "残り {seconds}秒"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — {seconds}秒後に閉じます"
+

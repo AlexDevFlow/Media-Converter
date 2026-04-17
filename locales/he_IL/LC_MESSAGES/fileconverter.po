@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: he_IL
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: he_IL\n"
+"Language: he_IL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "הוספה"
+
+msgid "After conversion:"
+msgstr "לאחר ההמרה:"
+
+msgid "Language:"
+msgstr "שפה:"
+
+msgid "System default"
+msgstr "ברירת מחדל של המערכת"
+
+msgid "System default ({name})"
+msgstr "ברירת מחדל של המערכת ({name})"
+
+msgid "Audio Bitrate"
+msgstr "קצב סיביות שמע"
+
+msgid "Auto-close when done"
+msgstr "סגירה אוטומטית בסיום"
+
+msgid "Auto-detect"
+msgstr "זיהוי אוטומטי"
+
+msgid "Available presets:"
+msgstr "הגדרות קבועות זמינות:"
+
+msgid "Cancel"
+msgstr "ביטול"
+
+msgid "Cancelled"
+msgstr "בוטל"
+
+msgid "Cancelling..."
+msgstr "מבטל..."
+
+msgid "Complete"
+msgstr "הושלם"
+
+msgid "Conversion"
+msgstr "המרה"
+
+msgid "Conversion settings:"
+msgstr "הגדרות המרה:"
+
+msgid "Convert"
+msgstr "המר"
+
+msgid "Convert files"
+msgstr "המרת קבצים"
+
+msgid "Converting document..."
+msgstr "ממיר מסמך..."
+
+msgid "Converting to image..."
+msgstr "ממיר לתמונה..."
+
+msgid "Converting..."
+msgstr "ממיר..."
+
+msgid "Creating GIF..."
+msgstr "יוצר GIF..."
+
+msgid "Done"
+msgstr "הושלם"
+
+msgid "Done: {name} → {path}"
+msgstr "הושלם: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "הפעלת שמע"
+
+msgid "Encoding Speed"
+msgstr "מהירות קידוד"
+
+msgid "Error reading input file list: {error}"
+msgstr "שגיאה בקריאת רשימת הקבצים: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "שגיאה: נדרש ‎--conversion-preset‎."
+
+msgid "Error: file not found: {path}"
+msgstr "שגיאה: קובץ לא נמצא: {path}"
+
+msgid "Error: no input files specified."
+msgstr "שגיאה: לא צוינו קבצי קלט."
+
+msgid "Error: preset '{name}' not found."
+msgstr "שגיאה: הגדרה קבועה ‎'{name}'‎ לא נמצאה."
+
+msgid "Exporting to PDF..."
+msgstr "מייצא ל-PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "נכשל: {name} — {error}"
+
+msgid "Failed"
+msgstr "נכשל"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — בחר הגדרה קבועה"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — הגדרות"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — הגדרות (נשמרו)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — הגדרות *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter עוד לא הותקן. מפעיל התקנה..."
+
+msgid "GPU accel:"
+msgstr "האצת GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "דרוש GTK 4 לחלון ההגדרות."
+
+msgid "GTK not available, running headless."
+msgstr "GTK לא זמין, פועל ללא ממשק."
+
+msgid "Global"
+msgstr "כללי"
+
+msgid "HW failed, retrying with software..."
+msgstr "חומרה נכשלה, מנסה שוב בתוכנה..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "האצת חומרה: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "איכות תמונה (0-100)"
+
+msgid "Image Scale"
+msgstr "קנה מידה של תמונה"
+
+msgid "Indexing colors"
+msgstr "מאנדקס צבעים"
+
+msgid "Input types:"
+msgstr "סוגי קלט:"
+
+msgid "Keep open"
+msgstr "השאר פתוח"
+
+msgid "Max jobs:"
+msgstr "מקס׳ משימות:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "שם:"
+
+msgid "New Preset"
+msgstr "הגדרה קבועה חדשה"
+
+msgid "No compatible presets"
+msgstr "אין הגדרות קבועות תואמות"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "אף הגדרה קבועה לא תומכת בכל סוגי הקבצים שנבחרו: {types}"
+
+msgid "Off"
+msgstr "כבוי"
+
+msgid "Open settings"
+msgstr "פתח הגדרות"
+
+msgid "Or right-click files in your file manager!"
+msgstr "או לחץ לחיצה ימנית על הקבצים במנהל הקבצים!"
+
+msgid "Output template:"
+msgstr "תבנית פלט:"
+
+msgid "Output:"
+msgstr "פלט:"
+
+msgid "Page {current}/{total}"
+msgstr "עמוד {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "מכין תמונה..."
+
+msgid "Preparing..."
+msgstr "מכין..."
+
+msgid "Presets"
+msgstr "הגדרות קבועות"
+
+msgid "Queued..."
+msgstr "בתור..."
+
+msgid "Re-run setup"
+msgstr "הפעל התקנה שוב"
+
+msgid "Remove"
+msgstr "הסר"
+
+msgid "Remove integration"
+msgstr "הסר אינטגרציה"
+
+msgid "Rotation (degrees)"
+msgstr "סיבוב (מעלות)"
+
+msgid "Save"
+msgstr "שמור"
+
+msgid "Select a preset to edit"
+msgstr "בחר הגדרה קבועה לעריכה"
+
+msgid "Unknown error"
+msgstr "שגיאה לא ידועה"
+
+msgid "Usage:"
+msgstr "שימוש:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "משתנים: (p) נתיב, (f) שם קובץ, (o) סיומת פלט, (i) סיומת קלט"
+
+msgid "Video Quality (0-63)"
+msgstr "איכות וידאו (0-63)"
+
+msgid "Video Scale"
+msgstr "קנה מידה של וידאו"
+
+msgid "Waiting..."
+msgstr "ממתין..."
+
+msgid "{count} file selected"
+msgstr "נבחר {count} קובץ"
+
+msgid "{count} files selected"
+msgstr "נבחרו {count} קבצים"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} הושלמו"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} הושלמו, {failed} נכשלו"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "נותרו {minutes}ד {seconds}ש"
+
+msgid "{seconds}s remaining"
+msgstr "נותרו {seconds}ש"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — נסגר בעוד {seconds}ש"
+

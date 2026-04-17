@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: ar_EG
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: ar_EG\n"
+"Language: ar_EG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "إضافة"
+
+msgid "After conversion:"
+msgstr "بعد التحويل:"
+
+msgid "Language:"
+msgstr "اللغة:"
+
+msgid "System default"
+msgstr "افتراضي النظام"
+
+msgid "System default ({name})"
+msgstr "افتراضي النظام ({name})"
+
+msgid "Audio Bitrate"
+msgstr "معدل بت الصوت"
+
+msgid "Auto-close when done"
+msgstr "إغلاق تلقائي عند الانتهاء"
+
+msgid "Auto-detect"
+msgstr "اكتشاف تلقائي"
+
+msgid "Available presets:"
+msgstr "الإعدادات المسبقة المتاحة:"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Cancelled"
+msgstr "أُلغي"
+
+msgid "Cancelling..."
+msgstr "جارٍ الإلغاء..."
+
+msgid "Complete"
+msgstr "اكتمل"
+
+msgid "Conversion"
+msgstr "تحويل"
+
+msgid "Conversion settings:"
+msgstr "إعدادات التحويل:"
+
+msgid "Convert"
+msgstr "تحويل"
+
+msgid "Convert files"
+msgstr "تحويل الملفات"
+
+msgid "Converting document..."
+msgstr "جارٍ تحويل المستند..."
+
+msgid "Converting to image..."
+msgstr "جارٍ التحويل إلى صورة..."
+
+msgid "Converting..."
+msgstr "جارٍ التحويل..."
+
+msgid "Creating GIF..."
+msgstr "جارٍ إنشاء GIF..."
+
+msgid "Done"
+msgstr "تم"
+
+msgid "Done: {name} → {path}"
+msgstr "تم: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "تمكين الصوت"
+
+msgid "Encoding Speed"
+msgstr "سرعة الترميز"
+
+msgid "Error reading input file list: {error}"
+msgstr "خطأ في قراءة قائمة الملفات: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "خطأ: ‎--conversion-preset‎ مطلوب."
+
+msgid "Error: file not found: {path}"
+msgstr "خطأ: لم يُعثر على الملف: {path}"
+
+msgid "Error: no input files specified."
+msgstr "خطأ: لم تُحدَّد ملفات الإدخال."
+
+msgid "Error: preset '{name}' not found."
+msgstr "خطأ: الإعداد المسبق ‎'{name}'‎ غير موجود."
+
+msgid "Exporting to PDF..."
+msgstr "جارٍ التصدير إلى PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "فشل: {name} — {error}"
+
+msgid "Failed"
+msgstr "فشل"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — اختر إعدادًا مسبقًا"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — الإعدادات"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — الإعدادات (محفوظة)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — الإعدادات *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "لم يُعَدّ File Converter بعد. جارٍ تشغيل الإعداد..."
+
+msgid "GPU accel:"
+msgstr "تسريع GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "يلزم GTK 4 لنافذة الإعدادات."
+
+msgid "GTK not available, running headless."
+msgstr "GTK غير متاح، يعمل بدون واجهة."
+
+msgid "Global"
+msgstr "عام"
+
+msgid "HW failed, retrying with software..."
+msgstr "فشل العتاد، إعادة المحاولة برمجيًا..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "تسريع العتاد: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "جودة الصورة (0-100)"
+
+msgid "Image Scale"
+msgstr "مقياس الصورة"
+
+msgid "Indexing colors"
+msgstr "فهرسة الألوان"
+
+msgid "Input types:"
+msgstr "أنواع الإدخال:"
+
+msgid "Keep open"
+msgstr "الإبقاء مفتوحًا"
+
+msgid "Max jobs:"
+msgstr "أقصى عدد مهام:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "الاسم:"
+
+msgid "New Preset"
+msgstr "إعداد مسبق جديد"
+
+msgid "No compatible presets"
+msgstr "لا إعدادات مسبقة متوافقة"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "لا يدعم أي إعداد مسبق جميع أنواع الملفات المختارة: {types}"
+
+msgid "Off"
+msgstr "معطّل"
+
+msgid "Open settings"
+msgstr "فتح الإعدادات"
+
+msgid "Or right-click files in your file manager!"
+msgstr "أو انقر بزر الفأرة الأيمن على الملفات في مدير الملفات!"
+
+msgid "Output template:"
+msgstr "قالب الإخراج:"
+
+msgid "Output:"
+msgstr "الإخراج:"
+
+msgid "Page {current}/{total}"
+msgstr "الصفحة {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "جارٍ تجهيز الصورة..."
+
+msgid "Preparing..."
+msgstr "جارٍ التجهيز..."
+
+msgid "Presets"
+msgstr "الإعدادات المسبقة"
+
+msgid "Queued..."
+msgstr "في الانتظار..."
+
+msgid "Re-run setup"
+msgstr "إعادة تشغيل الإعداد"
+
+msgid "Remove"
+msgstr "إزالة"
+
+msgid "Remove integration"
+msgstr "إزالة التكامل"
+
+msgid "Rotation (degrees)"
+msgstr "الدوران (درجات)"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Select a preset to edit"
+msgstr "اختر إعدادًا مسبقًا للتحرير"
+
+msgid "Unknown error"
+msgstr "خطأ غير معروف"
+
+msgid "Usage:"
+msgstr "الاستخدام:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "المتغيرات: (p) المسار، (f) اسم الملف، (o) امتداد الإخراج، (i) امتداد الإدخال"
+
+msgid "Video Quality (0-63)"
+msgstr "جودة الفيديو (0-63)"
+
+msgid "Video Scale"
+msgstr "مقياس الفيديو"
+
+msgid "Waiting..."
+msgstr "في الانتظار..."
+
+msgid "{count} file selected"
+msgstr "تم تحديد {count} ملف"
+
+msgid "{count} files selected"
+msgstr "تم تحديد {count} ملف"
+
+msgid "{done}/{total} completed"
+msgstr "اكتمل {done}/{total}"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "اكتمل {done}/{total}، فشل {failed}"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "متبقّي {minutes}د {seconds}ث"
+
+msgid "{seconds}s remaining"
+msgstr "متبقّي {seconds}ث"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — الإغلاق بعد {seconds}ث"
+

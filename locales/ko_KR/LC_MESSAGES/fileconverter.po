@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: ko_KR
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: ko_KR\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "추가"
+
+msgid "After conversion:"
+msgstr "변환 후:"
+
+msgid "Language:"
+msgstr "언어:"
+
+msgid "System default"
+msgstr "시스템 기본값"
+
+msgid "System default ({name})"
+msgstr "시스템 기본값 ({name})"
+
+msgid "Audio Bitrate"
+msgstr "오디오 비트레이트"
+
+msgid "Auto-close when done"
+msgstr "완료 시 자동으로 닫기"
+
+msgid "Auto-detect"
+msgstr "자동 감지"
+
+msgid "Available presets:"
+msgstr "사용 가능한 프리셋:"
+
+msgid "Cancel"
+msgstr "취소"
+
+msgid "Cancelled"
+msgstr "취소됨"
+
+msgid "Cancelling..."
+msgstr "취소 중..."
+
+msgid "Complete"
+msgstr "완료"
+
+msgid "Conversion"
+msgstr "변환"
+
+msgid "Conversion settings:"
+msgstr "변환 설정:"
+
+msgid "Convert"
+msgstr "변환"
+
+msgid "Convert files"
+msgstr "파일 변환"
+
+msgid "Converting document..."
+msgstr "문서 변환 중..."
+
+msgid "Converting to image..."
+msgstr "이미지로 변환 중..."
+
+msgid "Converting..."
+msgstr "변환 중..."
+
+msgid "Creating GIF..."
+msgstr "GIF 생성 중..."
+
+msgid "Done"
+msgstr "완료"
+
+msgid "Done: {name} → {path}"
+msgstr "완료: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "오디오 활성화"
+
+msgid "Encoding Speed"
+msgstr "인코딩 속도"
+
+msgid "Error reading input file list: {error}"
+msgstr "입력 파일 목록 읽기 오류: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "오류: --conversion-preset가 필요합니다."
+
+msgid "Error: file not found: {path}"
+msgstr "오류: 파일을 찾을 수 없음: {path}"
+
+msgid "Error: no input files specified."
+msgstr "오류: 입력 파일이 지정되지 않았습니다."
+
+msgid "Error: preset '{name}' not found."
+msgstr "오류: 프리셋 '{name}'을(를) 찾을 수 없습니다."
+
+msgid "Exporting to PDF..."
+msgstr "PDF로 내보내는 중..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "실패: {name} — {error}"
+
+msgid "Failed"
+msgstr "실패"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — 프리셋 선택"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — 설정"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — 설정 (저장됨)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — 설정 *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter가 아직 설정되지 않았습니다. 설정을 실행 중..."
+
+msgid "GPU accel:"
+msgstr "GPU 가속:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "설정 창에는 GTK 4가 필요합니다."
+
+msgid "GTK not available, running headless."
+msgstr "GTK를 사용할 수 없어 헤드리스로 실행합니다."
+
+msgid "Global"
+msgstr "일반"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW 실패, 소프트웨어로 재시도 중..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "하드웨어 가속: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "이미지 품질 (0-100)"
+
+msgid "Image Scale"
+msgstr "이미지 배율"
+
+msgid "Indexing colors"
+msgstr "색상 인덱싱"
+
+msgid "Input types:"
+msgstr "입력 형식:"
+
+msgid "Keep open"
+msgstr "열어두기"
+
+msgid "Max jobs:"
+msgstr "최대 작업:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "이름:"
+
+msgid "New Preset"
+msgstr "새 프리셋"
+
+msgid "No compatible presets"
+msgstr "호환되는 프리셋이 없습니다"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "선택된 모든 파일 형식을 지원하는 프리셋이 없습니다: {types}"
+
+msgid "Off"
+msgstr "끔"
+
+msgid "Open settings"
+msgstr "설정 열기"
+
+msgid "Or right-click files in your file manager!"
+msgstr "또는 파일 관리자에서 파일을 마우스 오른쪽 클릭하세요!"
+
+msgid "Output template:"
+msgstr "출력 템플릿:"
+
+msgid "Output:"
+msgstr "출력:"
+
+msgid "Page {current}/{total}"
+msgstr "{current}/{total} 페이지"
+
+msgid "Preparing image..."
+msgstr "이미지 준비 중..."
+
+msgid "Preparing..."
+msgstr "준비 중..."
+
+msgid "Presets"
+msgstr "프리셋"
+
+msgid "Queued..."
+msgstr "대기 중..."
+
+msgid "Re-run setup"
+msgstr "설정 다시 실행"
+
+msgid "Remove"
+msgstr "제거"
+
+msgid "Remove integration"
+msgstr "통합 제거"
+
+msgid "Rotation (degrees)"
+msgstr "회전 (도)"
+
+msgid "Save"
+msgstr "저장"
+
+msgid "Select a preset to edit"
+msgstr "편집할 프리셋 선택"
+
+msgid "Unknown error"
+msgstr "알 수 없는 오류"
+
+msgid "Usage:"
+msgstr "사용법:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "변수: (p) 경로, (f) 파일명, (o) 출력 확장자, (i) 입력 확장자"
+
+msgid "Video Quality (0-63)"
+msgstr "비디오 품질 (0-63)"
+
+msgid "Video Scale"
+msgstr "비디오 배율"
+
+msgid "Waiting..."
+msgstr "대기 중..."
+
+msgid "{count} file selected"
+msgstr "{count}개 파일 선택됨"
+
+msgid "{count} files selected"
+msgstr "{count}개 파일 선택됨"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} 완료"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} 완료, {failed} 실패"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "{minutes}분 {seconds}초 남음"
+
+msgid "{seconds}s remaining"
+msgstr "{seconds}초 남음"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — {seconds}초 후 종료"
+

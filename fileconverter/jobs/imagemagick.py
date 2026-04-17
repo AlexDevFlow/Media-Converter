@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 
+from fileconverter.i18n import _
 from fileconverter.integration.install import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.presets import ConversionPreset
@@ -71,7 +72,7 @@ class ImageMagickJob(ConversionJob):
         for i, out_path in enumerate(self.output_paths):
             if self.cancel_requested:
                 return
-            self.user_state = f"Page {i + 1}/{num_pages}"
+            self.user_state = _("Page {current}/{total}").format(current=i + 1, total=num_pages)
             self.progress = i / num_pages
 
             args = [self._convert_cmd]

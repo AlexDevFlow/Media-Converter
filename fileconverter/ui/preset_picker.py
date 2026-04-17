@@ -15,6 +15,9 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw
 
+from fileconverter import i18n
+from fileconverter.i18n import _
+
 
 def _find_fileconverter():
     for path in [
@@ -30,7 +33,7 @@ def _find_fileconverter():
 
 class PresetPickerWindow(Gtk.ApplicationWindow):
     def __init__(self, app, file_paths: list[str], presets: list[dict]):
-        super().__init__(application=app, title="File Converter — Select Preset",
+        super().__init__(application=app, title=_("File Converter — Select Preset"),
                          default_width=400, default_height=500)
         self.file_paths = file_paths
         self.presets = presets
@@ -42,8 +45,12 @@ class PresetPickerWindow(Gtk.ApplicationWindow):
 
         # Info label
         n = len(file_paths)
+        if n == 1:
+            info_text = _("{count} file selected").format(count=n)
+        else:
+            info_text = _("{count} files selected").format(count=n)
         info = Gtk.Label(
-            label=f"{n} file{'s' if n > 1 else ''} selected",
+            label=info_text,
             margin_start=12, margin_end=12, margin_top=12, margin_bottom=8,
         )
         info.add_css_class("dim-label")
@@ -88,7 +95,7 @@ class PresetPickerWindow(Gtk.ApplicationWindow):
             out_label.add_css_class("dim-label")
             row.append(out_label)
 
-            btn = Gtk.Button(label="Convert")
+            btn = Gtk.Button(label=_("Convert"))
             btn.add_css_class("suggested-action")
             btn.connect("clicked", self._on_convert, name)
             row.append(btn)
@@ -114,15 +121,15 @@ class PickerApp(Adw.Application):
         self.connect("activate", self._on_activate)
 
     def _on_activate(self, _app):
-        extensions = set()
-        for f in self.file_paths:
-            _, ext = os.path.splitext(f)
-            if ext:
-                extensions.add(ext.lower().lstrip("."))
-
-        # Load presets
         from fileconverter.config import load_settings
         settings = load_settings()
+        i18n.init(settings.language)
+
+        extensions = set()
+        for f in self.file_paths:
+            ext = os.path.splitext(f)[1]
+            if ext:
+                extensions.add(ext.lower().lstrip("."))
         compatible = []
         for p in settings.presets:
             if all(ext in p.input_types for ext in extensions):
@@ -130,8 +137,9 @@ class PickerApp(Adw.Application):
 
         if not compatible:
             dialog = Gtk.AlertDialog()
-            dialog.set_message("No compatible presets")
-            dialog.set_detail(f"No presets support all selected file types: {', '.join(sorted(extensions))}")
+            dialog.set_message(_("No compatible presets"))
+            dialog.set_detail(_("No presets support all selected file types: {types}").format(
+                types=", ".join(sorted(extensions))))
             dialog.show(None)
             return
 

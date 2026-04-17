@@ -1,0 +1,381 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the fileconverter package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-17 21:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: fileconverter/cli.py:51
+#, python-brace-format
+msgid "Error reading input file list: {error}"
+msgstr ""
+
+#: fileconverter/cli.py:74
+#, python-brace-format
+msgid "FAILED: {name} — {error}"
+msgstr ""
+
+#: fileconverter/cli.py:79
+#, python-brace-format
+msgid "Done: {name} → {path}"
+msgstr ""
+
+#: fileconverter/cli.py:114
+msgid "GTK 4 is required for the settings window."
+msgstr ""
+
+#: fileconverter/cli.py:122
+msgid "File Converter is not set up yet. Running setup..."
+msgstr ""
+
+#: fileconverter/cli.py:130
+msgid "Usage:"
+msgstr ""
+
+#: fileconverter/cli.py:131
+msgid "Convert files"
+msgstr ""
+
+#: fileconverter/cli.py:132
+msgid "Open settings"
+msgstr ""
+
+#: fileconverter/cli.py:133
+msgid "Re-run setup"
+msgstr ""
+
+#: fileconverter/cli.py:134
+msgid "Remove integration"
+msgstr ""
+
+#: fileconverter/cli.py:136
+msgid "Or right-click files in your file manager!"
+msgstr ""
+
+#: fileconverter/cli.py:140
+msgid "Error: --conversion-preset is required."
+msgstr ""
+
+#: fileconverter/cli.py:146
+msgid "Error: no input files specified."
+msgstr ""
+
+#: fileconverter/cli.py:151
+#, python-brace-format
+msgid "Error: file not found: {path}"
+msgstr ""
+
+#: fileconverter/cli.py:162
+#, python-brace-format
+msgid "Error: preset '{name}' not found."
+msgstr ""
+
+#: fileconverter/cli.py:163
+msgid "Available presets:"
+msgstr ""
+
+#: fileconverter/cli.py:172
+#, python-brace-format
+msgid "Hardware acceleration: {mode}"
+msgstr ""
+
+#: fileconverter/cli.py:181
+msgid "GTK not available, running headless."
+msgstr ""
+
+#: fileconverter/jobs/base.py:34
+msgid "Preparing..."
+msgstr ""
+
+#: fileconverter/jobs/base.py:80
+msgid "Converting..."
+msgstr ""
+
+#: fileconverter/jobs/base.py:85
+msgid "Cancelled"
+msgstr ""
+
+#: fileconverter/jobs/base.py:90
+msgid "Done"
+msgstr ""
+
+#: fileconverter/jobs/base.py:95 fileconverter/jobs/base.py:154
+#: fileconverter/ui/progress_window.py:93
+msgid "Failed"
+msgstr ""
+
+#: fileconverter/jobs/ffmpeg.py:168 fileconverter/jobs/ffmpeg.py:198
+#: fileconverter/jobs/ffmpeg.py:248 fileconverter/jobs/ffmpeg.py:263
+#: fileconverter/jobs/ffmpeg.py:268 fileconverter/jobs/ffmpeg.py:289
+#: fileconverter/jobs/ffmpeg.py:301 fileconverter/jobs/ffmpeg.py:351
+#: fileconverter/jobs/ffmpeg.py:359 fileconverter/jobs/ffmpeg.py:372
+#: fileconverter/jobs/ffmpeg.py:379 fileconverter/jobs/ffmpeg.py:396
+msgid "Conversion"
+msgstr ""
+
+#: fileconverter/jobs/ffmpeg.py:281
+msgid "Indexing colors"
+msgstr ""
+
+#: fileconverter/jobs/ffmpeg.py:405
+msgid "HW failed, retrying with software..."
+msgstr ""
+
+#: fileconverter/jobs/gif.py:30
+msgid "Preparing image..."
+msgstr ""
+
+#: fileconverter/jobs/gif.py:51 fileconverter/jobs/gif.py:63
+msgid "Creating GIF..."
+msgstr ""
+
+#: fileconverter/jobs/imagemagick.py:75
+#, python-brace-format
+msgid "Page {current}/{total}"
+msgstr ""
+
+#: fileconverter/jobs/libreoffice.py:42
+msgid "Converting document..."
+msgstr ""
+
+#: fileconverter/jobs/libreoffice.py:67
+msgid "Exporting to PDF..."
+msgstr ""
+
+#: fileconverter/jobs/libreoffice.py:87
+msgid "Converting to image..."
+msgstr ""
+
+#: fileconverter/ui/preset_picker.py:36
+msgid "File Converter — Select Preset"
+msgstr ""
+
+#: fileconverter/ui/preset_picker.py:49
+#, python-brace-format
+msgid "{count} file selected"
+msgstr ""
+
+#: fileconverter/ui/preset_picker.py:51
+#, python-brace-format
+msgid "{count} files selected"
+msgstr ""
+
+#: fileconverter/ui/preset_picker.py:98
+msgid "Convert"
+msgstr ""
+
+#: fileconverter/ui/preset_picker.py:140
+msgid "No compatible presets"
+msgstr ""
+
+#: fileconverter/ui/preset_picker.py:141
+#, python-brace-format
+msgid "No presets support all selected file types: {types}"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:43
+msgid "Cancel"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:54
+msgid "Waiting..."
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:64
+msgid "Cancelling..."
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:78
+#, python-brace-format
+msgid "{seconds}s remaining"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:80
+#, python-brace-format
+msgid "{minutes}m {seconds}s remaining"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:88
+msgid "Complete"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:94
+msgid "Unknown error"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:98
+msgid "Queued..."
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:130
+msgid "Keep open"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:203
+#, python-brace-format
+msgid "{done}/{total} completed, {failed} failed"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:205
+#, python-brace-format
+msgid "{done}/{total} completed"
+msgstr ""
+
+#: fileconverter/ui/progress_window.py:210
+#, python-brace-format
+msgid "{status} — closing in {seconds}s"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:32
+msgid "Name:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:40
+msgid "Output:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:49
+msgid "Input types:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:63
+msgid "Conversion settings:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:70
+msgid "Video Quality (0-63)"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:71
+msgid "Encoding Speed"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:72
+msgid "Video Scale"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:73
+msgid "Rotation (degrees)"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:74
+msgid "Audio Bitrate"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:75
+msgid "Image Quality (0-100)"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:76
+msgid "Image Scale"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:77
+msgid "Enable Audio"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:110
+msgid "After conversion:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:121
+msgid "Output template:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:123
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:174
+#: fileconverter/ui/settings_window.py:373
+msgid "File Converter — Settings"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:182
+msgid "Save"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:196
+msgid "Global"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:219
+msgid "Max jobs:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:222
+msgid "Auto-close when done"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:228
+msgid "Auto-detect"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:228
+msgid "NVENC (NVIDIA)"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:228
+msgid "Off"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:228
+msgid "VAAPI (AMD/Intel)"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:233
+msgid "GPU accel:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:239
+#, python-brace-format
+msgid "System default ({name})"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:240
+msgid "System default"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:252
+msgid "Language:"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:258
+msgid "Presets"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:271
+msgid "Add"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:274
+msgid "Remove"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:286
+msgid "Select a preset to edit"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:318
+msgid "New Preset"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:372
+msgid "File Converter — Settings (saved)"
+msgstr ""
+
+#: fileconverter/ui/settings_window.py:377
+msgid "File Converter — Settings *"
+msgstr ""

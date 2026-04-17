@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: vi_VN
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: vi_VN\n"
+"Language: vi_VN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Thêm"
+
+msgid "After conversion:"
+msgstr "Sau khi chuyển đổi:"
+
+msgid "Language:"
+msgstr "Ngôn ngữ:"
+
+msgid "System default"
+msgstr "Mặc định của hệ thống"
+
+msgid "System default ({name})"
+msgstr "Mặc định của hệ thống ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Tốc độ bit âm thanh"
+
+msgid "Auto-close when done"
+msgstr "Tự động đóng khi hoàn tất"
+
+msgid "Auto-detect"
+msgstr "Tự động phát hiện"
+
+msgid "Available presets:"
+msgstr "Các bộ cài đặt sẵn:"
+
+msgid "Cancel"
+msgstr "Hủy"
+
+msgid "Cancelled"
+msgstr "Đã hủy"
+
+msgid "Cancelling..."
+msgstr "Đang hủy..."
+
+msgid "Complete"
+msgstr "Hoàn tất"
+
+msgid "Conversion"
+msgstr "Chuyển đổi"
+
+msgid "Conversion settings:"
+msgstr "Cài đặt chuyển đổi:"
+
+msgid "Convert"
+msgstr "Chuyển đổi"
+
+msgid "Convert files"
+msgstr "Chuyển đổi tệp"
+
+msgid "Converting document..."
+msgstr "Đang chuyển đổi tài liệu..."
+
+msgid "Converting to image..."
+msgstr "Đang chuyển thành hình ảnh..."
+
+msgid "Converting..."
+msgstr "Đang chuyển đổi..."
+
+msgid "Creating GIF..."
+msgstr "Đang tạo GIF..."
+
+msgid "Done"
+msgstr "Xong"
+
+msgid "Done: {name} → {path}"
+msgstr "Xong: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Bật âm thanh"
+
+msgid "Encoding Speed"
+msgstr "Tốc độ mã hóa"
+
+msgid "Error reading input file list: {error}"
+msgstr "Lỗi đọc danh sách tệp: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Lỗi: cần --conversion-preset."
+
+msgid "Error: file not found: {path}"
+msgstr "Lỗi: không tìm thấy tệp: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Lỗi: chưa chỉ định tệp đầu vào."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Lỗi: không tìm thấy bộ cài đặt '{name}'."
+
+msgid "Exporting to PDF..."
+msgstr "Đang xuất sang PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "THẤT BẠI: {name} — {error}"
+
+msgid "Failed"
+msgstr "Thất bại"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Chọn bộ cài đặt"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Cài đặt"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Cài đặt (đã lưu)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Cài đặt *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter chưa được cài đặt. Đang chạy cài đặt..."
+
+msgid "GPU accel:"
+msgstr "Tăng tốc GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "Cần GTK 4 cho cửa sổ cài đặt."
+
+msgid "GTK not available, running headless."
+msgstr "Không có GTK, chạy ở chế độ không giao diện."
+
+msgid "Global"
+msgstr "Chung"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW thất bại, thử lại bằng phần mềm..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Tăng tốc phần cứng: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Chất lượng hình ảnh (0-100)"
+
+msgid "Image Scale"
+msgstr "Tỉ lệ hình ảnh"
+
+msgid "Indexing colors"
+msgstr "Đang lập chỉ mục màu"
+
+msgid "Input types:"
+msgstr "Loại đầu vào:"
+
+msgid "Keep open"
+msgstr "Giữ mở"
+
+msgid "Max jobs:"
+msgstr "Tối đa:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Tên:"
+
+msgid "New Preset"
+msgstr "Bộ cài đặt mới"
+
+msgid "No compatible presets"
+msgstr "Không có bộ cài đặt tương thích"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Không có bộ cài đặt nào hỗ trợ tất cả loại tệp đã chọn: {types}"
+
+msgid "Off"
+msgstr "Tắt"
+
+msgid "Open settings"
+msgstr "Mở cài đặt"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Hoặc nhấp chuột phải vào tệp trong trình quản lý tệp!"
+
+msgid "Output template:"
+msgstr "Mẫu đầu ra:"
+
+msgid "Output:"
+msgstr "Đầu ra:"
+
+msgid "Page {current}/{total}"
+msgstr "Trang {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Đang chuẩn bị hình ảnh..."
+
+msgid "Preparing..."
+msgstr "Đang chuẩn bị..."
+
+msgid "Presets"
+msgstr "Bộ cài đặt"
+
+msgid "Queued..."
+msgstr "Trong hàng đợi..."
+
+msgid "Re-run setup"
+msgstr "Chạy lại cài đặt"
+
+msgid "Remove"
+msgstr "Xóa"
+
+msgid "Remove integration"
+msgstr "Gỡ tích hợp"
+
+msgid "Rotation (degrees)"
+msgstr "Xoay (độ)"
+
+msgid "Save"
+msgstr "Lưu"
+
+msgid "Select a preset to edit"
+msgstr "Chọn một bộ cài đặt để chỉnh sửa"
+
+msgid "Unknown error"
+msgstr "Lỗi không xác định"
+
+msgid "Usage:"
+msgstr "Cách dùng:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Biến: (p) đường dẫn, (f) tên tệp, (o) đuôi đầu ra, (i) đuôi đầu vào"
+
+msgid "Video Quality (0-63)"
+msgstr "Chất lượng video (0-63)"
+
+msgid "Video Scale"
+msgstr "Tỉ lệ video"
+
+msgid "Waiting..."
+msgstr "Đang chờ..."
+
+msgid "{count} file selected"
+msgstr "Đã chọn {count} tệp"
+
+msgid "{count} files selected"
+msgstr "Đã chọn {count} tệp"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} hoàn tất"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} hoàn tất, {failed} thất bại"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Còn {minutes}p {seconds}s"
+
+msgid "{seconds}s remaining"
+msgstr "Còn {seconds}s"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — đóng sau {seconds}s"
+

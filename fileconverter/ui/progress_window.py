@@ -12,6 +12,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Gtk, GLib, Adw, Pango
 
 from fileconverter.config import Settings
+from fileconverter.i18n import _
 from fileconverter.jobs.base import ConversionJob, ConversionState
 
 
@@ -39,7 +40,7 @@ class JobRow(Gtk.Box):
         self.output_label.add_css_class("dim-label")
         top.append(self.output_label)
 
-        self.cancel_btn = Gtk.Button(label="Cancel")
+        self.cancel_btn = Gtk.Button(label=_("Cancel"))
         self.cancel_btn.add_css_class("destructive-action")
         self.cancel_btn.connect("clicked", self._on_cancel)
         top.append(self.cancel_btn)
@@ -50,7 +51,7 @@ class JobRow(Gtk.Box):
         self.append(self.progress_bar)
 
         # Status row
-        self.status_label = Gtk.Label(label="Waiting...", xalign=0)
+        self.status_label = Gtk.Label(label=_("Waiting..."), xalign=0)
         self.status_label.add_css_class("dim-label")
         self.append(self.status_label)
 
@@ -60,7 +61,7 @@ class JobRow(Gtk.Box):
     def _on_cancel(self, _btn):
         self.job.request_cancel()
         self.cancel_btn.set_sensitive(False)
-        self.cancel_btn.set_label("Cancelling...")
+        self.cancel_btn.set_label(_("Cancelling..."))
 
     def update(self) -> None:
         """Update UI from job state. Must be called on the GTK main thread."""
@@ -74,26 +75,27 @@ class JobRow(Gtk.Box):
             if progress > 0.01 and elapsed > 1:
                 eta = (elapsed / progress) * (1 - progress)
                 if eta < 60:
-                    eta_str = f"{int(eta)}s remaining"
+                    eta_str = _("{seconds}s remaining").format(seconds=int(eta))
                 else:
-                    eta_str = f"{int(eta // 60)}m {int(eta % 60)}s remaining"
+                    eta_str = _("{minutes}m {seconds}s remaining").format(
+                        minutes=int(eta // 60), seconds=int(eta % 60))
                 self.progress_bar.set_text(f"{progress * 100:.0f}% — {eta_str}")
             else:
                 self.progress_bar.set_text(f"{progress * 100:.0f}%")
             self.status_label.set_label(self.job.user_state)
         elif state == ConversionState.DONE:
             self.progress_bar.set_fraction(1.0)
-            self.progress_bar.set_text("Complete")
+            self.progress_bar.set_text(_("Complete"))
             self.status_label.set_label(f"→ {os.path.basename(self.job.output_path)}")
             self.cancel_btn.set_visible(False)
             self.progress_bar.add_css_class("success")
         elif state == ConversionState.FAILED:
-            self.progress_bar.set_text("Failed")
-            self.status_label.set_label(self.job.error_message or "Unknown error")
+            self.progress_bar.set_text(_("Failed"))
+            self.status_label.set_label(self.job.error_message or _("Unknown error"))
             self.cancel_btn.set_visible(False)
             self.progress_bar.add_css_class("error")
         elif state == ConversionState.READY:
-            self.status_label.set_label("Queued...")
+            self.status_label.set_label(_("Queued..."))
 
 
 class ProgressWindow(Gtk.ApplicationWindow):
@@ -125,7 +127,7 @@ class ProgressWindow(Gtk.ApplicationWindow):
         self.bottom_bar.set_margin_top(8)
         self.auto_close_label = Gtk.Label(label="", xalign=0, hexpand=True)
         self.bottom_bar.append(self.auto_close_label)
-        self.cancel_close_btn = Gtk.Button(label="Keep open")
+        self.cancel_close_btn = Gtk.Button(label=_("Keep open"))
         self.cancel_close_btn.connect("clicked", self._cancel_auto_close)
         self.cancel_close_btn.set_visible(False)
         self.bottom_bar.append(self.cancel_close_btn)
@@ -193,27 +195,27 @@ class ProgressWindow(Gtk.ApplicationWindow):
         self._update_close_label()
         return True
 
-    def _update_close_label(self) -> None:
+    def _summary_status(self) -> str:
         failed = sum(1 for j in self.jobs if j.state == ConversionState.FAILED)
         done = sum(1 for j in self.jobs if j.state == ConversionState.DONE)
         total = len(self.jobs)
-        status = f"{done}/{total} completed"
         if failed:
-            status += f", {failed} failed"
-        self.auto_close_label.set_label(f"{status} — closing in {self._auto_close_seconds}s")
+            return _("{done}/{total} completed, {failed} failed").format(
+                done=done, total=total, failed=failed)
+        return _("{done}/{total} completed").format(done=done, total=total)
+
+    def _update_close_label(self) -> None:
+        status = self._summary_status()
+        self.auto_close_label.set_label(
+            _("{status} — closing in {seconds}s").format(
+                status=status, seconds=self._auto_close_seconds))
 
     def _cancel_auto_close(self, _btn=None) -> None:
         if self._auto_close_id is not None:
             GLib.source_remove(self._auto_close_id)
             self._auto_close_id = None
         self.cancel_close_btn.set_visible(False)
-        failed = sum(1 for j in self.jobs if j.state == ConversionState.FAILED)
-        done = sum(1 for j in self.jobs if j.state == ConversionState.DONE)
-        total = len(self.jobs)
-        status = f"{done}/{total} completed"
-        if failed:
-            status += f", {failed} failed"
-        self.auto_close_label.set_label(status)
+        self.auto_close_label.set_label(self._summary_status())
 
 
 class ConverterApp(Adw.Application):

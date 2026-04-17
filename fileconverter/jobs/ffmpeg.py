@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass
 
+from fileconverter.i18n import _
 from fileconverter.integration.install import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.path_helpers import generate_unique_path
@@ -164,7 +165,7 @@ class FFmpegJob(ConversionJob):
             custom_cmd = preset.get_setting("ffmpeg_custom_command", "")
             if custom_cmd:
                 args = base + ["-i", self.input_path] + custom_cmd.split() + [self.output_path]
-                self._passes.append(_FFmpegPass("Conversion", args))
+                self._passes.append(_FFmpegPass(_("Conversion"), args))
                 return
 
         out_type = preset.output_type
@@ -194,7 +195,7 @@ class FFmpegJob(ConversionJob):
         else:
             # Generic passthrough attempt
             args = base + ["-i", self.input_path, self.output_path]
-            self._passes.append(_FFmpegPass("Conversion", args))
+            self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     # --- Audio channel args ---
     def _channel_args(self) -> list[str]:
@@ -244,7 +245,7 @@ class FFmpegJob(ConversionJob):
         args = base + ["-i", self.input_path, "-c:a", "aac", "-q:a", str(q)]
         args += self._channel_args()
         args += ["-write_apetag", "1", self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_avi(self, base: list[str]) -> None:
         vq = self.preset.get_setting_int("video_quality", 15)
@@ -259,12 +260,12 @@ class FFmpegJob(ConversionJob):
         args = base + ["-i", self.input_path, "-c:v", "mpeg4", "-vtag", "xvid",
                         "-qscale:v", str(mpeg4q)] + audio + vf
         args += ["-id3v2_version", "3", "-write_id3v1", "1", self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_flac(self, base: list[str]) -> None:
         args = base + ["-i", self.input_path, "-compression_level", "12"]
         args += self._channel_args() + [self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_gif(self, base: list[str]) -> None:
         """Two-pass GIF with palette generation."""
@@ -277,7 +278,7 @@ class FFmpegJob(ConversionJob):
         )
         # Pass 1: palette
         args1 = base + ["-i", self.input_path, "-vf", f"{tf_fps},palettegen", palette]
-        self._passes.append(_FFmpegPass("Indexing colors", args1))
+        self._passes.append(_FFmpegPass(_("Indexing colors"), args1))
         # Pass 2: gif
         args2 = base + ["-i", self.input_path, "-i", palette,
                          "-lavfi", f"{tf_fps},paletteuse", self.output_path]
@@ -285,7 +286,7 @@ class FFmpegJob(ConversionJob):
 
     def _build_ico(self, base: list[str]) -> None:
         args = base + ["-i", self.input_path, self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_mp3(self, base: list[str]) -> None:
         mode = self.preset.get_setting("audio_encoding_mode", "mp3vbr").lower()
@@ -297,7 +298,7 @@ class FFmpegJob(ConversionJob):
             enc = ["-codec:a", "libmp3lame", "-q:a", str(q)]
         args = base + ["-i", self.input_path] + enc + self._channel_args()
         args += ["-id3v2_version", "3", "-write_id3v1", "1", self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_h264(self, base: list[str]) -> None:
         vq = self.preset.get_setting_int("video_quality", 28)
@@ -347,7 +348,7 @@ class FFmpegJob(ConversionJob):
             codec_args = ["-c:v", "libx264", "-preset", speed, "-crf", str(crf)]
 
         args = base + hw_input_args + ["-i", self.input_path] + codec_args + audio + vf + [self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_ogg(self, base: list[str]) -> None:
         bitrate = self.preset.get_setting_int("audio_bitrate", 128)
@@ -355,7 +356,7 @@ class FFmpegJob(ConversionJob):
         args = base + ["-i", self.input_path, "-vn",
                         "-codec:a", "libvorbis", "-qscale:a", str(q)]
         args += self._channel_args() + [self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_ogv(self, base: list[str]) -> None:
         vq = self.preset.get_setting_int("video_quality", 7)
@@ -368,14 +369,14 @@ class FFmpegJob(ConversionJob):
         args = base + ["-i", self.input_path,
                         "-codec:v", "libtheora", "-qscale:v", str(vq)] + audio + vf
         args += [self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_wav(self, base: list[str]) -> None:
         mode = self.preset.get_setting("audio_encoding_mode", "wav16").lower()
         codec = _WAV_CODEC_MAP.get(mode, "pcm_s16le")
         args = base + ["-i", self.input_path, "-acodec", codec]
         args += self._channel_args() + [self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_webm(self, base: list[str]) -> None:
         vq = self.preset.get_setting_int("video_quality", 30)
@@ -392,7 +393,7 @@ class FFmpegJob(ConversionJob):
             audio = ["-c:a", "libvorbis", "-qscale:a", str(ogg_q)]
         args = base + ["-i", self.input_path, "-c:v", "libvpx-vp9"] + enc + audio + vf
         args += [self.output_path]
-        self._passes.append(_FFmpegPass("Conversion", args))
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     # --- Execution ---
     def _convert(self) -> None:
@@ -401,7 +402,7 @@ class FFmpegJob(ConversionJob):
         except RuntimeError:
             if self._hw_accel != "off" and not self.cancel_requested:
                 # Hardware encoding failed — fall back to software and retry
-                self.user_state = "HW failed, retrying with software..."
+                self.user_state = _("HW failed, retrying with software...")
                 self.progress = 0.0
                 self._duration_seconds = 0.0
                 self._hw_accel = "off"

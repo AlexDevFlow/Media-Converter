@@ -9,11 +9,35 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# Test / coverage / lint caches
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
 # PyInstaller (fileconverter.spec is tracked — needed for CI)
+
+# Translation catalogs: .po and .mo are committed so end users get a working
+# build without needing gettext tools installed. Ignore only backup files
+# produced by xgettext/msgmerge.
+locales/*.pot~
+locales/*.po~
+locales/**/*.po~
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store

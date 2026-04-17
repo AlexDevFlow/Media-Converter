@@ -10,6 +10,8 @@ from gi.repository import Gtk, Adw, GLib
 
 from fileconverter.config import load_settings, save_settings, Settings, HWACCEL_MODES
 from fileconverter.helpers import ALL_INPUT_EXTENSIONS, OUTPUT_TYPES
+from fileconverter import i18n
+from fileconverter.i18n import _
 from fileconverter.presets import ConversionPreset
 
 
@@ -27,7 +29,7 @@ class PresetEditor(Gtk.Box):
 
         # Name
         name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        name_box.append(Gtk.Label(label="Name:", xalign=0))
+        name_box.append(Gtk.Label(label=_("Name:"), xalign=0))
         self.name_entry = Gtk.Entry(text=preset.name, hexpand=True)
         self.name_entry.connect("changed", self._on_name_changed)
         name_box.append(self.name_entry)
@@ -35,7 +37,7 @@ class PresetEditor(Gtk.Box):
 
         # Output type
         out_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        out_box.append(Gtk.Label(label="Output:", xalign=0))
+        out_box.append(Gtk.Label(label=_("Output:"), xalign=0))
         self.output_combo = Gtk.DropDown.new_from_strings(OUTPUT_TYPES)
         if preset.output_type in OUTPUT_TYPES:
             self.output_combo.set_selected(OUTPUT_TYPES.index(preset.output_type))
@@ -44,7 +46,7 @@ class PresetEditor(Gtk.Box):
         self.append(out_box)
 
         # Input types
-        self.append(Gtk.Label(label="Input types:", xalign=0))
+        self.append(Gtk.Label(label=_("Input types:"), xalign=0))
         input_scroll = Gtk.ScrolledWindow(vexpand=True, min_content_height=150)
         input_flow = Gtk.FlowBox(selection_mode=Gtk.SelectionMode.NONE, max_children_per_line=8)
         self._input_checks = {}
@@ -58,21 +60,21 @@ class PresetEditor(Gtk.Box):
 
         # Settings section
         self.append(Gtk.Separator())
-        self.append(Gtk.Label(label="Conversion settings:", xalign=0))
+        self.append(Gtk.Label(label=_("Conversion settings:"), xalign=0))
 
         settings_grid = Gtk.Grid(column_spacing=12, row_spacing=6)
         row = 0
 
         # Common settings
         common_settings = [
-            ("video_quality", "Video Quality (0-63)", 0, 63, 28),
-            ("video_encoding_speed", "Encoding Speed", None, None, None),
-            ("video_scale", "Video Scale", 0.1, 4.0, 1.0),
-            ("video_rotation", "Rotation (degrees)", 0, 270, 0),
-            ("audio_bitrate", "Audio Bitrate", 16, 500, 155),
-            ("image_quality", "Image Quality (0-100)", 0, 100, 85),
-            ("image_scale", "Image Scale", 0.1, 4.0, 1.0),
-            ("enable_audio", "Enable Audio", None, None, True),
+            ("video_quality", _("Video Quality (0-63)"), 0, 63, 28),
+            ("video_encoding_speed", _("Encoding Speed"), None, None, None),
+            ("video_scale", _("Video Scale"), 0.1, 4.0, 1.0),
+            ("video_rotation", _("Rotation (degrees)"), 0, 270, 0),
+            ("audio_bitrate", _("Audio Bitrate"), 16, 500, 155),
+            ("image_quality", _("Image Quality (0-100)"), 0, 100, 85),
+            ("image_scale", _("Image Scale"), 0.1, 4.0, 1.0),
+            ("enable_audio", _("Enable Audio"), None, None, True),
         ]
 
         for key, label, min_val, max_val, default in common_settings:
@@ -105,7 +107,7 @@ class PresetEditor(Gtk.Box):
 
         # Post-conversion action
         action_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        action_box.append(Gtk.Label(label="After conversion:", xalign=0))
+        action_box.append(Gtk.Label(label=_("After conversion:"), xalign=0))
         actions = ["none", "archive", "delete"]
         action_combo = Gtk.DropDown.new_from_strings(actions)
         if preset.input_post_action in actions:
@@ -116,9 +118,9 @@ class PresetEditor(Gtk.Box):
 
         # Output template
         tmpl_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        tmpl_box.append(Gtk.Label(label="Output template:", xalign=0))
+        tmpl_box.append(Gtk.Label(label=_("Output template:"), xalign=0))
         self.tmpl_entry = Gtk.Entry(text=preset.output_template, hexpand=True)
-        self.tmpl_entry.set_tooltip_text("Variables: (p) path, (f) filename, (o) output ext, (i) input ext")
+        self.tmpl_entry.set_tooltip_text(_("Variables: (p) path, (f) filename, (o) output ext, (i) input ext"))
         self.tmpl_entry.connect("changed", self._on_template_changed)
         tmpl_box.append(self.tmpl_entry)
         self.append(tmpl_box)
@@ -169,7 +171,7 @@ class PresetEditor(Gtk.Box):
 
 class SettingsWindow(Gtk.ApplicationWindow):
     def __init__(self, app, settings: Settings):
-        super().__init__(application=app, title="File Converter — Settings",
+        super().__init__(application=app, title=_("File Converter — Settings"),
                          default_width=800, default_height=600)
         self.settings = settings
         self._modified = False
@@ -177,28 +179,36 @@ class SettingsWindow(Gtk.ApplicationWindow):
         header = Gtk.HeaderBar()
         self.set_titlebar(header)
 
-        save_btn = Gtk.Button(label="Save")
+        save_btn = Gtk.Button(label=_("Save"))
         save_btn.add_css_class("suggested-action")
         save_btn.connect("clicked", self._on_save)
         header.pack_end(save_btn)
 
         # Main layout: sidebar + editor
         paned = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
-        paned.set_position(220)
+        paned.set_position(260)
 
         # Left: preset list
         left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
 
-        # Global settings
-        global_frame = Gtk.Frame(label="Global")
-        global_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        # Global settings — each row stacks label above its control so long
+        # translated labels don't push the control out of view.
+        global_frame = Gtk.Frame(label=_("Global"))
+        global_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         global_box.set_margin_start(8)
         global_box.set_margin_end(8)
-        global_box.set_margin_top(4)
-        global_box.set_margin_bottom(4)
+        global_box.set_margin_top(6)
+        global_box.set_margin_bottom(6)
 
-        max_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
-        max_box.append(Gtk.Label(label="Max jobs:", xalign=0, hexpand=True))
+        def _row(label_text: str, control: Gtk.Widget) -> Gtk.Box:
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            lbl = Gtk.Label(label=label_text, xalign=0, wrap=True)
+            lbl.add_css_class("dim-label")
+            box.append(lbl)
+            control.set_hexpand(True)
+            box.append(control)
+            return box
+
         self._max_adj = Gtk.Adjustment(value=settings.max_simultaneous_conversions,
                                        lower=1, upper=16, step_increment=1,
                                        page_increment=1)
@@ -206,30 +216,46 @@ class SettingsWindow(Gtk.ApplicationWindow):
                                        numeric=True, climb_rate=1)
         self.max_spin.set_value(settings.max_simultaneous_conversions)
         self.max_spin.connect("value-changed", self._on_max_changed)
-        max_box.append(self.max_spin)
-        global_box.append(max_box)
+        global_box.append(_row(_("Max jobs:"), self.max_spin))
 
-        self.exit_check = Gtk.CheckButton(label="Auto-close when done",
-                                          active=settings.exit_when_done)
+        self.exit_check = Gtk.CheckButton(active=settings.exit_when_done)
+        self.exit_check.set_child(Gtk.Label(label=_("Auto-close when done"),
+                                            xalign=0, wrap=True, hexpand=True))
         self.exit_check.connect("toggled", self._on_exit_toggled)
         global_box.append(self.exit_check)
 
         # Hardware acceleration
-        hw_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
-        hw_box.append(Gtk.Label(label="GPU accel:", xalign=0, hexpand=True))
-        hw_labels = ["Off", "Auto-detect", "NVENC (NVIDIA)", "VAAPI (AMD/Intel)"]
+        hw_labels = [_("Off"), _("Auto-detect"), _("NVENC (NVIDIA)"), _("VAAPI (AMD/Intel)")]
         self.hw_combo = Gtk.DropDown.new_from_strings(hw_labels)
         if settings.hardware_acceleration in HWACCEL_MODES:
             self.hw_combo.set_selected(HWACCEL_MODES.index(settings.hardware_acceleration))
         self.hw_combo.connect("notify::selected", self._on_hw_changed)
-        hw_box.append(self.hw_combo)
-        global_box.append(hw_box)
+        global_box.append(_row(_("GPU accel:"), self.hw_combo))
+
+        # Language
+        detected = i18n.detect_system_language() or ""
+        detected_label = dict(i18n.SUPPORTED_LANGUAGES).get(detected)
+        auto_label = (
+            _("System default ({name})").format(name=detected_label)
+            if detected_label else _("System default")
+        )
+        lang_labels = [auto_label] + [
+            label for code, label in i18n.SUPPORTED_LANGUAGES if code != "auto"
+        ]
+        self.lang_combo = Gtk.DropDown.new_from_strings(lang_labels)
+        current_lang = settings.language if settings.language in i18n.LANGUAGE_CODES else "auto"
+        try:
+            self.lang_combo.set_selected(i18n.LANGUAGE_CODES.index(current_lang))
+        except ValueError:
+            self.lang_combo.set_selected(0)
+        self.lang_combo.connect("notify::selected", self._on_lang_changed)
+        global_box.append(_row(_("Language:"), self.lang_combo))
 
         global_frame.set_child(global_box)
         left_box.append(global_frame)
 
         # Preset list
-        left_box.append(Gtk.Label(label="Presets", xalign=0, margin_start=8, margin_top=8))
+        left_box.append(Gtk.Label(label=_("Presets"), xalign=0, margin_start=8, margin_top=8))
         scroll = Gtk.ScrolledWindow(vexpand=True)
         self.preset_listbox = Gtk.ListBox()
         self.preset_listbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
@@ -242,20 +268,22 @@ class SettingsWindow(Gtk.ApplicationWindow):
         btn_box.set_margin_start(8)
         btn_box.set_margin_end(8)
         btn_box.set_margin_bottom(8)
-        add_btn = Gtk.Button(label="Add")
+        add_btn = Gtk.Button(label=_("Add"))
         add_btn.connect("clicked", self._on_add_preset)
         btn_box.append(add_btn)
-        remove_btn = Gtk.Button(label="Remove")
+        remove_btn = Gtk.Button(label=_("Remove"))
         remove_btn.add_css_class("destructive-action")
         remove_btn.connect("clicked", self._on_remove_preset)
         btn_box.append(remove_btn)
         left_box.append(btn_box)
 
+        left_box.set_size_request(240, -1)
         paned.set_start_child(left_box)
+        paned.set_shrink_start_child(False)
 
         # Right: editor
         self.editor_scroll = Gtk.ScrolledWindow(hexpand=True, vexpand=True)
-        self.editor_placeholder = Gtk.Label(label="Select a preset to edit")
+        self.editor_placeholder = Gtk.Label(label=_("Select a preset to edit"))
         self.editor_scroll.set_child(self.editor_placeholder)
         paned.set_end_child(self.editor_scroll)
 
@@ -287,7 +315,7 @@ class SettingsWindow(Gtk.ApplicationWindow):
 
     def _on_add_preset(self, _btn):
         new_preset = ConversionPreset(
-            name="New Preset",
+            name=_("New Preset"),
             output_type="mp4",
             input_types=["avi", "mkv", "mov", "mp4", "webm"],
             settings={"enable_audio": True, "video_quality": 28, "video_encoding_speed": "medium",
@@ -321,15 +349,32 @@ class SettingsWindow(Gtk.ApplicationWindow):
             self.settings.hardware_acceleration = HWACCEL_MODES[idx]
             self._mark_modified()
 
+    def _on_lang_changed(self, combo, _pspec):
+        idx = combo.get_selected()
+        if not (0 <= idx < len(i18n.LANGUAGE_CODES)):
+            return
+        code = i18n.LANGUAGE_CODES[idx]
+        if code == self.settings.language:
+            return
+        self.settings.language = code
+        save_settings(self.settings)
+        self._modified = False
+        i18n.init(code)
+        app = self.get_application()
+        # Rebuild the window so every label picks up the new language.
+        new_win = SettingsWindow(app, self.settings)
+        new_win.present()
+        self.close()
+
     def _on_save(self, _btn):
         save_settings(self.settings)
         self._modified = False
-        self.set_title("File Converter — Settings (saved)")
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2000, lambda: self.set_title("File Converter — Settings") or False)
+        self.set_title(_("File Converter — Settings (saved)"))
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2000, lambda: self.set_title(_("File Converter — Settings")) or False)
 
     def _mark_modified(self):
         self._modified = True
-        self.set_title("File Converter — Settings *")
+        self.set_title(_("File Converter — Settings *"))
 
 
 class SettingsApp(Adw.Application):
@@ -339,6 +384,7 @@ class SettingsApp(Adw.Application):
 
     def _on_activate(self, _app):
         settings = load_settings()
+        i18n.init(settings.language)
         win = SettingsWindow(self, settings)
         win.present()
 

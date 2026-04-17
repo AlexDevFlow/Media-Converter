@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: th_TH
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: th_TH\n"
+"Language: th_TH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "เพิ่ม"
+
+msgid "After conversion:"
+msgstr "หลังการแปลง:"
+
+msgid "Language:"
+msgstr "ภาษา:"
+
+msgid "System default"
+msgstr "ค่าเริ่มต้นของระบบ"
+
+msgid "System default ({name})"
+msgstr "ค่าเริ่มต้นของระบบ ({name})"
+
+msgid "Audio Bitrate"
+msgstr "บิตเรตเสียง"
+
+msgid "Auto-close when done"
+msgstr "ปิดอัตโนมัติเมื่อเสร็จ"
+
+msgid "Auto-detect"
+msgstr "ตรวจจับอัตโนมัติ"
+
+msgid "Available presets:"
+msgstr "พรีเซ็ตที่มี:"
+
+msgid "Cancel"
+msgstr "ยกเลิก"
+
+msgid "Cancelled"
+msgstr "ยกเลิกแล้ว"
+
+msgid "Cancelling..."
+msgstr "กำลังยกเลิก..."
+
+msgid "Complete"
+msgstr "เสร็จสิ้น"
+
+msgid "Conversion"
+msgstr "การแปลง"
+
+msgid "Conversion settings:"
+msgstr "การตั้งค่าการแปลง:"
+
+msgid "Convert"
+msgstr "แปลง"
+
+msgid "Convert files"
+msgstr "แปลงไฟล์"
+
+msgid "Converting document..."
+msgstr "กำลังแปลงเอกสาร..."
+
+msgid "Converting to image..."
+msgstr "กำลังแปลงเป็นรูปภาพ..."
+
+msgid "Converting..."
+msgstr "กำลังแปลง..."
+
+msgid "Creating GIF..."
+msgstr "กำลังสร้าง GIF..."
+
+msgid "Done"
+msgstr "เสร็จแล้ว"
+
+msgid "Done: {name} → {path}"
+msgstr "เสร็จ: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "เปิดใช้เสียง"
+
+msgid "Encoding Speed"
+msgstr "ความเร็วการเข้ารหัส"
+
+msgid "Error reading input file list: {error}"
+msgstr "อ่านรายการไฟล์ล้มเหลว: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "ข้อผิดพลาด: ต้องระบุ --conversion-preset"
+
+msgid "Error: file not found: {path}"
+msgstr "ข้อผิดพลาด: ไม่พบไฟล์: {path}"
+
+msgid "Error: no input files specified."
+msgstr "ข้อผิดพลาด: ไม่ได้ระบุไฟล์นำเข้า"
+
+msgid "Error: preset '{name}' not found."
+msgstr "ข้อผิดพลาด: ไม่พบพรีเซ็ต '{name}'"
+
+msgid "Exporting to PDF..."
+msgstr "กำลังส่งออกเป็น PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "ล้มเหลว: {name} — {error}"
+
+msgid "Failed"
+msgstr "ล้มเหลว"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — เลือกพรีเซ็ต"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — การตั้งค่า"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — การตั้งค่า (บันทึกแล้ว)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — การตั้งค่า *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "ยังไม่ได้ตั้งค่า File Converter กำลังติดตั้ง..."
+
+msgid "GPU accel:"
+msgstr "เร่งด้วย GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "หน้าต่างการตั้งค่าต้องใช้ GTK 4"
+
+msgid "GTK not available, running headless."
+msgstr "ไม่มี GTK กำลังรันแบบไม่มีหน้าต่าง"
+
+msgid "Global"
+msgstr "ทั่วไป"
+
+msgid "HW failed, retrying with software..."
+msgstr "ฮาร์ดแวร์ล้มเหลว กำลังลองใหม่ด้วยซอฟต์แวร์..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "การเร่งด้วยฮาร์ดแวร์: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "คุณภาพรูปภาพ (0-100)"
+
+msgid "Image Scale"
+msgstr "สเกลรูปภาพ"
+
+msgid "Indexing colors"
+msgstr "กำลังทำดัชนีสี"
+
+msgid "Input types:"
+msgstr "ประเภทนำเข้า:"
+
+msgid "Keep open"
+msgstr "เปิดไว้"
+
+msgid "Max jobs:"
+msgstr "งานสูงสุด:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "ชื่อ:"
+
+msgid "New Preset"
+msgstr "พรีเซ็ตใหม่"
+
+msgid "No compatible presets"
+msgstr "ไม่มีพรีเซ็ตที่เข้ากันได้"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "ไม่มีพรีเซ็ตที่รองรับประเภทไฟล์ที่เลือกทั้งหมด: {types}"
+
+msgid "Off"
+msgstr "ปิด"
+
+msgid "Open settings"
+msgstr "เปิดการตั้งค่า"
+
+msgid "Or right-click files in your file manager!"
+msgstr "หรือคลิกขวาที่ไฟล์ในตัวจัดการไฟล์!"
+
+msgid "Output template:"
+msgstr "เทมเพลตเอาต์พุต:"
+
+msgid "Output:"
+msgstr "เอาต์พุต:"
+
+msgid "Page {current}/{total}"
+msgstr "หน้า {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "กำลังเตรียมรูปภาพ..."
+
+msgid "Preparing..."
+msgstr "กำลังเตรียม..."
+
+msgid "Presets"
+msgstr "พรีเซ็ต"
+
+msgid "Queued..."
+msgstr "ในคิว..."
+
+msgid "Re-run setup"
+msgstr "ติดตั้งใหม่อีกครั้ง"
+
+msgid "Remove"
+msgstr "ลบ"
+
+msgid "Remove integration"
+msgstr "ลบการรวมระบบ"
+
+msgid "Rotation (degrees)"
+msgstr "การหมุน (องศา)"
+
+msgid "Save"
+msgstr "บันทึก"
+
+msgid "Select a preset to edit"
+msgstr "เลือกพรีเซ็ตเพื่อแก้ไข"
+
+msgid "Unknown error"
+msgstr "ข้อผิดพลาดที่ไม่ทราบ"
+
+msgid "Usage:"
+msgstr "การใช้งาน:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "ตัวแปร: (p) เส้นทาง, (f) ชื่อไฟล์, (o) นามสกุลเอาต์พุต, (i) นามสกุลอินพุต"
+
+msgid "Video Quality (0-63)"
+msgstr "คุณภาพวิดีโอ (0-63)"
+
+msgid "Video Scale"
+msgstr "สเกลวิดีโอ"
+
+msgid "Waiting..."
+msgstr "กำลังรอ..."
+
+msgid "{count} file selected"
+msgstr "เลือก {count} ไฟล์"
+
+msgid "{count} files selected"
+msgstr "เลือก {count} ไฟล์"
+
+msgid "{done}/{total} completed"
+msgstr "เสร็จ {done}/{total}"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "เสร็จ {done}/{total}, ล้มเหลว {failed}"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "เหลืออีก {minutes}น {seconds}ว"
+
+msgid "{seconds}s remaining"
+msgstr "เหลืออีก {seconds}ว"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — จะปิดใน {seconds}ว"
+

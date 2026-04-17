@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: sv_SE
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: sv_SE\n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Lägg till"
+
+msgid "After conversion:"
+msgstr "Efter konvertering:"
+
+msgid "Language:"
+msgstr "Språk:"
+
+msgid "System default"
+msgstr "Systemstandard"
+
+msgid "System default ({name})"
+msgstr "Systemstandard ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Ljudbitfrekvens"
+
+msgid "Auto-close when done"
+msgstr "Stäng automatiskt när klart"
+
+msgid "Auto-detect"
+msgstr "Upptäck automatiskt"
+
+msgid "Available presets:"
+msgstr "Tillgängliga förval:"
+
+msgid "Cancel"
+msgstr "Avbryt"
+
+msgid "Cancelled"
+msgstr "Avbruten"
+
+msgid "Cancelling..."
+msgstr "Avbryter..."
+
+msgid "Complete"
+msgstr "Klar"
+
+msgid "Conversion"
+msgstr "Konvertering"
+
+msgid "Conversion settings:"
+msgstr "Konverteringsinställningar:"
+
+msgid "Convert"
+msgstr "Konvertera"
+
+msgid "Convert files"
+msgstr "Konvertera filer"
+
+msgid "Converting document..."
+msgstr "Konverterar dokument..."
+
+msgid "Converting to image..."
+msgstr "Konverterar till bild..."
+
+msgid "Converting..."
+msgstr "Konverterar..."
+
+msgid "Creating GIF..."
+msgstr "Skapar GIF..."
+
+msgid "Done"
+msgstr "Klar"
+
+msgid "Done: {name} → {path}"
+msgstr "Klar: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Aktivera ljud"
+
+msgid "Encoding Speed"
+msgstr "Kodningshastighet"
+
+msgid "Error reading input file list: {error}"
+msgstr "Fel vid läsning av fillista: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Fel: --conversion-preset krävs."
+
+msgid "Error: file not found: {path}"
+msgstr "Fel: filen hittades inte: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Fel: inga indatafiler angivna."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Fel: förvalet '{name}' hittades inte."
+
+msgid "Exporting to PDF..."
+msgstr "Exporterar till PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "MISSLYCKADES: {name} — {error}"
+
+msgid "Failed"
+msgstr "Misslyckades"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Välj förval"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Inställningar"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Inställningar (sparade)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Inställningar *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter är inte konfigurerad ännu. Kör installation..."
+
+msgid "GPU accel:"
+msgstr "GPU-acceleration:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "GTK 4 krävs för inställningsfönstret."
+
+msgid "GTK not available, running headless."
+msgstr "GTK ej tillgängligt, kör utan gränssnitt."
+
+msgid "Global"
+msgstr "Globalt"
+
+msgid "HW failed, retrying with software..."
+msgstr "Hårdvara misslyckades, försöker med programvara..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Hårdvaruacceleration: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Bildkvalitet (0-100)"
+
+msgid "Image Scale"
+msgstr "Bildskala"
+
+msgid "Indexing colors"
+msgstr "Indexerar färger"
+
+msgid "Input types:"
+msgstr "Indatatyper:"
+
+msgid "Keep open"
+msgstr "Håll öppen"
+
+msgid "Max jobs:"
+msgstr "Max. jobb:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Namn:"
+
+msgid "New Preset"
+msgstr "Nytt förval"
+
+msgid "No compatible presets"
+msgstr "Inga kompatibla förval"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Inget förval stödjer alla valda filtyper: {types}"
+
+msgid "Off"
+msgstr "Av"
+
+msgid "Open settings"
+msgstr "Öppna inställningar"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Eller högerklicka på filer i filhanteraren!"
+
+msgid "Output template:"
+msgstr "Utdatamall:"
+
+msgid "Output:"
+msgstr "Utdata:"
+
+msgid "Page {current}/{total}"
+msgstr "Sida {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Förbereder bild..."
+
+msgid "Preparing..."
+msgstr "Förbereder..."
+
+msgid "Presets"
+msgstr "Förval"
+
+msgid "Queued..."
+msgstr "I kö..."
+
+msgid "Re-run setup"
+msgstr "Kör installation igen"
+
+msgid "Remove"
+msgstr "Ta bort"
+
+msgid "Remove integration"
+msgstr "Ta bort integration"
+
+msgid "Rotation (degrees)"
+msgstr "Rotation (grader)"
+
+msgid "Save"
+msgstr "Spara"
+
+msgid "Select a preset to edit"
+msgstr "Välj ett förval att redigera"
+
+msgid "Unknown error"
+msgstr "Okänt fel"
+
+msgid "Usage:"
+msgstr "Användning:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Variabler: (p) sökväg, (f) filnamn, (o) utdata-ändelse, (i) indata-ändelse"
+
+msgid "Video Quality (0-63)"
+msgstr "Videokvalitet (0-63)"
+
+msgid "Video Scale"
+msgstr "Videoskala"
+
+msgid "Waiting..."
+msgstr "Väntar..."
+
+msgid "{count} file selected"
+msgstr "{count} fil vald"
+
+msgid "{count} files selected"
+msgstr "{count} filer valda"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} klara"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} klara, {failed} misslyckades"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "{minutes}m {seconds}s kvar"
+
+msgid "{seconds}s remaining"
+msgstr "{seconds}s kvar"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — stänger om {seconds}s"
+

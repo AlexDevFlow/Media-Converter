@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: pl_PL
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: pl_PL\n"
+"Language: pl_PL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Dodaj"
+
+msgid "After conversion:"
+msgstr "Po konwersji:"
+
+msgid "Language:"
+msgstr "Język:"
+
+msgid "System default"
+msgstr "Domyślny systemu"
+
+msgid "System default ({name})"
+msgstr "Domyślny systemu ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Przepływność dźwięku"
+
+msgid "Auto-close when done"
+msgstr "Zamknij automatycznie po zakończeniu"
+
+msgid "Auto-detect"
+msgstr "Wykryj automatycznie"
+
+msgid "Available presets:"
+msgstr "Dostępne ustawienia:"
+
+msgid "Cancel"
+msgstr "Anuluj"
+
+msgid "Cancelled"
+msgstr "Anulowano"
+
+msgid "Cancelling..."
+msgstr "Anulowanie..."
+
+msgid "Complete"
+msgstr "Zakończono"
+
+msgid "Conversion"
+msgstr "Konwersja"
+
+msgid "Conversion settings:"
+msgstr "Ustawienia konwersji:"
+
+msgid "Convert"
+msgstr "Konwertuj"
+
+msgid "Convert files"
+msgstr "Konwertuj pliki"
+
+msgid "Converting document..."
+msgstr "Konwertowanie dokumentu..."
+
+msgid "Converting to image..."
+msgstr "Konwertowanie do obrazu..."
+
+msgid "Converting..."
+msgstr "Konwertowanie..."
+
+msgid "Creating GIF..."
+msgstr "Tworzenie GIF..."
+
+msgid "Done"
+msgstr "Gotowe"
+
+msgid "Done: {name} → {path}"
+msgstr "Gotowe: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Włącz dźwięk"
+
+msgid "Encoding Speed"
+msgstr "Prędkość kodowania"
+
+msgid "Error reading input file list: {error}"
+msgstr "Błąd odczytu listy plików: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Błąd: --conversion-preset jest wymagane."
+
+msgid "Error: file not found: {path}"
+msgstr "Błąd: nie znaleziono pliku: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Błąd: nie podano plików wejściowych."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Błąd: nie znaleziono ustawienia '{name}'."
+
+msgid "Exporting to PDF..."
+msgstr "Eksportowanie do PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "NIEPOWODZENIE: {name} — {error}"
+
+msgid "Failed"
+msgstr "Niepowodzenie"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Wybierz ustawienie"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Ustawienia"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Ustawienia (zapisane)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Ustawienia *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter nie jest jeszcze skonfigurowany. Uruchamianie instalacji..."
+
+msgid "GPU accel:"
+msgstr "Akceleracja GPU:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "Wymagane jest GTK 4 dla okna ustawień."
+
+msgid "GTK not available, running headless."
+msgstr "GTK niedostępne, uruchamianie bez interfejsu."
+
+msgid "Global"
+msgstr "Ogólne"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW nieudane, ponawianie programowo..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Akceleracja sprzętowa: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Jakość obrazu (0-100)"
+
+msgid "Image Scale"
+msgstr "Skala obrazu"
+
+msgid "Indexing colors"
+msgstr "Indeksowanie kolorów"
+
+msgid "Input types:"
+msgstr "Typy wejściowe:"
+
+msgid "Keep open"
+msgstr "Pozostaw otwarte"
+
+msgid "Max jobs:"
+msgstr "Maks. zadań:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Nazwa:"
+
+msgid "New Preset"
+msgstr "Nowe ustawienie"
+
+msgid "No compatible presets"
+msgstr "Brak zgodnych ustawień"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Żadne ustawienie nie obsługuje wszystkich wybranych typów: {types}"
+
+msgid "Off"
+msgstr "Wyłączone"
+
+msgid "Open settings"
+msgstr "Otwórz ustawienia"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Albo kliknij prawym przyciskiem na plikach w menedżerze plików!"
+
+msgid "Output template:"
+msgstr "Szablon wyjścia:"
+
+msgid "Output:"
+msgstr "Wyjście:"
+
+msgid "Page {current}/{total}"
+msgstr "Strona {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Przygotowywanie obrazu..."
+
+msgid "Preparing..."
+msgstr "Przygotowywanie..."
+
+msgid "Presets"
+msgstr "Ustawienia"
+
+msgid "Queued..."
+msgstr "W kolejce..."
+
+msgid "Re-run setup"
+msgstr "Uruchom instalację ponownie"
+
+msgid "Remove"
+msgstr "Usuń"
+
+msgid "Remove integration"
+msgstr "Usuń integrację"
+
+msgid "Rotation (degrees)"
+msgstr "Obrót (stopnie)"
+
+msgid "Save"
+msgstr "Zapisz"
+
+msgid "Select a preset to edit"
+msgstr "Wybierz ustawienie do edycji"
+
+msgid "Unknown error"
+msgstr "Nieznany błąd"
+
+msgid "Usage:"
+msgstr "Użycie:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Zmienne: (p) ścieżka, (f) nazwa pliku, (o) rozsz. wyj., (i) rozsz. wej."
+
+msgid "Video Quality (0-63)"
+msgstr "Jakość wideo (0-63)"
+
+msgid "Video Scale"
+msgstr "Skala wideo"
+
+msgid "Waiting..."
+msgstr "Oczekiwanie..."
+
+msgid "{count} file selected"
+msgstr "Wybrano {count} plik"
+
+msgid "{count} files selected"
+msgstr "Wybrano {count} plików"
+
+msgid "{done}/{total} completed"
+msgstr "Ukończono {done}/{total}"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "Ukończono {done}/{total}, nieudanych: {failed}"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Pozostało {minutes}m {seconds}s"
+
+msgid "{seconds}s remaining"
+msgstr "Pozostało {seconds}s"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — zamykanie za {seconds}s"
+

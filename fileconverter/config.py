@@ -28,6 +28,7 @@ class Settings:
     exit_when_done: bool = True
     exit_delay_seconds: int = 3
     hardware_acceleration: str = "off"  # off | auto | nvenc | vaapi
+    language: str = "auto"  # auto (system) | locale code like "it_IT"
     presets: list[ConversionPreset] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -37,6 +38,7 @@ class Settings:
             "exit_when_done": self.exit_when_done,
             "exit_delay_seconds": self.exit_delay_seconds,
             "hardware_acceleration": self.hardware_acceleration,
+            "language": self.language,
             "presets": [p.to_dict() for p in self.presets],
         }
 
@@ -50,6 +52,7 @@ class Settings:
             exit_when_done=data.get("exit_when_done", True),
             exit_delay_seconds=data.get("exit_delay_seconds", 3),
             hardware_acceleration=hw,
+            language=data.get("language", "auto"),
             presets=[ConversionPreset.from_dict(p) for p in data.get("presets", [])],
         )
 

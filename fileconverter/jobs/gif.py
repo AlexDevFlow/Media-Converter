@@ -9,6 +9,7 @@ import os
 import tempfile
 
 from fileconverter.helpers import IMAGE_EXTENSIONS, ANIMATED_IMAGE_EXTENSIONS
+from fileconverter.i18n import _
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.jobs.ffmpeg import FFmpegJob
 from fileconverter.jobs.imagemagick import ImageMagickJob
@@ -26,7 +27,7 @@ class GifJob(ConversionJob):
 
         if is_image and ext != "png":
             # Step 1: Convert image to PNG via ImageMagick
-            self.user_state = "Preparing image..."
+            self.user_state = _("Preparing image...")
             self.progress = 0.1
 
             tmp_png = generate_unique_path(
@@ -47,7 +48,7 @@ class GifJob(ConversionJob):
                 self.progress = 0.3
 
                 # Step 2: PNG → GIF via FFmpeg
-                self.user_state = "Creating GIF..."
+                self.user_state = _("Creating GIF...")
                 ff_job = FFmpegJob(self.preset, tmp_png)
                 ff_job.output_paths = self.output_paths
                 ff_job._build_arguments()
@@ -59,7 +60,7 @@ class GifJob(ConversionJob):
                     os.remove(tmp_png)
         else:
             # Video or PNG → GIF directly via FFmpeg
-            self.user_state = "Creating GIF..."
+            self.user_state = _("Creating GIF...")
             ff_job = FFmpegJob(self.preset, self.input_path)
             ff_job.output_paths = self.output_paths
             ff_job._build_arguments()

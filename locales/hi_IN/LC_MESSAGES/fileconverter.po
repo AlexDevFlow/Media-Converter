@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: hi_IN
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: hi_IN\n"
+"Language: hi_IN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "जोड़ें"
+
+msgid "After conversion:"
+msgstr "रूपांतरण के बाद:"
+
+msgid "Language:"
+msgstr "भाषा:"
+
+msgid "System default"
+msgstr "सिस्टम डिफ़ॉल्ट"
+
+msgid "System default ({name})"
+msgstr "सिस्टम डिफ़ॉल्ट ({name})"
+
+msgid "Audio Bitrate"
+msgstr "ऑडियो बिटरेट"
+
+msgid "Auto-close when done"
+msgstr "पूर्ण होने पर स्वतः बंद करें"
+
+msgid "Auto-detect"
+msgstr "स्वतः पहचान"
+
+msgid "Available presets:"
+msgstr "उपलब्ध प्रीसेट:"
+
+msgid "Cancel"
+msgstr "रद्द करें"
+
+msgid "Cancelled"
+msgstr "रद्द किया गया"
+
+msgid "Cancelling..."
+msgstr "रद्द किया जा रहा है..."
+
+msgid "Complete"
+msgstr "पूर्ण"
+
+msgid "Conversion"
+msgstr "रूपांतरण"
+
+msgid "Conversion settings:"
+msgstr "रूपांतरण सेटिंग्स:"
+
+msgid "Convert"
+msgstr "रूपांतरित करें"
+
+msgid "Convert files"
+msgstr "फ़ाइलें रूपांतरित करें"
+
+msgid "Converting document..."
+msgstr "दस्तावेज़ रूपांतरित हो रहा है..."
+
+msgid "Converting to image..."
+msgstr "छवि में रूपांतरित हो रहा है..."
+
+msgid "Converting..."
+msgstr "रूपांतरित हो रहा है..."
+
+msgid "Creating GIF..."
+msgstr "GIF बनाया जा रहा है..."
+
+msgid "Done"
+msgstr "हो गया"
+
+msgid "Done: {name} → {path}"
+msgstr "हो गया: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "ऑडियो सक्षम करें"
+
+msgid "Encoding Speed"
+msgstr "एन्कोडिंग गति"
+
+msgid "Error reading input file list: {error}"
+msgstr "इनपुट फ़ाइल सूची पढ़ने में त्रुटि: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "त्रुटि: --conversion-preset आवश्यक है।"
+
+msgid "Error: file not found: {path}"
+msgstr "त्रुटि: फ़ाइल नहीं मिली: {path}"
+
+msgid "Error: no input files specified."
+msgstr "त्रुटि: कोई इनपुट फ़ाइल निर्दिष्ट नहीं।"
+
+msgid "Error: preset '{name}' not found."
+msgstr "त्रुटि: प्रीसेट '{name}' नहीं मिला।"
+
+msgid "Exporting to PDF..."
+msgstr "PDF में निर्यात हो रहा है..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "विफल: {name} — {error}"
+
+msgid "Failed"
+msgstr "विफल"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — प्रीसेट चुनें"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — सेटिंग्स"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — सेटिंग्स (सहेजी गई)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — सेटिंग्स *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter अभी सेट अप नहीं है। सेटअप चलाया जा रहा है..."
+
+msgid "GPU accel:"
+msgstr "GPU त्वरण:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "सेटिंग्स विंडो के लिए GTK 4 आवश्यक है।"
+
+msgid "GTK not available, running headless."
+msgstr "GTK उपलब्ध नहीं, बिना इंटरफ़ेस चल रहा है।"
+
+msgid "Global"
+msgstr "वैश्विक"
+
+msgid "HW failed, retrying with software..."
+msgstr "HW विफल, सॉफ्टवेयर से पुनः प्रयास..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "हार्डवेयर त्वरण: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "छवि गुणवत्ता (0-100)"
+
+msgid "Image Scale"
+msgstr "छवि स्केल"
+
+msgid "Indexing colors"
+msgstr "रंग अनुक्रमित हो रहे हैं"
+
+msgid "Input types:"
+msgstr "इनपुट प्रकार:"
+
+msgid "Keep open"
+msgstr "खुला रखें"
+
+msgid "Max jobs:"
+msgstr "अधिकतम कार्य:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "नाम:"
+
+msgid "New Preset"
+msgstr "नया प्रीसेट"
+
+msgid "No compatible presets"
+msgstr "कोई संगत प्रीसेट नहीं"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "कोई प्रीसेट सभी चयनित फ़ाइल प्रकारों का समर्थन नहीं करता: {types}"
+
+msgid "Off"
+msgstr "बंद"
+
+msgid "Open settings"
+msgstr "सेटिंग्स खोलें"
+
+msgid "Or right-click files in your file manager!"
+msgstr "या अपने फ़ाइल प्रबंधक में फ़ाइलों पर दायाँ-क्लिक करें!"
+
+msgid "Output template:"
+msgstr "आउटपुट टेम्पलेट:"
+
+msgid "Output:"
+msgstr "आउटपुट:"
+
+msgid "Page {current}/{total}"
+msgstr "पृष्ठ {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "छवि तैयार की जा रही है..."
+
+msgid "Preparing..."
+msgstr "तैयार किया जा रहा है..."
+
+msgid "Presets"
+msgstr "प्रीसेट"
+
+msgid "Queued..."
+msgstr "कतार में..."
+
+msgid "Re-run setup"
+msgstr "सेटअप पुनः चलाएँ"
+
+msgid "Remove"
+msgstr "हटाएँ"
+
+msgid "Remove integration"
+msgstr "एकीकरण हटाएँ"
+
+msgid "Rotation (degrees)"
+msgstr "घुमाव (डिग्री)"
+
+msgid "Save"
+msgstr "सहेजें"
+
+msgid "Select a preset to edit"
+msgstr "संपादित करने के लिए प्रीसेट चुनें"
+
+msgid "Unknown error"
+msgstr "अज्ञात त्रुटि"
+
+msgid "Usage:"
+msgstr "उपयोग:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "चर: (p) पथ, (f) फ़ाइल नाम, (o) आउटपुट एक्सट., (i) इनपुट एक्सट."
+
+msgid "Video Quality (0-63)"
+msgstr "वीडियो गुणवत्ता (0-63)"
+
+msgid "Video Scale"
+msgstr "वीडियो स्केल"
+
+msgid "Waiting..."
+msgstr "प्रतीक्षा..."
+
+msgid "{count} file selected"
+msgstr "{count} फ़ाइल चयनित"
+
+msgid "{count} files selected"
+msgstr "{count} फ़ाइलें चयनित"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} पूर्ण"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} पूर्ण, {failed} विफल"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "{minutes}मि {seconds}से शेष"
+
+msgid "{seconds}s remaining"
+msgstr "{seconds}से शेष"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — {seconds}से में बंद"
+

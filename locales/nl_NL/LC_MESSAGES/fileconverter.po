@@ -1,0 +1,269 @@
+# File Converter — translation catalog
+# Language: nl_NL
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: fileconverter 1.1.0\n"
+"PO-Revision-Date: 2026-04-17 00:00+0000\n"
+"Last-Translator: File Converter project\n"
+"Language-Team: nl_NL\n"
+"Language: nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Add"
+msgstr "Toevoegen"
+
+msgid "After conversion:"
+msgstr "Na conversie:"
+
+msgid "Language:"
+msgstr "Taal:"
+
+msgid "System default"
+msgstr "Systeemstandaard"
+
+msgid "System default ({name})"
+msgstr "Systeemstandaard ({name})"
+
+msgid "Audio Bitrate"
+msgstr "Audio-bitrate"
+
+msgid "Auto-close when done"
+msgstr "Automatisch sluiten na voltooiing"
+
+msgid "Auto-detect"
+msgstr "Automatisch detecteren"
+
+msgid "Available presets:"
+msgstr "Beschikbare voorinstellingen:"
+
+msgid "Cancel"
+msgstr "Annuleren"
+
+msgid "Cancelled"
+msgstr "Geannuleerd"
+
+msgid "Cancelling..."
+msgstr "Bezig met annuleren..."
+
+msgid "Complete"
+msgstr "Voltooid"
+
+msgid "Conversion"
+msgstr "Conversie"
+
+msgid "Conversion settings:"
+msgstr "Conversie-instellingen:"
+
+msgid "Convert"
+msgstr "Converteren"
+
+msgid "Convert files"
+msgstr "Bestanden converteren"
+
+msgid "Converting document..."
+msgstr "Document converteren..."
+
+msgid "Converting to image..."
+msgstr "Converteren naar afbeelding..."
+
+msgid "Converting..."
+msgstr "Converteren..."
+
+msgid "Creating GIF..."
+msgstr "GIF aanmaken..."
+
+msgid "Done"
+msgstr "Klaar"
+
+msgid "Done: {name} → {path}"
+msgstr "Klaar: {name} → {path}"
+
+msgid "Enable Audio"
+msgstr "Audio inschakelen"
+
+msgid "Encoding Speed"
+msgstr "Coderingssnelheid"
+
+msgid "Error reading input file list: {error}"
+msgstr "Fout bij lezen bestandslijst: {error}"
+
+msgid "Error: --conversion-preset is required."
+msgstr "Fout: --conversion-preset is vereist."
+
+msgid "Error: file not found: {path}"
+msgstr "Fout: bestand niet gevonden: {path}"
+
+msgid "Error: no input files specified."
+msgstr "Fout: geen invoerbestanden opgegeven."
+
+msgid "Error: preset '{name}' not found."
+msgstr "Fout: voorinstelling '{name}' niet gevonden."
+
+msgid "Exporting to PDF..."
+msgstr "Exporteren naar PDF..."
+
+msgid "FAILED: {name} — {error}"
+msgstr "MISLUKT: {name} — {error}"
+
+msgid "Failed"
+msgstr "Mislukt"
+
+msgid "File Converter — Select Preset"
+msgstr "File Converter — Voorinstelling kiezen"
+
+msgid "File Converter — Settings"
+msgstr "File Converter — Instellingen"
+
+msgid "File Converter — Settings (saved)"
+msgstr "File Converter — Instellingen (opgeslagen)"
+
+msgid "File Converter — Settings *"
+msgstr "File Converter — Instellingen *"
+
+msgid "File Converter is not set up yet. Running setup..."
+msgstr "File Converter is nog niet ingesteld. Setup wordt uitgevoerd..."
+
+msgid "GPU accel:"
+msgstr "GPU-versnelling:"
+
+msgid "GTK 4 is required for the settings window."
+msgstr "GTK 4 is vereist voor het instellingenvenster."
+
+msgid "GTK not available, running headless."
+msgstr "GTK niet beschikbaar, uitvoeren zonder interface."
+
+msgid "Global"
+msgstr "Algemeen"
+
+msgid "HW failed, retrying with software..."
+msgstr "Hardware mislukt, opnieuw via software..."
+
+msgid "Hardware acceleration: {mode}"
+msgstr "Hardwareversnelling: {mode}"
+
+msgid "Image Quality (0-100)"
+msgstr "Beeldkwaliteit (0-100)"
+
+msgid "Image Scale"
+msgstr "Beeldschaal"
+
+msgid "Indexing colors"
+msgstr "Kleuren indexeren"
+
+msgid "Input types:"
+msgstr "Invoertypes:"
+
+msgid "Keep open"
+msgstr "Open laten"
+
+msgid "Max jobs:"
+msgstr "Max. taken:"
+
+msgid "NVENC (NVIDIA)"
+msgstr "NVENC (NVIDIA)"
+
+msgid "Name:"
+msgstr "Naam:"
+
+msgid "New Preset"
+msgstr "Nieuwe voorinstelling"
+
+msgid "No compatible presets"
+msgstr "Geen compatibele voorinstellingen"
+
+msgid "No presets support all selected file types: {types}"
+msgstr "Geen voorinstelling ondersteunt alle geselecteerde bestandstypen: {types}"
+
+msgid "Off"
+msgstr "Uit"
+
+msgid "Open settings"
+msgstr "Instellingen openen"
+
+msgid "Or right-click files in your file manager!"
+msgstr "Of klik met de rechtermuisknop op bestanden in je bestandsbeheer!"
+
+msgid "Output template:"
+msgstr "Uitvoersjabloon:"
+
+msgid "Output:"
+msgstr "Uitvoer:"
+
+msgid "Page {current}/{total}"
+msgstr "Pagina {current}/{total}"
+
+msgid "Preparing image..."
+msgstr "Afbeelding voorbereiden..."
+
+msgid "Preparing..."
+msgstr "Voorbereiden..."
+
+msgid "Presets"
+msgstr "Voorinstellingen"
+
+msgid "Queued..."
+msgstr "In wachtrij..."
+
+msgid "Re-run setup"
+msgstr "Setup opnieuw uitvoeren"
+
+msgid "Remove"
+msgstr "Verwijderen"
+
+msgid "Remove integration"
+msgstr "Integratie verwijderen"
+
+msgid "Rotation (degrees)"
+msgstr "Rotatie (graden)"
+
+msgid "Save"
+msgstr "Opslaan"
+
+msgid "Select a preset to edit"
+msgstr "Kies een voorinstelling om te bewerken"
+
+msgid "Unknown error"
+msgstr "Onbekende fout"
+
+msgid "Usage:"
+msgstr "Gebruik:"
+
+msgid "VAAPI (AMD/Intel)"
+msgstr "VAAPI (AMD/Intel)"
+
+msgid "Variables: (p) path, (f) filename, (o) output ext, (i) input ext"
+msgstr "Variabelen: (p) pad, (f) bestandsnaam, (o) uitvoerext., (i) invoerext."
+
+msgid "Video Quality (0-63)"
+msgstr "Videokwaliteit (0-63)"
+
+msgid "Video Scale"
+msgstr "Videoschaal"
+
+msgid "Waiting..."
+msgstr "Wachten..."
+
+msgid "{count} file selected"
+msgstr "{count} bestand geselecteerd"
+
+msgid "{count} files selected"
+msgstr "{count} bestanden geselecteerd"
+
+msgid "{done}/{total} completed"
+msgstr "{done}/{total} voltooid"
+
+msgid "{done}/{total} completed, {failed} failed"
+msgstr "{done}/{total} voltooid, {failed} mislukt"
+
+msgid "{minutes}m {seconds}s remaining"
+msgstr "Nog {minutes}m {seconds}s"
+
+msgid "{seconds}s remaining"
+msgstr "Nog {seconds}s"
+
+msgid "{status} — closing in {seconds}s"
+msgstr "{status} — sluiten over {seconds}s"
+

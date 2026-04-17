@@ -9,6 +9,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 from fileconverter import __version__
 from fileconverter.config import load_settings
+from fileconverter import i18n
+from fileconverter.i18n import _
 from fileconverter.jobs.base import ConversionJob, ConversionState
 from fileconverter.jobs.factory import create_job
 
@@ -46,7 +48,7 @@ def _collect_files(args: argparse.Namespace) -> list[str]:
                     if line:
                         files.append(line)
         except OSError as e:
-            print(f"Error reading input file list: {e}", file=sys.stderr)
+            print(_("Error reading input file list: {error}").format(error=e), file=sys.stderr)
             sys.exit(1)
     return [os.path.abspath(f) for f in files]
 
@@ -69,14 +71,26 @@ def _run_headless(jobs: list[ConversionJob], max_workers: int) -> None:
     failed = [j for j in jobs if j.state == ConversionState.FAILED]
     if failed:
         for j in failed:
-            print(f"FAILED: {j.input_filename} — {j.error_message}", file=sys.stderr)
+            print(_("FAILED: {name} — {error}").format(
+                name=j.input_filename, error=j.error_message), file=sys.stderr)
         sys.exit(1)
     else:
         for j in jobs:
-            print(f"Done: {j.input_filename} → {j.output_path}")
+            print(_("Done: {name} → {path}").format(
+                name=j.input_filename, path=j.output_path))
+
+
+def _apply_language_from_settings() -> None:
+    """Apply the saved UI language as early as possible."""
+    try:
+        s = load_settings()
+        i18n.init(s.language)
+    except Exception:
+        pass
 
 
 def main() -> None:
+    _apply_language_from_settings()
     args = _parse_args()
 
     # --install
@@ -97,7 +111,7 @@ def main() -> None:
             from fileconverter.ui.settings_window import run_settings
             run_settings()
         except (ImportError, ValueError):
-            print("GTK 4 is required for the settings window.", file=sys.stderr)
+            print(_("GTK 4 is required for the settings window."), file=sys.stderr)
             sys.exit(1)
         return
 
@@ -105,35 +119,36 @@ def main() -> None:
     if not args.preset_name and not args.files:
         from fileconverter.integration.install import is_installed
         if not is_installed():
-            print("File Converter is not set up yet. Running setup...\n")
+            print(_("File Converter is not set up yet. Running setup..."))
+            print()
             from fileconverter.integration.install import run_install
             run_install()
             return
         else:
             print(f"File Converter {__version__}")
             print()
-            print("Usage:")
-            print("  fileconverter --conversion-preset 'To Mp4' file.avi  Convert files")
-            print("  fileconverter --settings                             Open settings")
-            print("  fileconverter --install                              Re-run setup")
-            print("  fileconverter --uninstall                            Remove integration")
+            print(_("Usage:"))
+            print("  fileconverter --conversion-preset 'To Mp4' file.avi  " + _("Convert files"))
+            print("  fileconverter --settings                             " + _("Open settings"))
+            print("  fileconverter --install                              " + _("Re-run setup"))
+            print("  fileconverter --uninstall                            " + _("Remove integration"))
             print()
-            print("Or right-click files in your file manager!")
+            print(_("Or right-click files in your file manager!"))
             return
 
     if not args.preset_name:
-        print("Error: --conversion-preset is required.", file=sys.stderr)
+        print(_("Error: --conversion-preset is required."), file=sys.stderr)
         print("Usage: fileconverter --conversion-preset 'To Mp4' file1.avi file2.mkv", file=sys.stderr)
         sys.exit(1)
 
     files = _collect_files(args)
     if not files:
-        print("Error: no input files specified.", file=sys.stderr)
+        print(_("Error: no input files specified."), file=sys.stderr)
         sys.exit(1)
 
     for f in files:
         if not os.path.exists(f):
-            print(f"Error: file not found: {f}", file=sys.stderr)
+            print(_("Error: file not found: {path}").format(path=f), file=sys.stderr)
             sys.exit(1)
 
     settings = load_settings()
@@ -144,8 +159,8 @@ def main() -> None:
             break
 
     if preset is None:
-        print(f"Error: preset '{args.preset_name}' not found.", file=sys.stderr)
-        print("Available presets:", file=sys.stderr)
+        print(_("Error: preset '{name}' not found.").format(name=args.preset_name), file=sys.stderr)
+        print(_("Available presets:"), file=sys.stderr)
         for p in settings.presets:
             print(f"  - {p.name}", file=sys.stderr)
         sys.exit(1)
@@ -154,7 +169,7 @@ def main() -> None:
     from fileconverter.jobs.ffmpeg import resolve_hwaccel
     hw_accel = resolve_hwaccel(settings.hardware_acceleration)
     if args.verbose and hw_accel != "off":
-        print(f"Hardware acceleration: {hw_accel}", file=sys.stderr)
+        print(_("Hardware acceleration: {mode}").format(mode=hw_accel), file=sys.stderr)
 
     jobs = [create_job(preset, f, hw_accel=hw_accel) for f in files]
 
@@ -163,7 +178,7 @@ def main() -> None:
         run_with_progress(jobs, settings)
     except (ImportError, ValueError):
         if args.verbose:
-            print("GTK not available, running headless.", file=sys.stderr)
+            print(_("GTK not available, running headless."), file=sys.stderr)
         _run_headless(jobs, settings.max_simultaneous_conversions)
 
 
