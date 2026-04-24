@@ -146,7 +146,7 @@ class ProgressWindow(Gtk.ApplicationWindow):
             self.list_box.append(row)
 
         # Start periodic UI updates
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, self._update_ui)
+        GLib.timeout_add(200, self._update_ui)
 
     def start_conversions(self) -> None:
         """Launch conversion worker threads."""
@@ -183,7 +183,7 @@ class ProgressWindow(Gtk.ApplicationWindow):
     def _start_auto_close(self) -> None:
         self._auto_close_seconds = self.settings.exit_delay_seconds
         self.cancel_close_btn.set_visible(True)
-        self._auto_close_id = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, self._auto_close_tick)
+        self._auto_close_id = GLib.timeout_add(1000, self._auto_close_tick)
         self._update_close_label()
 
     def _auto_close_tick(self) -> bool:

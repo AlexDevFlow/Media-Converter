@@ -370,7 +370,7 @@ class SettingsWindow(Gtk.ApplicationWindow):
         save_settings(self.settings)
         self._modified = False
         self.set_title(_("File Converter — Settings (saved)"))
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2000, lambda: self.set_title(_("File Converter — Settings")) or False)
+        GLib.timeout_add(2000, lambda: self.set_title(_("File Converter — Settings")) or False)
 
     def _mark_modified(self):
         self._modified = True
