@@ -331,6 +331,7 @@ def _install_dolphin_service_menu() -> bool:
             ]
 
         desktop_file.write_text("\n".join(lines))
+        desktop_file.chmod(0o755)
         _print(f"  [OK] Dolphin service menu installed", "green")
         return True
 
