@@ -35,6 +35,15 @@ a = Analysis(
         'fileconverter.integration',
         'fileconverter.integration.install',
         'fileconverter.integration.nautilus_extension',
+        # PyGObject override modules — without these, frozen builds fall
+        # through to the raw GIR signatures and calls like
+        # GLib.timeout_add(200, fn) crash with "takes exactly 4 arguments".
+        'gi.overrides',
+        'gi.overrides.GLib',
+        'gi.overrides.GObject',
+        'gi.overrides.Gtk',
+        'gi.overrides.Gdk',
+        'gi.overrides.Gio',
     ],
     hookspath=[],
     hooksconfig={},
