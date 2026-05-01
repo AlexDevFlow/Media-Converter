@@ -23,17 +23,31 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
+          # Both gir versions: PyGObject 3.50+ wheels require
+          # girepository-2.0 to build, but PyInstaller's gi hook discovers
+          # GTK/Cairo/Pango/Adw libraries via gobject-introspection-1.0.pc
+          # (from the 1.0 variant). Without both, the bundle is missing
+          # the GTK4 + libadwaita stack and the binary silently exits when
+          # Adw.Application.run() can't find a GTK runtime.
           sudo apt-get install -y \
+            libgirepository1.0-dev \
             libgirepository-2.0-dev \
             gir1.2-gtk-4.0 \
             gir1.2-adw-1 \
+            libgtk-4-dev \
+            libadwaita-1-dev \
             libcairo2-dev \
             pkg-config \
             python3-gi
 
       - name: Install Python dependencies
         run: |
-          pip install pyinstaller pyyaml PyGObject
+          # Pin PyGObject < 3.50: the 3.50 release switched to
+          # libgirepository-2.0 and changed Application.run() semantics in
+          # a way that makes Adw.Application.run() return 0 without firing
+          # the activate signal in PyInstaller-frozen apps. 3.48.x matches
+          # the version used by working local development builds.
+          pip install pyinstaller pyyaml 'PyGObject<3.50'
 
       - name: Build binary
         run: python -m PyInstaller fileconverter.spec --noconfirm --clean
@@ -41,8 +55,89 @@ jobs:
       - name: Verify binary runs
         run: ./dist/fileconverter --version
 
+      - name: Package release tarball
+        id: package
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          PKG_DIR="fileconverter-${VERSION}"
+          mkdir -p "${PKG_DIR}"
+          cp dist/fileconverter "${PKG_DIR}/fileconverter"
+          chmod +x "${PKG_DIR}/fileconverter"
+
+          cat > "${PKG_DIR}/install.sh" <<'EOF'
+          #!/usr/bin/env bash
+          # File Converter for Linux — installer wrapper
+          # Runs the bundled binary with --install to set up context menu integration.
+          set -e
+          DIR="$(cd "$(dirname "$0")" && pwd)"
+          BIN="${DIR}/fileconverter"
+          if [ ! -f "${BIN}" ]; then
+              echo "Error: 'fileconverter' binary not found next to install.sh" >&2
+              exit 1
+          fi
+          chmod +x "${BIN}"
+          exec "${BIN}" --install
+          EOF
+          chmod +x "${PKG_DIR}/install.sh"
+
+          cat > "${PKG_DIR}/README.txt" <<'EOF'
+          File Converter for Linux
+          ========================
+
+          Quick install (terminal):
+
+              ./install.sh
+
+          Or run the binary directly — first run triggers setup automatically:
+
+              ./fileconverter
+
+          To remove the integration later:
+
+              ./fileconverter --uninstall
+
+          Project page: https://github.com/AlexDevFlow/Media-Converter
+          EOF
+
+          TARBALL="fileconverter-${VERSION}-linux-x86_64.tar.gz"
+          tar -czf "${TARBALL}" "${PKG_DIR}"
+          sha256sum "${TARBALL}" > "${TARBALL}.sha256"
+          echo "tarball=${TARBALL}" >> "$GITHUB_OUTPUT"
+          echo "checksum=${TARBALL}.sha256" >> "$GITHUB_OUTPUT"
+          ls -la "${TARBALL}" "${TARBALL}.sha256"
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/fileconverter
+          files: |
+            ${{ steps.package.outputs.tarball }}
+            ${{ steps.package.outputs.checksum }}
+            dist/fileconverter
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          body: |
+            ## Install
+
+            **Recommended — download the tarball:**
+
+            1. Download `fileconverter-${{ github.ref_name }}-linux-x86_64.tar.gz` below.
+            2. Open a terminal in your downloads folder and run:
+
+            ```bash
+            tar -xzf fileconverter-${{ github.ref_name }}-linux-x86_64.tar.gz
+            cd fileconverter-${{ github.ref_name }}
+            ./install.sh
+            ```
+
+            The installer detects your file manager (Nautilus / Nemo / Dolphin / Thunar / PCManFM)
+            and sets up the right-click "File Converter" submenu.
+
+            To remove later:
+
+            ```bash
+            fileconverter --uninstall
+            ```
+
+            **Power users:** the raw `fileconverter` binary is also attached if you want to manage placement yourself.
+
+            ---

@@ -8,17 +8,18 @@ If you find this useful, you can [buy me a coffee](https://paypal.me/alextrysh).
 
 ## Quick Start
 
-### Download the binary
+### Download the release tarball
 
-1. Download `fileconverter` from the [Releases page](https://github.com/AlexDevFlow/Media-Converter/releases)
-2. Open a terminal where you downloaded it:
+1. Grab `fileconverter-vX.Y.Z-linux-x86_64.tar.gz` from the [Releases page](https://github.com/AlexDevFlow/Media-Converter/releases).
+2. Open a terminal in your downloads folder and run:
 
 ```bash
-chmod +x fileconverter
-./fileconverter
+tar -xzf fileconverter-v*-linux-x86_64.tar.gz
+cd fileconverter-v*
+./install.sh
 ```
 
-First run walks you through setup automatically.
+The installer detects your file manager and sets up the right-click "File Converter" submenu. The bare `fileconverter` binary is also attached to each release for power users who want to manage placement themselves (`chmod +x fileconverter && ./fileconverter`).
 
 ### Run from source
 

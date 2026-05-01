@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Gtk, GLib, Adw, Pango
+from gi.repository import Gtk, GLib, Gio, Adw, Pango
 
 from fileconverter.config import Settings
 from fileconverter.i18n import _
@@ -220,7 +220,15 @@ class ProgressWindow(Gtk.ApplicationWindow):
 
 class ConverterApp(Adw.Application):
     def __init__(self, jobs: list[ConversionJob], settings: Settings):
-        super().__init__(application_id="org.fileconverter.app")
+        # NON_UNIQUE: each invocation runs as its own instance instead of
+        # forwarding to a primary on the session bus. fileconverter is
+        # invoked per-conversion (from Nautilus right-click, command line,
+        # etc.) — D-Bus uniqueness causes silent activate-skip if any
+        # session-bus state for the name lingers from a previous run.
+        super().__init__(
+            application_id="org.fileconverter.app",
+            flags=Gio.ApplicationFlags.NON_UNIQUE,
+        )
         self.jobs = jobs
         self.settings = settings
         self.connect("activate", self._on_activate)
