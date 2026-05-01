@@ -1,8 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import glob
+import os
 
 _locale_datas = [(p, f"locales/{p.split('/')[-3]}/LC_MESSAGES") for p in glob.glob('locales/*/LC_MESSAGES/fileconverter.mo')]
+
+# GIR typelibs — PyInstaller's auto-discovery fails on Ubuntu 24.04 with
+# libgirepository-2.0 installed, leaving the bundle without GLib/Gtk/Adw
+# typelibs and causing every GTK call to silently no-op at runtime.
+# Bundle them explicitly from the system path; the binary loader expects
+# them under gi_typelibs/ inside the frozen archive.
+_gi_typelib_dirs = [
+    "/usr/lib/x86_64-linux-gnu/girepository-1.0",
+    "/usr/lib64/girepository-1.0",
+    "/usr/lib/girepository-1.0",
+]
+_gi_typelib_datas = []
+for _d in _gi_typelib_dirs:
+    if os.path.isdir(_d):
+        _gi_typelib_datas = [(p, "gi_typelibs") for p in glob.glob(os.path.join(_d, "*.typelib"))]
+        break
 
 a = Analysis(
     ['fileconverter/__main__.py'],
@@ -12,7 +29,7 @@ a = Analysis(
         ('resources/default_presets.yaml', 'resources'),
         ('resources/fileconverter.desktop', 'resources'),
         ('fileconverter/integration/nautilus_extension.py', 'fileconverter/integration'),
-    ] + _locale_datas,
+    ] + _locale_datas + _gi_typelib_datas,
     hiddenimports=[
         'fileconverter',
         'fileconverter.cli',
@@ -35,9 +52,6 @@ a = Analysis(
         'fileconverter.integration',
         'fileconverter.integration.install',
         'fileconverter.integration.nautilus_extension',
-        # PyGObject override modules — without these, frozen builds fall
-        # through to the raw GIR signatures and calls like
-        # GLib.timeout_add(200, fn) crash with "takes exactly 4 arguments".
         'gi.overrides',
         'gi.overrides.GLib',
         'gi.overrides.GObject',
