@@ -23,12 +23,15 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          # Use libgirepository1.0-dev (gobject-introspection-1.0.pc) — the
-          # 2.0 variant on Ubuntu 24.04 publishes a different .pc file that
-          # PyInstaller's gi hook does not discover, leaving GTK/libadwaita
-          # libraries un-bundled in the frozen binary.
+          # Both gir versions: PyGObject 3.50+ wheels require
+          # girepository-2.0 to build, but PyInstaller's gi hook discovers
+          # GTK/Cairo/Pango/Adw libraries via gobject-introspection-1.0.pc
+          # (from the 1.0 variant). Without both, the bundle is missing
+          # the GTK4 + libadwaita stack and the binary silently exits when
+          # Adw.Application.run() can't find a GTK runtime.
           sudo apt-get install -y \
             libgirepository1.0-dev \
+            libgirepository-2.0-dev \
             gir1.2-gtk-4.0 \
             gir1.2-adw-1 \
             libgtk-4-dev \
