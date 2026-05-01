@@ -6,7 +6,7 @@ import os
 import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Gtk, Adw, GLib
+from gi.repository import Gtk, Adw, GLib, Gio
 
 from fileconverter.config import load_settings, save_settings, Settings, HWACCEL_MODES
 from fileconverter.helpers import ALL_INPUT_EXTENSIONS, OUTPUT_TYPES
@@ -379,7 +379,10 @@ class SettingsWindow(Gtk.ApplicationWindow):
 
 class SettingsApp(Adw.Application):
     def __init__(self):
-        super().__init__(application_id="org.fileconverter.settings")
+        super().__init__(
+            application_id="org.fileconverter.settings",
+            flags=Gio.ApplicationFlags.NON_UNIQUE,
+        )
         self.connect("activate", self._on_activate)
 
     def _on_activate(self, _app):
