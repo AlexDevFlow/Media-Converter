@@ -180,15 +180,6 @@ def main() -> None:
         if args.verbose:
             print(_("GTK not available, running headless."), file=sys.stderr)
         _run_headless(jobs, settings.max_simultaneous_conversions)
-    except Exception as e:
-        # FCDEBUG: surface any other GTK/runtime failure that would
-        # otherwise be swallowed by GTK's signal handlers and show as
-        # a silent exit-0. Falls back to headless so the conversion
-        # still happens.
-        import traceback
-        print(f"FCDEBUG: run_with_progress raised {type(e).__name__}: {e}", file=sys.stderr)
-        traceback.print_exc()
-        _run_headless(jobs, settings.max_simultaneous_conversions)
 
 
 if __name__ == "__main__":
