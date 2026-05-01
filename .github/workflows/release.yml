@@ -42,7 +42,12 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install pyinstaller pyyaml PyGObject
+          # Pin PyGObject < 3.50: the 3.50 release switched to
+          # libgirepository-2.0 and changed Application.run() semantics in
+          # a way that makes Adw.Application.run() return 0 without firing
+          # the activate signal in PyInstaller-frozen apps. 3.48.x matches
+          # the version used by working local development builds.
+          pip install pyinstaller pyyaml 'PyGObject<3.50'
 
       - name: Build binary
         run: python -m PyInstaller fileconverter.spec --noconfirm --clean
