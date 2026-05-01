@@ -226,12 +226,27 @@ class ConverterApp(Adw.Application):
         self.connect("activate", self._on_activate)
 
     def _on_activate(self, _app):
-        win = ProgressWindow(self, self.jobs, self.settings)
-        win.present()
-        win.start_conversions()
+        import sys
+        print("FCDEBUG: _on_activate ENTER", file=sys.stderr, flush=True)
+        try:
+            win = ProgressWindow(self, self.jobs, self.settings)
+            print("FCDEBUG: ProgressWindow built", file=sys.stderr, flush=True)
+            win.present()
+            print("FCDEBUG: window presented", file=sys.stderr, flush=True)
+            win.start_conversions()
+            print("FCDEBUG: start_conversions returned", file=sys.stderr, flush=True)
+        except Exception as e:
+            import traceback
+            print(f"FCDEBUG: activate handler raised {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+            traceback.print_exc()
+            raise
 
 
 def run_with_progress(jobs: list[ConversionJob], settings: Settings) -> None:
     """Launch the GTK progress window and run conversions."""
+    import sys
+    print(f"FCDEBUG: run_with_progress called, jobs={len(jobs)}", file=sys.stderr, flush=True)
     app = ConverterApp(jobs, settings)
-    app.run(None)
+    print("FCDEBUG: ConverterApp constructed, calling run()", file=sys.stderr, flush=True)
+    rc = app.run(None)
+    print(f"FCDEBUG: app.run() returned {rc}", file=sys.stderr, flush=True)
