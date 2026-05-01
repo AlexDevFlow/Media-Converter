@@ -100,6 +100,7 @@ jobs:
             ${{ steps.package.outputs.checksum }}
             dist/fileconverter
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
           body: |
             ## Install
 
