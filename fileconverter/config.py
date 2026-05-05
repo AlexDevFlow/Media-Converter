@@ -22,6 +22,9 @@ DEFAULT_PRESETS_FILE = _BASE_DIR / "resources" / "default_presets.yaml"
 HWACCEL_MODES = ["off", "auto", "nvenc", "vaapi"]
 
 
+CURRENT_VERSION = 2
+
+
 @dataclass
 class Settings:
     max_simultaneous_conversions: int = 2
@@ -30,10 +33,11 @@ class Settings:
     hardware_acceleration: str = "off"  # off | auto | nvenc | vaapi
     language: str = "auto"  # auto (system) | locale code like "it_IT"
     presets: list[ConversionPreset] = field(default_factory=list)
+    version: int = CURRENT_VERSION
 
     def to_dict(self) -> dict:
         return {
-            "version": 1,
+            "version": self.version,
             "max_simultaneous_conversions": self.max_simultaneous_conversions,
             "exit_when_done": self.exit_when_done,
             "exit_delay_seconds": self.exit_delay_seconds,
@@ -54,6 +58,7 @@ class Settings:
             hardware_acceleration=hw,
             language=data.get("language", "auto"),
             presets=[ConversionPreset.from_dict(p) for p in data.get("presets", [])],
+            version=data.get("version", 1),
         )
 
 
@@ -64,18 +69,60 @@ def ensure_config() -> None:
         shutil.copy2(DEFAULT_PRESETS_FILE, CONFIG_FILE)
 
 
+def _load_default_settings() -> Settings | None:
+    if not DEFAULT_PRESETS_FILE.exists():
+        return None
+    with open(DEFAULT_PRESETS_FILE, "r") as f:
+        data = yaml.safe_load(f) or {}
+    return Settings.from_dict(data)
+
+
 def load_settings() -> Settings:
-    """Load settings from YAML config, falling back to defaults."""
+    """Load settings from YAML config, falling back to defaults.
+
+    Every load runs an additive merge: any default preset whose name is
+    missing from the user config is appended.
+
+    When the user config version is older than the bundled default version,
+    we also union the input_types of presets that exist in both — so a user
+    who hasn't customised inputs picks up newly supported formats. User
+    settings (quality, scale, etc.) are never touched.
+    """
     ensure_config()
     if CONFIG_FILE.exists():
         with open(CONFIG_FILE, "r") as f:
             data = yaml.safe_load(f) or {}
-        return Settings.from_dict(data)
+        settings = Settings.from_dict(data)
 
-    if DEFAULT_PRESETS_FILE.exists():
-        with open(DEFAULT_PRESETS_FILE, "r") as f:
-            data = yaml.safe_load(f) or {}
-        return Settings.from_dict(data)
+        defaults = _load_default_settings()
+        if defaults is not None:
+            changed = False
+            existing = {p.name: p for p in settings.presets}
+            new_names = [p.name for p in defaults.presets if p.name not in existing]
+
+            for d in defaults.presets:
+                if d.name not in existing:
+                    settings.presets.append(d)
+                    changed = True
+                elif settings.version < CURRENT_VERSION:
+                    # Union input_types so older configs gain newly supported inputs.
+                    user_p = existing[d.name]
+                    merged = sorted(set(user_p.input_types) | set(d.input_types))
+                    if merged != user_p.input_types:
+                        user_p.input_types = merged
+                        changed = True
+
+            if settings.version < CURRENT_VERSION:
+                settings.version = CURRENT_VERSION
+                changed = True
+
+            if changed:
+                save_settings(settings)
+        return settings
+
+    defaults = _load_default_settings()
+    if defaults is not None:
+        return defaults
 
     return Settings()
 

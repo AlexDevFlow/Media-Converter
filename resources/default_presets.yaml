@@ -1,13 +1,46 @@
-version: 1
+version: 2
 max_simultaneous_conversions: 2
 exit_when_done: true
 exit_delay_seconds: 3
+
+# Reusable input lists (YAML anchors keep this file readable).
+_anchors:
+  video: &video_inputs
+    [3gp, 3gpp, avi, bik, f4v, flv, m2ts, m4v, mkv, mov, mp4, mts,
+     mxf, mpg, mpeg, ogv, qt, rm, ts, vob, webm, wmv]
+
+  audio: &audio_inputs
+    [aac, aif, aiff, ape, dff, dsf, flac, m4a, m4b, mka, mp3, mpc,
+     oga, ogg, opus, wav, wma, wv]
+
+  audio_lossless: &audio_lossless_inputs
+    [aif, aiff, ape, dff, dsf, flac, mka, wav, wma, wv]
+
+  image: &image_inputs
+    [arw, avif, bmp, cr2, dds, dng, exr, heic, ico, jfif, jp2, jpg,
+     jpeg, nef, pbm, pgm, png, ppm, psd, raf, svg, tga, tif, tiff,
+     webp, xcf]
+
+  doc_text: &doc_text_inputs
+    [doc, docx, epub, html, odt, pages, rtf, txt]
+
+  doc_sheet: &doc_sheet_inputs
+    [csv, numbers, ods, xls, xlsx]
+
+  doc_pres: &doc_pres_inputs
+    [key, odp, ppt, pptx]
+
+  doc_all: &doc_all_inputs
+    [csv, doc, docx, epub, html, key, numbers, odp, odt, pages,
+     ppt, pptx, rtf, txt, xls, xlsx]
 
 presets:
   # ── Video ──
   - name: "To Mp4"
     output_type: mp4
-    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: &video_or_gif
+      [gif, 3gp, 3gpp, avi, bik, f4v, flv, m2ts, m4v, mkv, mov, mp4,
+       mts, mxf, mpg, mpeg, ogv, qt, rm, ts, vob, webm, wmv]
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -20,7 +53,7 @@ presets:
 
   - name: "To Mp4 (low quality)"
     output_type: mp4
-    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *video_or_gif
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -33,7 +66,20 @@ presets:
 
   - name: "To Mkv"
     output_type: mkv
-    input_types: [3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv, gif]
+    input_types: *video_or_gif
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      enable_audio: true
+      video_quality: 30
+      video_encoding_speed: medium
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 155
+
+  - name: "To Mov"
+    output_type: mov
+    input_types: *video_or_gif
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -46,7 +92,7 @@ presets:
 
   - name: "To Webm"
     output_type: webm
-    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *video_or_gif
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -58,7 +104,7 @@ presets:
 
   - name: "To Ogv"
     output_type: ogv
-    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *video_or_gif
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -70,7 +116,7 @@ presets:
 
   - name: "To Avi"
     output_type: avi
-    input_types: [gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *video_or_gif
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -83,7 +129,12 @@ presets:
   # ── GIF ──
   - name: "To Gif"
     output_type: gif
-    input_types: [xcf, gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv, arw, bmp, cr2, dds, dng, exr, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp]
+    input_types: &gif_inputs
+      [xcf, gif, 3gp, 3gpp, avi, bik, f4v, flv, m2ts, m4v, mkv, mov,
+       mp4, mts, mxf, mpg, mpeg, ogv, qt, rm, ts, vob, webm, wmv,
+       arw, avif, bmp, cr2, dds, dng, exr, heic, ico, jfif, jp2, jpg,
+       jpeg, nef, pbm, pgm, png, ppm, psd, raf, svg, tga, tif, tiff,
+       webp]
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -93,7 +144,7 @@ presets:
 
   - name: "To Gif (low quality)"
     output_type: gif
-    input_types: [xcf, gif, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv, arw, bmp, cr2, dds, dng, exr, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp]
+    input_types: *gif_inputs
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -104,7 +155,11 @@ presets:
   # ── Audio ──
   - name: "To Mp3"
     output_type: mp3
-    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: &audio_or_video
+      [aac, aif, aiff, ape, dff, dsf, flac, m4a, m4b, mka, mp3, mpc,
+       oga, ogg, opus, wav, wma, wv,
+       3gp, 3gpp, avi, bik, f4v, flv, m2ts, m4v, mkv, mov, mp4, mts,
+       mxf, mpg, mpeg, ogv, qt, rm, ts, vob, webm, wmv]
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -114,7 +169,7 @@ presets:
 
   - name: "To Mp3 (low quality)"
     output_type: mp3
-    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *audio_or_video
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -124,7 +179,16 @@ presets:
 
   - name: "To Aac"
     output_type: aac
-    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *audio_or_video
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_bitrate: 155
+      audio_channel_count: 0
+
+  - name: "To M4a"
+    output_type: m4a
+    input_types: *audio_or_video
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -133,16 +197,25 @@ presets:
 
   - name: "To Ogg"
     output_type: ogg
-    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *audio_or_video
     input_post_action: none
     output_template: "(p)(f)"
     settings:
       audio_bitrate: 160
       audio_channel_count: 0
 
+  - name: "To Opus"
+    output_type: opus
+    input_types: *audio_or_video
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_bitrate: 128
+      audio_channel_count: 0
+
   - name: "To Flac"
     output_type: flac
-    input_types: [wav, ape, wma, aiff, flac]
+    input_types: *audio_lossless_inputs
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -150,7 +223,7 @@ presets:
 
   - name: "To Wav"
     output_type: wav
-    input_types: [aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma, 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, webm, wmv]
+    input_types: *audio_or_video
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -160,7 +233,10 @@ presets:
   # ── Image ──
   - name: "To Png"
     output_type: png
-    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_types: &image_or_pdf
+      [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jp2,
+       jpg, jpeg, nef, pbm, pgm, png, ppm, psd, raf, svg, tga, tif,
+       tiff, webp, xcf, pdf]
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -169,7 +245,7 @@ presets:
 
   - name: "To Jpg"
     output_type: jpg
-    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_types: *image_or_pdf
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -179,7 +255,7 @@ presets:
 
   - name: "To Webp"
     output_type: webp
-    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_types: *image_or_pdf
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -189,7 +265,7 @@ presets:
 
   - name: "To Avif"
     output_type: avif
-    input_types: [arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf, pdf]
+    input_types: *image_or_pdf
     input_post_action: none
     output_template: "(p)(f)"
     settings:
@@ -197,11 +273,79 @@ presets:
       image_scale: 1.0
       image_rotation: 0
 
-  # ── Document ──
-  - name: "To Pdf"
-    output_type: pdf
-    input_types: [doc, docx, odt, xls, xlsx, ods, ppt, pptx, odp, arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf]
+  - name: "To Tiff"
+    output_type: tiff
+    input_types: *image_or_pdf
     input_post_action: none
     output_template: "(p)(f)"
     settings:
       image_scale: 1.0
+      image_rotation: 0
+
+  - name: "To Bmp"
+    output_type: bmp
+    input_types: *image_or_pdf
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_scale: 1.0
+      image_rotation: 0
+
+  - name: "To Ico"
+    output_type: ico
+    input_types: *image_or_pdf
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_scale: 1.0
+      image_rotation: 0
+
+  # ── Document ──
+  - name: "To Pdf"
+    output_type: pdf
+    input_types:
+      [csv, doc, docx, epub, html, key, numbers, odp, ods, odt, pages,
+       ppt, pptx, rtf, txt, xls, xlsx,
+       arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jp2,
+       jpg, jpeg, nef, pbm, pgm, png, ppm, psd, raf, svg, tga, tif,
+       tiff, webp, xcf]
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_scale: 1.0
+
+  - name: "To Docx"
+    output_type: docx
+    input_types: *doc_text_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Odt"
+    output_type: odt
+    input_types: *doc_text_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Xlsx"
+    output_type: xlsx
+    input_types: *doc_sheet_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Ods"
+    output_type: ods
+    input_types: *doc_sheet_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Pptx"
+    output_type: pptx
+    input_types: *doc_pres_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Odp"
+    output_type: odp
+    input_types: *doc_pres_inputs
+    input_post_action: none
+    output_template: "(p)(f)"

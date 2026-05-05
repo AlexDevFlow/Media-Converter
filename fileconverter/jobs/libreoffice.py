@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 
+from fileconverter.helpers import LIBREOFFICE_OUTPUTS
 from fileconverter.i18n import _
 from fileconverter.integration.install import install_hint
 from fileconverter.jobs.base import ConversionJob
@@ -33,9 +34,33 @@ class LibreOfficeJob(ConversionJob):
 
         if out_type == "pdf":
             self._convert_to_pdf(lo)
+        elif out_type in LIBREOFFICE_OUTPUTS:
+            self._convert_direct(lo, out_type)
         else:
             # Two-step: document → PDF → target image format
             self._convert_via_pdf(lo)
+
+    def _convert_direct(self, lo: str, out_type: str) -> None:
+        """Direct office-format conversion via `--convert-to <ext>`."""
+        self.user_state = _("Converting document...")
+        self.progress = 0.1
+
+        out_dir = os.path.dirname(self.output_path)
+        result = subprocess.run(
+            [lo, "--headless", "--convert-to", out_type, "--outdir", out_dir, self.input_path],
+            capture_output=True, text=True, timeout=600,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"LibreOffice error: {result.stderr}")
+
+        expected = os.path.join(
+            out_dir,
+            os.path.splitext(os.path.basename(self.input_path))[0] + "." + out_type,
+        )
+        if expected != self.output_path and os.path.exists(expected):
+            shutil.move(expected, self.output_path)
+
+        self.progress = 1.0
 
     def _convert_to_pdf(self, lo: str) -> None:
         """Direct conversion to PDF."""

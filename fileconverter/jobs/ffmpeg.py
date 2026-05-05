@@ -180,14 +180,18 @@ class FFmpegJob(ConversionJob):
             self._build_gif(base)
         elif out_type == "ico":
             self._build_ico(base)
+        elif out_type == "m4a":
+            self._build_m4a(base)
         elif out_type == "mp3":
             self._build_mp3(base)
-        elif out_type in ("mp4", "mkv"):
+        elif out_type in ("mp4", "mkv", "mov"):
             self._build_h264(base)
         elif out_type == "ogg":
             self._build_ogg(base)
         elif out_type == "ogv":
             self._build_ogv(base)
+        elif out_type == "opus":
+            self._build_opus(base)
         elif out_type == "wav":
             self._build_wav(base)
         elif out_type == "webm":
@@ -208,7 +212,7 @@ class FFmpegJob(ConversionJob):
         scale = self.preset.get_setting_float("video_scale", 1.0)
         out_type = self.preset.output_type
 
-        if out_type in ("mp4", "mkv"):
+        if out_type in ("mp4", "mkv", "mov"):
             sf = f"{scale:#.2g}" if abs(scale - 1.0) >= 0.005 else "1"
             if hw_mode == "nvenc":
                 # CUDA scale filter includes format conversion
@@ -227,9 +231,9 @@ class FFmpegJob(ConversionJob):
         elif abs(rotation - 270) <= 0.05:
             parts.append("transpose=1")
 
-        # For H.264 in MP4/MKV, force yuv420p for broad player compatibility
+        # For H.264 in MP4/MKV/MOV, force yuv420p for broad player compatibility
         # NVENC/CUDA excluded: scale_cuda above already sets format=yuv420p
-        if out_type in ("mp4", "mkv") and hw_mode != "nvenc":
+        if out_type in ("mp4", "mkv", "mov") and hw_mode != "nvenc":
             parts.append("format=yuv420p")
 
         return ",".join(parts)
@@ -286,6 +290,23 @@ class FFmpegJob(ConversionJob):
 
     def _build_ico(self, base: list[str]) -> None:
         args = base + ["-i", self.input_path, self.output_path]
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_m4a(self, base: list[str]) -> None:
+        # AAC audio in an MP4/M4A container — what iTunes/iOS expect.
+        bitrate = self.preset.get_setting_int("audio_bitrate", 155)
+        q = _find_closest(_AAC_VBR_MAP, bitrate)
+        args = base + ["-i", self.input_path, "-vn",
+                       "-c:a", "aac", "-q:a", str(q)]
+        args += self._channel_args()
+        args += ["-movflags", "+faststart", self.output_path]
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_opus(self, base: list[str]) -> None:
+        bitrate = self.preset.get_setting_int("audio_bitrate", 128)
+        args = base + ["-i", self.input_path, "-vn",
+                       "-c:a", "libopus", "-b:a", f"{bitrate}k"]
+        args += self._channel_args() + [self.output_path]
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_mp3(self, base: list[str]) -> None:

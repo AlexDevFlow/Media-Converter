@@ -53,23 +53,28 @@ A progress window shows conversion status with estimated time remaining. Multipl
 
 ## Supported Formats
 
-### Input (62 formats)
+### Input (85 formats)
 
 | Category | Formats |
 |----------|---------|
-| **Video** | 3gp, 3gpp, avi, bik, flv, m4v, mkv, mov, mp4, mpg, mpeg, ogv, rm, ts, vob, webm, wmv |
-| **Audio** | aac, aiff, ape, flac, m4a, m4b, mp3, oga, ogg, opus, wav, wma |
-| **Image** | arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jpg, jpeg, nef, png, psd, raf, svg, tga, tif, tiff, webp, xcf |
-| **Document** | doc, docx, odt, pdf, ppt, pptx, odp, ods, xls, xlsx |
+| **Video** | 3gp, 3gpp, avi, bik, f4v, flv, m2ts, m4v, mkv, mov, mp4, mts, mxf, mpg, mpeg, ogv, qt, rm, ts, vob, webm, wmv |
+| **Audio** | aac, aif, aiff, ape, dff, dsf, flac, m4a, m4b, mka, mp3, mpc, oga, ogg, opus, wav, wma, wv |
+| **Image** | arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jp2, jpg, jpeg, nef, pbm, pgm, png, ppm, psd, raf, svg, tga, tif, tiff, webp, xcf |
+| **Document** | csv, doc, docx, epub, html, key, numbers, odp, ods, odt, pages, pdf, ppt, pptx, rtf, txt, xls, xlsx |
 
-### Output (17 formats)
+### Output (28 formats)
 
 | Category | Formats |
 |----------|---------|
-| **Video** | MP4, MKV, WebM, OGV, AVI |
-| **Audio** | MP3, AAC, OGG, FLAC, WAV |
-| **Image** | PNG, JPG, WebP, AVIF, ICO |
-| **Document** | PDF, GIF |
+| **Video** | MP4, MKV, MOV, WebM, OGV, AVI |
+| **Audio** | MP3, AAC, M4A, OGG, OPUS, FLAC, WAV |
+| **Image** | PNG, JPG, WebP, AVIF, TIFF, BMP, ICO, GIF |
+| **Document** | PDF, DOCX, ODT, XLSX, ODS, PPTX, ODP |
+
+> Note: not every input/output combination is meaningful (e.g. `csv → pptx`),
+> and exotic codecs depend on what your local `ffmpeg`/`imagemagick` build
+> supports. If a conversion fails, please open an issue with the source file
+> type and target format.
 
 ## Dependencies
 
@@ -161,6 +166,7 @@ fileconverter --uninstall
 | To Mp4 | MP4 | H.264, quality 30, AAC audio |
 | To Mp4 (low quality) | MP4 | H.264, quality 20, lower bitrate |
 | To Mkv | MKV | H.264, quality 30, AAC audio |
+| To Mov | MOV | H.264, quality 30, AAC audio |
 | To Webm | WebM | VP9 codec |
 | To Ogv | OGV | Theora codec |
 | To Avi | AVI | MPEG-4/XviD |
@@ -169,16 +175,27 @@ fileconverter --uninstall
 | To Mp3 | MP3 | VBR ~190kbps |
 | To Mp3 (low quality) | MP3 | VBR ~100kbps |
 | To Aac | AAC | VBR ~155kbps |
+| To M4a | M4A | AAC in MP4 container, ~155kbps |
 | To Ogg | OGG | Vorbis ~160kbps |
+| To Opus | Opus | ~128kbps |
 | To Flac | FLAC | Lossless, max compression |
 | To Wav | WAV | 16-bit PCM |
 | To Png | PNG | Lossless |
 | To Jpg | JPG | Quality 85 |
 | To Webp | WebP | Quality 85 |
 | To Avif | AVIF | Quality 80 |
+| To Tiff | TIFF | LZW lossless |
+| To Bmp | BMP | Uncompressed |
+| To Ico | ICO | Windows icon |
 | To Pdf | PDF | From images or documents |
+| To Docx | DOCX | Word format via LibreOffice |
+| To Odt | ODT | OpenDocument Text |
+| To Xlsx | XLSX | Excel format via LibreOffice |
+| To Ods | ODS | OpenDocument Spreadsheet |
+| To Pptx | PPTX | PowerPoint format via LibreOffice |
+| To Odp | ODP | OpenDocument Presentation |
 
-All presets are customizable in the settings window or directly in `~/.config/fileconverter/settings.yaml`.
+All presets are customizable in the settings window or directly in `~/.config/fileconverter/settings.yaml`. When upgrading from an older version, missing default presets are added automatically on next launch (your customisations are preserved).
 
 ## Settings
 

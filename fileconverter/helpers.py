@@ -1,30 +1,40 @@
 """Extension categories and format compatibility — ported from Helpers.cs."""
 
 AUDIO_EXTENSIONS = {
-    "aac", "aiff", "ape", "flac", "mp3", "m4a", "m4b",
-    "oga", "ogg", "opus", "wav", "wma",
+    "aac", "aif", "aiff", "ape", "dff", "dsf", "flac", "mka", "mp3",
+    "m4a", "m4b", "mpc", "oga", "ogg", "opus", "wav", "wma", "wv",
 }
 
 VIDEO_EXTENSIONS = {
-    "3gp", "3gpp", "avi", "bik", "flv", "m4v", "mp4",
-    "mpg", "mpeg", "mov", "mkv", "ogv", "rm", "ts", "vob", "webm", "wmv",
+    "3gp", "3gpp", "avi", "bik", "f4v", "flv", "m2ts", "m4v", "mp4",
+    "mts", "mxf", "mpg", "mpeg", "mov", "mkv", "ogv", "qt", "rm",
+    "ts", "vob", "webm", "wmv",
 }
 
 IMAGE_EXTENSIONS = {
     "arw", "avif", "bmp", "cr2", "dds", "dng", "exr", "heic",
-    "ico", "jfif", "jpg", "jpeg", "nef", "png", "psd", "raf",
-    "tga", "tif", "tiff", "svg", "xcf", "webp",
+    "ico", "jfif", "jp2", "jpg", "jpeg", "nef", "pbm", "pgm", "png",
+    "ppm", "psd", "raf", "tga", "tif", "tiff", "svg", "xcf", "webp",
 }
 
 ANIMATED_IMAGE_EXTENSIONS = {"gif"}
 
 DOCUMENT_EXTENSIONS = {
-    "pdf", "doc", "docx", "ppt", "pptx", "odp", "ods", "odt", "xls", "xlsx",
+    "csv", "doc", "docx", "epub", "html", "key", "numbers", "odp",
+    "ods", "odt", "pages", "pdf", "ppt", "pptx", "rtf", "txt",
+    "xls", "xlsx",
 }
 
+# Things LibreOffice should handle (everything that isn't pdf-as-pdf or an image).
+# pdf is excluded because pdf-as-input goes to ImageMagick (rasterisation path).
 OFFICE_EXTENSIONS = {
-    "doc", "docx", "odt", "xls", "xlsx", "ods", "ppt", "pptx", "odp",
+    "csv", "doc", "docx", "epub", "html", "key", "numbers", "odp",
+    "ods", "odt", "pages", "ppt", "pptx", "rtf", "txt", "xls", "xlsx",
 }
+
+# Office formats LibreOffice can produce directly (no PDF detour).
+# Single source of truth — both factory.py and libreoffice.py read this.
+LIBREOFFICE_OUTPUTS = frozenset({"docx", "odp", "ods", "odt", "pptx", "xlsx"})
 
 ALL_INPUT_EXTENSIONS = sorted(
     AUDIO_EXTENSIONS | VIDEO_EXTENSIONS | IMAGE_EXTENSIONS
@@ -32,8 +42,14 @@ ALL_INPUT_EXTENSIONS = sorted(
 )
 
 OUTPUT_TYPES = [
-    "aac", "avi", "avif", "flac", "gif", "ico", "jpg", "mkv",
-    "mp3", "mp4", "ogg", "ogv", "pdf", "png", "wav", "webm", "webp",
+    # Audio
+    "aac", "flac", "m4a", "mp3", "ogg", "opus", "wav",
+    # Video
+    "avi", "mkv", "mov", "mp4", "ogv", "webm",
+    # Image
+    "avif", "bmp", "gif", "ico", "jpg", "png", "tiff", "webp",
+    # Document
+    "docx", "odp", "ods", "odt", "pdf", "pptx", "xlsx",
 ]
 
 

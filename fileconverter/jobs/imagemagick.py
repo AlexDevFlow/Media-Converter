@@ -121,6 +121,11 @@ class ImageMagickJob(ConversionJob):
             return ["-quality", str(q)]
         elif out == "png":
             return ["-quality", "95"]
+        elif out == "tiff":
+            # LZW is broadly supported and lossless; smaller than uncompressed.
+            return ["-compress", "LZW"]
+        elif out == "bmp":
+            return []
         elif out == "pdf":
             return ["-density", str(BASE_DPI_FOR_PDF)]
         return []
