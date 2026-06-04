@@ -8,7 +8,10 @@ from fileconverter.presets import ConversionPreset
 from fileconverter.jobs.base import ConversionJob
 
 # Output types handled by ImageMagick (raster image outputs + pdf rasterisation).
-_IMAGEMAGICK_OUTPUTS = {"avif", "bmp", "jpg", "png", "tiff", "webp", "pdf"}
+_IMAGEMAGICK_OUTPUTS = {"avif", "bmp", "jp2", "jpg", "png", "tga", "tiff", "webp", "pdf"}
+
+# Video codecs that can use GPU acceleration (the others are CPU-only here).
+_HW_CAPABLE_CODECS = {"h264", "h265", "hevc"}
 
 
 def create_job(preset: ConversionPreset, input_path: str, hw_accel: str = "off") -> ConversionJob:
@@ -47,7 +50,10 @@ def create_job(preset: ConversionPreset, input_path: str, hw_accel: str = "off")
     if out_type in _IMAGEMAGICK_OUTPUTS:
         return ImageMagickJob(preset, input_path)
 
-    # Video outputs (mp4, mkv, mov) get hardware acceleration.
-    # Audio-only outputs and other video containers don't.
-    effective_hw = hw_accel if out_type in ("mp4", "mkv", "mov") else "off"
+    # Video outputs (mp4, mkv, mov) get hardware acceleration — but only for
+    # H.264/H.265. ProRes and AV1 are encoded on the CPU here, and audio-only
+    # outputs and other video containers never use hw accel.
+    codec = (preset.get_setting("video_codec") or "h264").lower()
+    hw_ok = out_type in ("mp4", "mkv", "mov") and codec in _HW_CAPABLE_CODECS
+    effective_hw = hw_accel if hw_ok else "off"
     return FFmpegJob(preset, input_path, hw_accel=effective_hw)

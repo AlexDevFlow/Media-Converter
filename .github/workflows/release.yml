@@ -55,6 +55,9 @@ jobs:
       - name: Verify binary runs
         run: ./dist/fileconverter --version
 
+      - name: Verify bundled presets load
+        run: ./dist/fileconverter --self-check
+
       - name: Package release tarball
         id: package
         run: |

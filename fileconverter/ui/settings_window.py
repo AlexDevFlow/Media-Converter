@@ -9,7 +9,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw, GLib, Gio
 
 from fileconverter.config import load_settings, save_settings, Settings, HWACCEL_MODES
-from fileconverter.helpers import ALL_INPUT_EXTENSIONS, OUTPUT_TYPES
+from fileconverter.helpers import ALL_INPUT_EXTENSIONS, OUTPUT_TYPES, VIDEO_CODECS
 from fileconverter import i18n
 from fileconverter.i18n import _
 from fileconverter.presets import ConversionPreset
@@ -67,6 +67,7 @@ class PresetEditor(Gtk.Box):
 
         # Common settings
         common_settings = [
+            ("video_codec", _("Video Codec"), None, None, None),
             ("video_quality", _("Video Quality (0-63)"), 0, 63, 28),
             ("video_encoding_speed", _("Encoding Speed"), None, None, None),
             ("video_scale", _("Video Scale"), 0.1, 4.0, 1.0),
@@ -93,6 +94,15 @@ class PresetEditor(Gtk.Box):
                 if curr_speed in speeds:
                     combo.set_selected(speeds.index(curr_speed))
                 combo.connect("notify::selected", self._on_setting_combo, key, speeds)
+                settings_grid.attach(combo, 1, row, 1, 1)
+            elif key == "video_codec":
+                combo = Gtk.DropDown.new_from_strings(VIDEO_CODECS)
+                curr_codec = str(current or "h264").lower()
+                if curr_codec in ("h265", "hevc"):
+                    curr_codec = "hevc"
+                if curr_codec in VIDEO_CODECS:
+                    combo.set_selected(VIDEO_CODECS.index(curr_codec))
+                combo.connect("notify::selected", self._on_setting_combo, key, VIDEO_CODECS)
                 settings_grid.attach(combo, 1, row, 1, 1)
             else:
                 val = float(current) if current is not None else float(default)

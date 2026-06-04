@@ -33,8 +33,34 @@ def _parse_args() -> argparse.Namespace:
                     help="Remove all File Converter integration files")
     p.add_argument("--verbose", action="store_true",
                     help="Show verbose output")
+    p.add_argument("--self-check", dest="self_check", action="store_true",
+                    help="Verify the bundled presets load, then exit (diagnostic)")
     p.add_argument("files", nargs="*", help="Input files to convert")
     return p.parse_args()
+
+
+# Presets that must be present for a build to be considered correctly bundled.
+_REQUIRED_PRESETS = {
+    "To Mp4", "To Mp3", "To Png", "To Pdf",
+    "To Mp4 (H.265)", "To Mp4 (AV1)", "To Mov (ProRes)",
+    "To Aiff", "To Wma", "To Ac3", "To M4a (Apple Lossless)",
+    "To Jp2", "To Tga", "To Epub", "To Rtf", "To Txt", "To Html", "To Csv",
+}
+
+
+def _self_check() -> None:
+    """Load settings (which loads the bundled default presets) and confirm the
+    expected presets are present. Exits non-zero on a bundling regression.
+
+    Deliberately avoids GTK and ffmpeg so it runs in a headless CI runner."""
+    settings = load_settings()
+    names = {p.name for p in settings.presets}
+    missing = sorted(_REQUIRED_PRESETS - names)
+    print(f"fileconverter {__version__}: {len(settings.presets)} presets loaded")
+    if missing:
+        print(f"self-check FAILED — missing presets: {missing}", file=sys.stderr)
+        sys.exit(1)
+    print("self-check OK")
 
 
 def _collect_files(args: argparse.Namespace) -> list[str]:
@@ -92,6 +118,11 @@ def _apply_language_from_settings() -> None:
 def main() -> None:
     _apply_language_from_settings()
     args = _parse_args()
+
+    # --self-check (diagnostic: verify bundled presets load)
+    if args.self_check:
+        _self_check()
+        return
 
     # --install
     if args.install:

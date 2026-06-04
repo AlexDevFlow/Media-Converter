@@ -126,6 +126,60 @@ presets:
       video_rotation: 0
       audio_bitrate: 190
 
+  - name: "To Mp4 (H.265)"
+    output_type: mp4
+    input_types: *video_or_gif
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      video_codec: hevc
+      enable_audio: true
+      video_quality: 28
+      video_encoding_speed: medium
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 155
+
+  - name: "To Mkv (H.265)"
+    output_type: mkv
+    input_types: *video_or_gif
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      video_codec: hevc
+      enable_audio: true
+      video_quality: 28
+      video_encoding_speed: medium
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 155
+
+  - name: "To Mp4 (AV1)"
+    output_type: mp4
+    input_types: *video_or_gif
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      video_codec: av1
+      enable_audio: true
+      video_quality: 33
+      video_encoding_speed: fast
+      video_scale: 1.0
+      video_rotation: 0
+      audio_bitrate: 155
+
+  - name: "To Mov (ProRes)"
+    output_type: mov
+    input_types: *video_or_gif
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      video_codec: prores
+      prores_profile: 3
+      enable_audio: true
+      video_scale: 1.0
+      video_rotation: 0
+
   # ── GIF ──
   - name: "To Gif"
     output_type: gif
@@ -230,6 +284,42 @@ presets:
       audio_encoding_mode: wav16
       audio_channel_count: 0
 
+  - name: "To Aiff"
+    output_type: aiff
+    input_types: *audio_or_video
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_encoding_mode: aiff16
+      audio_channel_count: 0
+
+  - name: "To M4a (Apple Lossless)"
+    output_type: m4a
+    input_types: *audio_lossless_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_codec: alac
+      audio_channel_count: 0
+
+  - name: "To Wma"
+    output_type: wma
+    input_types: *audio_or_video
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_bitrate: 160
+      audio_channel_count: 0
+
+  - name: "To Ac3"
+    output_type: ac3
+    input_types: *audio_or_video
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      audio_bitrate: 192
+      audio_channel_count: 0
+
   # ── Image ──
   - name: "To Png"
     output_type: png
@@ -300,6 +390,25 @@ presets:
       image_scale: 1.0
       image_rotation: 0
 
+  - name: "To Jp2"
+    output_type: jp2
+    input_types: *image_or_pdf
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_quality: 85
+      image_scale: 1.0
+      image_rotation: 0
+
+  - name: "To Tga"
+    output_type: tga
+    input_types: *image_or_pdf
+    input_post_action: none
+    output_template: "(p)(f)"
+    settings:
+      image_scale: 1.0
+      image_rotation: 0
+
   # ── Document ──
   - name: "To Pdf"
     output_type: pdf
@@ -347,5 +456,35 @@ presets:
   - name: "To Odp"
     output_type: odp
     input_types: *doc_pres_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Epub"
+    output_type: epub
+    input_types: *doc_text_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Rtf"
+    output_type: rtf
+    input_types: *doc_text_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Txt"
+    output_type: txt
+    input_types: *doc_text_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Html"
+    output_type: html
+    input_types: *doc_text_inputs
+    input_post_action: none
+    output_template: "(p)(f)"
+
+  - name: "To Csv"
+    output_type: csv
+    input_types: *doc_sheet_inputs
     input_post_action: none
     output_template: "(p)(f)"

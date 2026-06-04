@@ -34,7 +34,12 @@ OFFICE_EXTENSIONS = {
 
 # Office formats LibreOffice can produce directly (no PDF detour).
 # Single source of truth — both factory.py and libreoffice.py read this.
-LIBREOFFICE_OUTPUTS = frozenset({"docx", "odp", "ods", "odt", "pptx", "xlsx"})
+# txt/csv export with a bare extension; rtf/epub/html need an explicit filter
+# name (see libreoffice._LO_EXPORT_FILTERS) because LibreOffice can't resolve
+# cross-module export filters from the extension alone.
+LIBREOFFICE_OUTPUTS = frozenset({
+    "csv", "docx", "epub", "html", "odp", "ods", "odt", "pptx", "rtf", "txt", "xlsx",
+})
 
 ALL_INPUT_EXTENSIONS = sorted(
     AUDIO_EXTENSIONS | VIDEO_EXTENSIONS | IMAGE_EXTENSIONS
@@ -43,14 +48,20 @@ ALL_INPUT_EXTENSIONS = sorted(
 
 OUTPUT_TYPES = [
     # Audio
-    "aac", "flac", "m4a", "mp3", "ogg", "opus", "wav",
+    "aac", "ac3", "aiff", "flac", "m4a", "mp3", "ogg", "opus", "wav", "wma",
     # Video
     "avi", "mkv", "mov", "mp4", "ogv", "webm",
     # Image
-    "avif", "bmp", "gif", "ico", "jpg", "png", "tiff", "webp",
+    "avif", "bmp", "gif", "ico", "jp2", "jpg", "png", "tga", "tiff", "webp",
     # Document
-    "docx", "odp", "ods", "odt", "pdf", "pptx", "xlsx",
+    "csv", "docx", "epub", "html", "odp", "ods", "odt", "pdf", "pptx", "rtf",
+    "txt", "xlsx",
 ]
+
+# Video codecs selectable per-preset for mp4/mkv/mov outputs. The container
+# (output_type) is the file extension; the codec is chosen via the preset's
+# "video_codec" setting so e.g. H.264 and H.265 can share the .mp4 extension.
+VIDEO_CODECS = ["h264", "hevc", "av1", "prores"]
 
 
 def get_extension_category(ext: str) -> str:

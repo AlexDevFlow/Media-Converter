@@ -54,9 +54,28 @@ class ConversionJob:
         self._cancel_requested = True
 
     def prepare(self) -> None:
-        """Generate output paths and validate."""
+        """Generate output paths and validate.
+
+        For multi-output conversions (e.g. one image per PDF page) the template
+        may not differentiate pages — the default ``(p)(f)`` has no page token,
+        so every page would resolve to the same path and clobber the previous
+        one. When that happens we append a 1-based page number, and we reserve
+        each chosen path so no two outputs in the batch ever collide.
+        """
         num_outputs = self._get_output_files_count()
         self.output_paths = []
+
+        differentiates = True
+        if num_outputs > 1:
+            first = generate_output_path(
+                self.input_path, self.preset.output_type,
+                self.preset.output_template, number_index=0, number_max=num_outputs)
+            second = generate_output_path(
+                self.input_path, self.preset.output_type,
+                self.preset.output_template, number_index=1, number_max=num_outputs)
+            differentiates = first != second
+
+        reserved: set[str] = set()
         for i in range(num_outputs):
             path = generate_output_path(
                 self.input_path,
@@ -65,7 +84,11 @@ class ConversionJob:
                 number_index=i,
                 number_max=num_outputs,
             )
-            path = generate_unique_path(path)
+            if num_outputs > 1 and not differentiates:
+                base, ext = os.path.splitext(path)
+                path = f"{base}-{i + 1}{ext}"
+            path = generate_unique_path(path, reserved=reserved)
+            reserved.add(path)
             out_dir = os.path.dirname(path)
             os.makedirs(out_dir, exist_ok=True)
             self.output_paths.append(path)

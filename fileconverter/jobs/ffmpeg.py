@@ -35,6 +35,29 @@ _AAC_VBR_MAP = {
     32: "0.2", 16: "0.1",
 }
 _WAV_CODEC_MAP = {"wav8": "pcm_s8le", "wav16": "pcm_s16le", "wav24": "pcm_s24le", "wav32": "pcm_s32le"}
+# AIFF is big-endian PCM. Same quality knob ("audio_encoding_mode") as WAV.
+_AIFF_CODEC_MAP = {"aiff16": "pcm_s16be", "aiff24": "pcm_s24be", "aiff32": "pcm_s32be"}
+
+# SVT-AV1 speed preset: maps VideoEncodingSpeed → SVT-AV1 preset (0=slowest/best,
+# 13=fastest). We bias toward the faster half so AV1 stays usable on CPU.
+_SVTAV1_PRESET_MAP = {
+    "ultrafast": 12, "superfast": 11, "veryfast": 10, "faster": 9, "fast": 8,
+    "medium": 6, "slow": 4, "slower": 3, "veryslow": 2,
+}
+
+# ProRes profiles for prores_ks: index → name (used for the prores_profile setting).
+# 0=proxy, 1=lt, 2=standard, 3=hq, 4=4444, 5=4444xq
+_PRORES_PROFILE_MAX = 5
+
+# Which containers (output extensions) each video codec can be muxed into.
+# AV1 can't go in MOV and ProRes can't go in MP4 — selecting such a combo in
+# the settings dropdown would otherwise produce a cryptic ffmpeg failure.
+_CODEC_CONTAINERS = {
+    "h264": {"mp4", "mkv", "mov"},
+    "hevc": {"mp4", "mkv", "mov"},
+    "av1": {"mp4", "mkv"},
+    "prores": {"mov", "mkv"},
+}
 
 # NVENC encoding speed: maps VideoEncodingSpeed → NVENC preset (from original C#)
 _NVENC_PRESET_MAP = {
@@ -83,11 +106,11 @@ def detect_hwaccel(encoder: str) -> bool:
 
     # Build a minimal test command for each encoder type
     if encoder == "nvenc":
-        cmd = [ffmpeg, "-y", "-f", "lavfi", "-i", "color=black:s=64x64:d=0.1",
+        cmd = [ffmpeg, "-y", "-f", "lavfi", "-i", "color=black:s=320x240:d=0.2",
                "-c:v", "h264_nvenc", "-preset", "p4", "-f", "null", "-"]
     elif encoder == "vaapi":
         cmd = [ffmpeg, "-y", "-vaapi_device", _vaapi_device(),
-               "-f", "lavfi", "-i", "color=black:s=64x64:d=0.1",
+               "-f", "lavfi", "-i", "color=black:s=320x240:d=0.2",
                "-vf", "format=nv12,hwupload",
                "-c:v", "h264_vaapi", "-f", "null", "-"]
     else:
@@ -172,6 +195,10 @@ class FFmpegJob(ConversionJob):
 
         if out_type == "aac":
             self._build_aac(base)
+        elif out_type == "ac3":
+            self._build_ac3(base)
+        elif out_type == "aiff":
+            self._build_aiff(base)
         elif out_type == "avi":
             self._build_avi(base)
         elif out_type == "flac":
@@ -185,7 +212,7 @@ class FFmpegJob(ConversionJob):
         elif out_type == "mp3":
             self._build_mp3(base)
         elif out_type in ("mp4", "mkv", "mov"):
-            self._build_h264(base)
+            self._build_video(base)
         elif out_type == "ogg":
             self._build_ogg(base)
         elif out_type == "ogv":
@@ -194,6 +221,8 @@ class FFmpegJob(ConversionJob):
             self._build_opus(base)
         elif out_type == "wav":
             self._build_wav(base)
+        elif out_type == "wma":
+            self._build_wma(base)
         elif out_type == "webm":
             self._build_webm(base)
         else:
@@ -207,7 +236,7 @@ class FFmpegJob(ConversionJob):
         return ["-ac", str(ch)] if ch > 0 else []
 
     # --- Video transform filter args ---
-    def _transform_args(self, hw_mode: str = "off") -> str:
+    def _transform_args(self, hw_mode: str = "off", pin_format: str | None = "yuv420p") -> str:
         parts = []
         scale = self.preset.get_setting_float("video_scale", 1.0)
         out_type = self.preset.output_type
@@ -231,10 +260,12 @@ class FFmpegJob(ConversionJob):
         elif abs(rotation - 270) <= 0.05:
             parts.append("transpose=1")
 
-        # For H.264 in MP4/MKV/MOV, force yuv420p for broad player compatibility
-        # NVENC/CUDA excluded: scale_cuda above already sets format=yuv420p
-        if out_type in ("mp4", "mkv", "mov") and hw_mode != "nvenc":
-            parts.append("format=yuv420p")
+        # For H.264/H.265 in MP4/MKV/MOV, force yuv420p for broad player
+        # compatibility. NVENC/CUDA excluded: scale_cuda above already sets
+        # format=yuv420p. ProRes opts out (pin_format=None) — it keeps its
+        # native 10-bit 4:2:2/4:4:4 pixel format.
+        if out_type in ("mp4", "mkv", "mov") and hw_mode != "nvenc" and pin_format:
+            parts.append(f"format={pin_format}")
 
         return ",".join(parts)
 
@@ -294,12 +325,44 @@ class FFmpegJob(ConversionJob):
 
     def _build_m4a(self, base: list[str]) -> None:
         # AAC audio in an MP4/M4A container — what iTunes/iOS expect.
+        # Setting audio_codec=alac produces Apple Lossless instead (still .m4a).
+        codec = (self.preset.get_setting("audio_codec") or "aac").lower()
+        if codec == "alac":
+            args = base + ["-i", self.input_path, "-vn", "-c:a", "alac"]
+            args += self._channel_args()
+            args += ["-movflags", "+faststart", self.output_path]
+            self._passes.append(_FFmpegPass(_("Conversion"), args))
+            return
         bitrate = self.preset.get_setting_int("audio_bitrate", 155)
         q = _find_closest(_AAC_VBR_MAP, bitrate)
         args = base + ["-i", self.input_path, "-vn",
                        "-c:a", "aac", "-q:a", str(q)]
         args += self._channel_args()
         args += ["-movflags", "+faststart", self.output_path]
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_aiff(self, base: list[str]) -> None:
+        # AIFF — big-endian PCM, lossless. Mirrors the WAV builder.
+        mode = (self.preset.get_setting("audio_encoding_mode") or "aiff16").lower()
+        codec = _AIFF_CODEC_MAP.get(mode, "pcm_s16be")
+        args = base + ["-i", self.input_path, "-vn", "-c:a", codec]
+        args += self._channel_args() + [self.output_path]
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_wma(self, base: list[str]) -> None:
+        # Windows Media Audio (WMA v2) in an ASF container.
+        bitrate = self.preset.get_setting_int("audio_bitrate", 160)
+        args = base + ["-i", self.input_path, "-vn",
+                       "-c:a", "wmav2", "-b:a", f"{bitrate}k"]
+        args += self._channel_args() + [self.output_path]
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_ac3(self, base: list[str]) -> None:
+        # Dolby Digital (AC-3) — CBR, common for surround/home-theatre.
+        bitrate = self.preset.get_setting_int("audio_bitrate", 192)
+        args = base + ["-i", self.input_path, "-vn",
+                       "-c:a", "ac3", "-b:a", f"{bitrate}k"]
+        args += self._channel_args() + [self.output_path]
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_opus(self, base: list[str]) -> None:
@@ -321,12 +384,57 @@ class FFmpegJob(ConversionJob):
         args += ["-id3v2_version", "3", "-write_id3v1", "1", self.output_path]
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
+    def _build_video(self, base: list[str]) -> None:
+        """Dispatch mp4/mkv/mov encoding to the codec chosen by the preset.
+
+        The container is the file extension; "video_codec" picks the codec so
+        H.264 and H.265 (and AV1/ProRes) can all target .mp4/.mkv/.mov.
+        """
+        codec = (self.preset.get_setting("video_codec") or "h264").lower()
+        if codec == "h265":
+            codec = "hevc"
+
+        # Guard against codec/container combinations ffmpeg can't mux.
+        allowed = _CODEC_CONTAINERS.get(codec, {"mp4", "mkv", "mov"})
+        if self.preset.output_type not in allowed:
+            raise RuntimeError(
+                f"{codec.upper()} video cannot be stored in a "
+                f".{self.preset.output_type} container; use "
+                f"{' or '.join('.' + e for e in sorted(allowed))}."
+            )
+
+        if codec == "hevc":
+            self._build_h26x(base, "hevc")
+        elif codec == "av1":
+            self._build_av1(base)
+        elif codec == "prores":
+            self._build_prores(base)
+        else:
+            self._build_h26x(base, "h264")
+
     def _build_h264(self, base: list[str]) -> None:
+        # Retained for backward compatibility / explicit callers.
+        self._build_h26x(base, "h264")
+
+    def _build_h26x(self, base: list[str], family: str) -> None:
+        """H.264 or H.265/HEVC encoding with optional NVENC/VAAPI acceleration.
+
+        family: "h264" or "hevc". The CRF/QP quality knob and hw-accel plumbing
+        are identical; only the encoder names (and the Apple hvc1 tag) differ.
+        """
         vq = self.preset.get_setting_int("video_quality", 28)
         speed = self.preset.get_setting("video_encoding_speed", "medium").lower()
         bitrate = self.preset.get_setting_int("audio_bitrate", 155)
         crf = 51 - vq
         hw = self._hw_accel
+        out_type = self.preset.output_type
+
+        sw_codec = "libx264" if family == "h264" else "libx265"
+        nvenc_codec = "h264_nvenc" if family == "h264" else "hevc_nvenc"
+        vaapi_codec = "h264_vaapi" if family == "h264" else "hevc_vaapi"
+        # hvc1 tag makes HEVC play in QuickTime/Safari/Finder; only meaningful
+        # for the MP4/MOV (ISO-BMFF) containers, not Matroska.
+        tag = ["-tag:v", "hvc1"] if (family == "hevc" and out_type in ("mp4", "mov")) else []
 
         # Audio args (same regardless of hw mode)
         audio = ["-an"]
@@ -344,7 +452,7 @@ class FFmpegJob(ConversionJob):
         if hw == "nvenc":
             # NVIDIA NVENC — ported from original C# CUDA path
             nvenc_preset = _NVENC_PRESET_MAP.get(speed, "p4")
-            codec_args = ["-c:v", "h264_nvenc",
+            codec_args = ["-c:v", nvenc_codec,
                           "-preset", nvenc_preset,
                           "-rc", "constqp", "-qp", str(crf)]
             hw_input_args = ["-hwaccel", "cuda", "-hwaccel_output_format", "cuda"]
@@ -352,7 +460,7 @@ class FFmpegJob(ConversionJob):
         elif hw == "vaapi":
             # VAAPI (AMD/Intel on Linux) — Linux replacement for AMF
             compression = _VAAPI_COMPRESSION_MAP.get(speed, 4)
-            codec_args = ["-c:v", "h264_vaapi",
+            codec_args = ["-c:v", vaapi_codec,
                           "-compression_level", str(compression),
                           "-qp", str(crf)]
             hw_input_args = ["-vaapi_device", _vaapi_device(),
@@ -366,9 +474,48 @@ class FFmpegJob(ConversionJob):
 
         else:
             # Software encoding (default, always works)
-            codec_args = ["-c:v", "libx264", "-preset", speed, "-crf", str(crf)]
+            codec_args = ["-c:v", sw_codec, "-preset", speed, "-crf", str(crf)]
 
-        args = base + hw_input_args + ["-i", self.input_path] + codec_args + audio + vf + [self.output_path]
+        args = (base + hw_input_args + ["-i", self.input_path]
+                + codec_args + tag + audio + vf + [self.output_path])
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_av1(self, base: list[str]) -> None:
+        """AV1 via SVT-AV1 (software). Royalty-free, smaller than H.265."""
+        vq = self.preset.get_setting_int("video_quality", 30)
+        speed = self.preset.get_setting("video_encoding_speed", "medium").lower()
+        bitrate = self.preset.get_setting_int("audio_bitrate", 155)
+        crf = max(0, min(63, 63 - vq))
+        preset_num = _SVTAV1_PRESET_MAP.get(speed, 6)
+
+        audio = ["-an"]
+        if self.preset.get_setting_bool("enable_audio", True):
+            aac_q = _find_closest(_AAC_VBR_MAP, bitrate)
+            audio = ["-c:a", "aac", "-qscale:a", str(aac_q)]
+
+        transform = self._transform_args()
+        vf = ["-vf", transform] if transform else []
+        args = (base + ["-i", self.input_path,
+                        "-c:v", "libsvtav1", "-crf", str(crf), "-preset", str(preset_num)]
+                + audio + vf + [self.output_path])
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_prores(self, base: list[str]) -> None:
+        """Apple ProRes via prores_ks — intra-frame, edit-friendly mezzanine."""
+        profile = self.preset.get_setting_int("prores_profile", 3)
+        profile = max(0, min(_PRORES_PROFILE_MAX, profile))
+
+        # PCM audio is the ProRes editing convention; -an if audio disabled.
+        audio = ["-an"]
+        if self.preset.get_setting_bool("enable_audio", True):
+            audio = ["-c:a", "pcm_s16le"]
+
+        # No yuv420p pin — ProRes keeps its native 10-bit 4:2:2/4:4:4.
+        transform = self._transform_args(pin_format=None)
+        vf = ["-vf", transform] if transform else []
+        args = (base + ["-i", self.input_path,
+                        "-c:v", "prores_ks", "-profile:v", str(profile)]
+                + audio + vf + [self.output_path])
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_ogg(self, base: list[str]) -> None:

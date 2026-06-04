@@ -70,13 +70,17 @@ def generate_output_path(
     return out
 
 
-def generate_unique_path(path: str) -> str:
-    if not os.path.exists(path):
+def generate_unique_path(path: str, reserved: set[str] | None = None) -> str:
+    """Return a path that collides with neither an existing file nor a path
+    already claimed in `reserved` (used when generating a batch of outputs in
+    one prepare() pass, before any of them exist on disk)."""
+    reserved = reserved or set()
+    if not os.path.exists(path) and path not in reserved:
         return path
     base, ext = os.path.splitext(path)
     counter = 2
     while True:
         candidate = f"{base} ({counter}){ext}"
-        if not os.path.exists(candidate):
+        if not os.path.exists(candidate) and candidate not in reserved:
             return candidate
         counter += 1

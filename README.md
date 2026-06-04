@@ -62,14 +62,15 @@ A progress window shows conversion status with estimated time remaining. Multipl
 | **Image** | arw, avif, bmp, cr2, dds, dng, exr, gif, heic, ico, jfif, jp2, jpg, jpeg, nef, pbm, pgm, png, ppm, psd, raf, svg, tga, tif, tiff, webp, xcf |
 | **Document** | csv, doc, docx, epub, html, key, numbers, odp, ods, odt, pages, pdf, ppt, pptx, rtf, txt, xls, xlsx |
 
-### Output (28 formats)
+### Output (38 formats)
 
 | Category | Formats |
 |----------|---------|
 | **Video** | MP4, MKV, MOV, WebM, OGV, AVI |
-| **Audio** | MP3, AAC, M4A, OGG, OPUS, FLAC, WAV |
-| **Image** | PNG, JPG, WebP, AVIF, TIFF, BMP, ICO, GIF |
-| **Document** | PDF, DOCX, ODT, XLSX, ODS, PPTX, ODP |
+| **Video codecs** | H.264 (default), H.265/HEVC, AV1, ProRes — selectable per preset for MP4/MKV/MOV (see [Video codecs](#video-codecs)) |
+| **Audio** | MP3, AAC, M4A (AAC or ALAC), AIFF, OGG, OPUS, FLAC, WAV, WMA, AC3 |
+| **Image** | PNG, JPG, WebP, AVIF, JP2, TIFF, BMP, TGA, ICO, GIF |
+| **Document** | PDF, DOCX, ODT, RTF, TXT, HTML, EPUB, XLSX, ODS, CSV, PPTX, ODP |
 
 > Note: not every input/output combination is meaningful (e.g. `csv → pptx`),
 > and exotic codecs depend on what your local `ffmpeg`/`imagemagick` build
@@ -170,6 +171,10 @@ fileconverter --uninstall
 | To Webm | WebM | VP9 codec |
 | To Ogv | OGV | Theora codec |
 | To Avi | AVI | MPEG-4/XviD |
+| To Mp4 (H.265) | MP4 | H.265/HEVC, ~half the size of H.264 |
+| To Mkv (H.265) | MKV | H.265/HEVC |
+| To Mp4 (AV1) | MP4 | AV1 via SVT-AV1, royalty-free |
+| To Mov (ProRes) | MOV | ProRes HQ, edit-friendly mezzanine |
 | To Gif | GIF | 15fps, palette-optimized |
 | To Gif (low quality) | GIF | 10fps, 75% scale |
 | To Mp3 | MP3 | VBR ~190kbps |
@@ -180,6 +185,10 @@ fileconverter --uninstall
 | To Opus | Opus | ~128kbps |
 | To Flac | FLAC | Lossless, max compression |
 | To Wav | WAV | 16-bit PCM |
+| To Aiff | AIFF | Lossless 16-bit PCM (big-endian) |
+| To M4a (Apple Lossless) | M4A | ALAC lossless, Apple ecosystem |
+| To Wma | WMA | Windows Media Audio, ~160kbps |
+| To Ac3 | AC3 | Dolby Digital, ~192kbps |
 | To Png | PNG | Lossless |
 | To Jpg | JPG | Quality 85 |
 | To Webp | WebP | Quality 85 |
@@ -187,6 +196,8 @@ fileconverter --uninstall
 | To Tiff | TIFF | LZW lossless |
 | To Bmp | BMP | Uncompressed |
 | To Ico | ICO | Windows icon |
+| To Jp2 | JP2 | JPEG 2000, quality 85 |
+| To Tga | TGA | Truevision Targa |
 | To Pdf | PDF | From images or documents |
 | To Docx | DOCX | Word format via LibreOffice |
 | To Odt | ODT | OpenDocument Text |
@@ -194,6 +205,11 @@ fileconverter --uninstall
 | To Ods | ODS | OpenDocument Spreadsheet |
 | To Pptx | PPTX | PowerPoint format via LibreOffice |
 | To Odp | ODP | OpenDocument Presentation |
+| To Epub | EPUB | Ebook (EPUB) via LibreOffice |
+| To Rtf | RTF | Rich Text Format via LibreOffice |
+| To Txt | TXT | Plain text via LibreOffice |
+| To Html | HTML | HTML via LibreOffice |
+| To Csv | CSV | From spreadsheets via LibreOffice |
 
 All presets are customizable in the settings window or directly in `~/.config/fileconverter/settings.yaml`. When upgrading from an older version, missing default presets are added automatically on next launch (your customisations are preserved).
 
@@ -209,7 +225,7 @@ Or from the context menu: **File Converter > Configure presets...**
 
 **Global:** max simultaneous conversions, auto-close window, hardware acceleration (Off / Auto / NVENC / VAAPI), UI language.
 
-**Per-preset:** output format, input file types, video quality/encoding speed/scale/rotation, audio bitrate/VBR/CBR/channels, image quality/scale/rotation, output filename template, post-conversion action, custom FFmpeg command override.
+**Per-preset:** output format, video codec (H.264/H.265/AV1/ProRes), input file types, video quality/encoding speed/scale/rotation, audio bitrate/VBR/CBR/channels, image quality/scale/rotation, output filename template, post-conversion action, custom FFmpeg command override.
 
 ### Config file
 
@@ -257,6 +273,30 @@ The UI is available in 29 languages. On first launch it picks your system langua
 Shipped locales: Arabic, Chinese (Simplified & Traditional), Czech, Dutch, English, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Persian, Polish, Portuguese (Brazil & Portugal), Romanian, Russian, Serbian (Cyrillic & Latin), Spanish, Swedish, Thai, Turkish, Ukrainian, Vietnamese.
 
 To add or update a translation, edit [`locales/build.py`](locales/build.py) and run `python3 locales/build.py`. That regenerates each `.po` and compiles `.mo` catalogs into `locales/<lang>/LC_MESSAGES/`.
+
+## Video codecs
+
+MP4, MKV and MOV are containers — the codec inside is chosen per preset via the
+`video_codec` setting (or the **Video Codec** dropdown in settings):
+
+| Codec | Setting | Notes |
+|-------|---------|-------|
+| **H.264** | `h264` (default) | Universal compatibility, hardware-accelerated |
+| **H.265 / HEVC** | `hevc` | ~half the size at similar quality; hardware-accelerated; tagged `hvc1` in MP4/MOV for Apple/QuickTime playback |
+| **AV1** | `av1` | Royalty-free, smallest files; CPU-only (SVT-AV1) |
+| **ProRes** | `prores` | Intra-frame editing mezzanine; keeps 10-bit 4:2:2; CPU-only. `prores_profile` 0–5 (3 = HQ) |
+
+```yaml
+presets:
+  - name: "To Mp4 (H.265)"
+    output_type: mp4
+    settings:
+      video_codec: hevc
+      video_quality: 28
+```
+
+H.264 and H.265 use the GPU when hardware acceleration is enabled; AV1 and
+ProRes always encode on the CPU.
 
 ## Hardware Acceleration
 

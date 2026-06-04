@@ -116,7 +116,7 @@ class ImageMagickJob(ConversionJob):
 
     def _quality_args(self) -> list[str]:
         out = self.preset.output_type
-        if out in ("jpg", "webp", "avif"):
+        if out in ("jpg", "webp", "avif", "jp2"):
             q = self.preset.get_setting_int("image_quality", 85)
             return ["-quality", str(q)]
         elif out == "png":

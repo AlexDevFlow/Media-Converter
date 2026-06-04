@@ -98,7 +98,6 @@ def load_settings() -> Settings:
         if defaults is not None:
             changed = False
             existing = {p.name: p for p in settings.presets}
-            new_names = [p.name for p in defaults.presets if p.name not in existing]
 
             for d in defaults.presets:
                 if d.name not in existing:
