@@ -6,11 +6,12 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from dataclasses import dataclass
 
 from fileconverter.i18n import _
-from fileconverter.integration.install import install_hint
+from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.path_helpers import generate_unique_path
 from fileconverter.presets import ConversionPreset
@@ -76,6 +77,34 @@ _VAAPI_COMPRESSION_MAP = {
 # Cache for hardware acceleration detection (avoids re-probing)
 _hwaccel_cache: dict[str, bool] = {}
 
+# Cache of the encoders the local ffmpeg build actually ships. Builds differ:
+# Fedora's ffmpeg-free lacks H.264/H.265, Homebrew's ffmpeg 8 dropped
+# libvorbis/libtheora — pick from what's really there instead of failing with
+# a cryptic "Error selecting an encoder".
+_encoders_cache: set | None = None
+
+
+def available_encoders() -> set:
+    global _encoders_cache
+    if _encoders_cache is None:
+        names = set()
+        ffmpeg = shutil.which("ffmpeg")
+        if ffmpeg:
+            try:
+                out = subprocess.run(
+                    [ffmpeg, "-hide_banner", "-encoders"],
+                    capture_output=True, text=True, timeout=15,
+                ).stdout
+                for line in out.splitlines():
+                    parts = line.split()
+                    # " V....D libx264  libx264 H.264 ..." — skip the legend
+                    if len(parts) >= 2 and parts[0][0] in "VAS" and parts[1] != "=":
+                        names.add(parts[1])
+            except (subprocess.SubprocessError, OSError):
+                pass
+        _encoders_cache = names
+    return _encoders_cache
+
 
 def _find_closest(table: dict, value: int):
     """Find the closest key in a mapping table and return its value."""
@@ -83,6 +112,13 @@ def _find_closest(table: dict, value: int):
         return table[value]
     closest = min(table.keys(), key=lambda k: abs(k - value))
     return table[closest]
+
+
+def jp2_quality_to_qv(quality: int) -> int:
+    """Map image_quality 0-100 (higher = better) to the native jpeg2000
+    encoder's -q:v 2-31 (lower = better). Shared with the ImageMagick PDF
+    path, which chains to this encoder on builds without OpenJPEG."""
+    return max(2, min(31, round(31 - quality * 29 / 100)))
 
 
 def _vaapi_device() -> str:
@@ -113,6 +149,11 @@ def detect_hwaccel(encoder: str) -> bool:
                "-f", "lavfi", "-i", "color=black:s=320x240:d=0.2",
                "-vf", "format=nv12,hwupload",
                "-c:v", "h264_vaapi", "-f", "null", "-"]
+    elif encoder == "videotoolbox":
+        # -q:v (constant quality) needs Apple Silicon; on Intel this probe
+        # fails and we fall back to software, which is the right call there.
+        cmd = [ffmpeg, "-y", "-f", "lavfi", "-i", "color=black:s=320x240:d=0.2",
+               "-c:v", "h264_videotoolbox", "-q:v", "55", "-f", "null", "-"]
     else:
         _hwaccel_cache[encoder] = False
         return False
@@ -131,15 +172,18 @@ def resolve_hwaccel(setting: str) -> str:
     """Resolve the hardware acceleration setting to an actual mode.
 
     Args:
-        setting: "off", "auto", "nvenc", or "vaapi"
+        setting: "off", "auto", "nvenc", "vaapi", or "videotoolbox"
 
     Returns:
-        "off", "nvenc", or "vaapi" — the resolved mode that actually works.
+        "off", "nvenc", "vaapi", or "videotoolbox" — a mode that actually works.
     """
     if setting == "off":
         return "off"
 
     if setting == "auto":
+        if sys.platform == "darwin":
+            # Apple hardware: VideoToolbox or nothing
+            return "videotoolbox" if detect_hwaccel("videotoolbox") else "off"
         # Prefer NVENC (usually faster), fall back to VAAPI
         if detect_hwaccel("nvenc"):
             return "nvenc"
@@ -148,7 +192,7 @@ def resolve_hwaccel(setting: str) -> str:
         return "off"
 
     # Specific encoder requested — verify it works
-    if setting in ("nvenc", "vaapi") and detect_hwaccel(setting):
+    if setting in ("nvenc", "vaapi", "videotoolbox") and detect_hwaccel(setting):
         return setting
 
     return "off"
@@ -207,6 +251,8 @@ class FFmpegJob(ConversionJob):
             self._build_gif(base)
         elif out_type == "ico":
             self._build_ico(base)
+        elif out_type == "jp2":
+            self._build_jp2(base)
         elif out_type == "m4a":
             self._build_m4a(base)
         elif out_type == "mp3":
@@ -234,6 +280,22 @@ class FFmpegJob(ConversionJob):
     def _channel_args(self) -> list[str]:
         ch = self.preset.get_setting_int("audio_channel_count", 0)
         return ["-ac", str(ch)] if ch > 0 else []
+
+    # --- Vorbis audio with build-dependent fallbacks ---
+    def _vorbis_audio(self, bitrate: int, allow_opus: bool = False) -> list[str]:
+        """Encoder args for Vorbis-family audio (ogg/ogv/webm).
+
+        Prefers libvorbis; falls back to libopus where the container allows it
+        (WebM), then to ffmpeg's built-in experimental vorbis encoder (which
+        is stereo-only, hence the -ac 2).
+        """
+        encoders = available_encoders()
+        if "libvorbis" in encoders:
+            q = _find_closest(_OGG_VBR_MAP, bitrate)
+            return ["-c:a", "libvorbis", "-qscale:a", str(q)]
+        if allow_opus and "libopus" in encoders:
+            return ["-c:a", "libopus", "-b:a", f"{bitrate}k"]
+        return ["-c:a", "vorbis", "-strict", "-2", "-ac", "2", "-b:a", f"{bitrate}k"]
 
     # --- Video transform filter args ---
     def _transform_args(self, hw_mode: str = "off", pin_format: str | None = "yuv420p") -> str:
@@ -320,7 +382,40 @@ class FFmpegJob(ConversionJob):
         self._passes.append(_FFmpegPass("Conversion", args2, file_to_delete=palette))
 
     def _build_ico(self, base: list[str]) -> None:
-        args = base + ["-i", self.input_path, self.output_path]
+        # ICO caps at 256x256 — fit larger sources into the box, keeping the
+        # aspect ratio; smaller ones pass through untouched.
+        fit = "scale=min(iw\\,256):min(ih\\,256):force_original_aspect_ratio=decrease"
+        args = base + ["-i", self.input_path, "-vf", fit, self.output_path]
+        self._passes.append(_FFmpegPass(_("Conversion"), args))
+
+    def _build_jp2(self, base: list[str]) -> None:
+        """JPEG-2000 via ffmpeg's native encoder — the fallback used when
+        ImageMagick was built without the OpenJPEG delegate. `-format jp2`
+        wraps the codestream in a proper JP2 container."""
+        quality = self.preset.get_setting_int("image_quality", 85)
+        q = jp2_quality_to_qv(quality)
+
+        # Honour the image transform settings the ImageMagick path applies.
+        parts = []
+        scale = self.preset.get_setting_float("image_scale", 1.0)
+        if abs(scale - 1.0) >= 0.005:
+            sf = f"{scale:#.4g}"
+            parts.append(f"scale=trunc(iw*{sf}):trunc(ih*{sf})")
+        rotation = self.preset.get_setting_float("image_rotation", 0) % 360
+        if abs(rotation - 90) <= 0.05:
+            parts.append("transpose=1")   # clockwise, matching `magick -rotate 90`
+        elif abs(rotation - 180) <= 0.05:
+            parts.append("vflip,hflip")
+        elif abs(rotation - 270) <= 0.05:
+            parts.append("transpose=2")
+        elif abs(rotation) > 0.05:
+            rad = f"{rotation}*PI/180"
+            parts.append(f"rotate={rad}:ow=rotw({rad}):oh=roth({rad})")
+        vf = ["-vf", ",".join(parts)] if parts else []
+
+        args = base + ["-i", self.input_path] + vf + [
+            "-c:v", "jpeg2000", "-format", "jp2", "-q:v", str(q),
+            self.output_path]
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_m4a(self, base: list[str]) -> None:
@@ -472,6 +567,18 @@ class FFmpegJob(ConversionJob):
             else:
                 vf = ["-vf", vaapi_filters]
 
+        elif hw == "videotoolbox":
+            # Apple VideoToolbox — macOS replacement for NVENC/VAAPI.
+            # Frames stay in system memory (no -hwaccel_output_format), so the
+            # regular software scale/rotate/format filters keep working; only
+            # the encode itself runs on the media engine. VT has no speed
+            # presets, and its constant-quality knob is 1-100 (higher =
+            # better) instead of CRF, so map our 0-63 quality onto it.
+            vt_codec = "h264_videotoolbox" if family == "h264" else "hevc_videotoolbox"
+            vt_q = max(1, min(100, round(100 * (vq + 12) / 75)))
+            codec_args = ["-c:v", vt_codec, "-q:v", str(vt_q)]
+            hw_input_args = ["-hwaccel", "videotoolbox"]
+
         else:
             # Software encoding (default, always works)
             codec_args = ["-c:v", sw_codec, "-preset", speed, "-crf", str(crf)]
@@ -520,20 +627,23 @@ class FFmpegJob(ConversionJob):
 
     def _build_ogg(self, base: list[str]) -> None:
         bitrate = self.preset.get_setting_int("audio_bitrate", 128)
-        q = _find_closest(_OGG_VBR_MAP, bitrate)
-        args = base + ["-i", self.input_path, "-vn",
-                        "-codec:a", "libvorbis", "-qscale:a", str(q)]
+        args = base + ["-i", self.input_path, "-vn"] + self._vorbis_audio(bitrate)
         args += self._channel_args() + [self.output_path]
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_ogv(self, base: list[str]) -> None:
+        if "libtheora" not in available_encoders():
+            raise RuntimeError(
+                "This ffmpeg build has no Theora encoder (libtheora), so OGV "
+                "output is unavailable — Homebrew's ffmpeg dropped it. "
+                "Convert to WebM instead."
+            )
         vq = self.preset.get_setting_int("video_quality", 7)
         bitrate = self.preset.get_setting_int("audio_bitrate", 128)
         vf = self._vf_args()
         audio = ["-an"]
         if self.preset.get_setting_bool("enable_audio", True):
-            ogg_q = _find_closest(_OGG_VBR_MAP, bitrate)
-            audio = ["-codec:a", "libvorbis", "-qscale:a", str(ogg_q)]
+            audio = self._vorbis_audio(bitrate)
         args = base + ["-i", self.input_path,
                         "-codec:v", "libtheora", "-qscale:v", str(vq)] + audio + vf
         args += [self.output_path]
@@ -557,8 +667,9 @@ class FFmpegJob(ConversionJob):
         vf = self._vf_args()
         audio = ["-an"]
         if self.preset.get_setting_bool("enable_audio", True):
-            ogg_q = _find_closest(_OGG_VBR_MAP, bitrate)
-            audio = ["-c:a", "libvorbis", "-qscale:a", str(ogg_q)]
+            # WebM allows Vorbis or Opus — _vorbis_audio picks what this
+            # ffmpeg build provides.
+            audio = self._vorbis_audio(bitrate, allow_opus=True)
         args = base + ["-i", self.input_path, "-c:v", "libvpx-vp9"] + enc + audio + vf
         args += [self.output_path]
         self._passes.append(_FFmpegPass(_("Conversion"), args))
