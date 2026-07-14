@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-24.04
 
     steps:
@@ -59,7 +59,6 @@ jobs:
         run: ./dist/fileconverter --self-check
 
       - name: Package release tarball
-        id: package
         run: |
           VERSION="${GITHUB_REF_NAME}"
           PKG_DIR="fileconverter-${VERSION}"
@@ -105,23 +104,125 @@ jobs:
           TARBALL="fileconverter-${VERSION}-linux-x86_64.tar.gz"
           tar -czf "${TARBALL}" "${PKG_DIR}"
           sha256sum "${TARBALL}" > "${TARBALL}.sha256"
-          echo "tarball=${TARBALL}" >> "$GITHUB_OUTPUT"
-          echo "checksum=${TARBALL}.sha256" >> "$GITHUB_OUTPUT"
           ls -la "${TARBALL}" "${TARBALL}.sha256"
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: |
+            fileconverter-*-linux-x86_64.tar.gz
+            fileconverter-*-linux-x86_64.tar.gz.sha256
+            dist/fileconverter
+
+  build-macos:
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile-check Python sources
+        run: python3 -m compileall -q fileconverter
+
+      - name: Compile-check native Swift sources
+        # The installer compiles these on the user's machine; make sure the
+        # release ships sources that build with a current Xcode toolchain.
+        run: |
+          swiftc -O -parse-as-library -module-name FileConverterUI \
+            fileconverter/ui/native/FileConverterUI.swift -o /tmp/fcui
+          swiftc -O -parse-as-library -module-name FileConverterHost \
+            fileconverter/ui/native/HostApp.swift -o /tmp/fchost
+          swiftc -O -parse-as-library -module-name FileConverterSync \
+            fileconverter/ui/native/FinderSyncExt.swift -o /tmp/fcsync \
+            -framework FinderSync -Xlinker -e -Xlinker _NSExtensionMain
+
+      - name: Install media tools
+        run: |
+          export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew install ffmpeg imagemagick ghostscript
+
+      - name: Run test suite
+        # Integration tests against the real backends; LibreOffice-dependent
+        # tests skip cleanly (the cask is too heavy for CI).
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet --disable-pip-version-check pyyaml pytest
+          .venv/bin/python -m pytest tests/ -q
+
+      - name: Verify bundled presets load
+        run: PYTHONPATH=. .venv/bin/python -m fileconverter --self-check
+
+      - name: Package macOS tarball
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          PKG_DIR="fileconverter-${VERSION}-macos"
+          mkdir -p "${PKG_DIR}"
+          cp -R fileconverter resources locales "${PKG_DIR}/"
+          cp install.sh install-macos.sh LICENSE "${PKG_DIR}/"
+          find "${PKG_DIR}" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+
+          cat > "${PKG_DIR}/README.txt" <<'EOF'
+          File Converter for macOS
+          ========================
+
+          Requirements:
+            - Xcode Command Line Tools:  xcode-select --install
+            - Homebrew (https://brew.sh) for the media tools
+
+          Quick install (terminal):
+
+              ./install.sh
+
+          This sets up the Finder right-click submenu ("File Converter"),
+          compiles the native progress/settings UI, and installs
+          File Converter.app in ~/Applications. Missing media tools
+          (ffmpeg, imagemagick, ghostscript) are offered via Homebrew.
+
+          To remove everything later:
+
+              fileconverter --uninstall
+
+          Project page: https://github.com/AlexDevFlow/Media-Converter
+          EOF
+
+          TARBALL="fileconverter-${VERSION}-macos.tar.gz"
+          tar -czf "${TARBALL}" "${PKG_DIR}"
+          shasum -a 256 "${TARBALL}" > "${TARBALL}.sha256"
+          ls -la "${TARBALL}" "${TARBALL}.sha256"
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: |
+            fileconverter-*-macos.tar.gz
+            fileconverter-*-macos.tar.gz.sha256
+
+  release:
+    runs-on: ubuntu-24.04
+    needs: [build-linux, build-macos]
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ${{ steps.package.outputs.tarball }}
-            ${{ steps.package.outputs.checksum }}
+            fileconverter-*-linux-x86_64.tar.gz
+            fileconverter-*-linux-x86_64.tar.gz.sha256
+            fileconverter-*-macos.tar.gz
+            fileconverter-*-macos.tar.gz.sha256
             dist/fileconverter
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
           body: |
             ## Install
 
-            **Recommended — download the tarball:**
+            ### Linux
 
             1. Download `fileconverter-${{ github.ref_name }}-linux-x86_64.tar.gz` below.
             2. Open a terminal in your downloads folder and run:
@@ -135,12 +236,27 @@ jobs:
             The installer detects your file manager (Nautilus / Nemo / Dolphin / Thunar / PCManFM)
             and sets up the right-click "File Converter" submenu.
 
-            To remove later:
+            ### macOS
+
+            1. Download `fileconverter-${{ github.ref_name }}-macos.tar.gz` below.
+            2. Open a terminal in your downloads folder and run:
+
+            ```bash
+            tar -xzf fileconverter-${{ github.ref_name }}-macos.tar.gz
+            cd fileconverter-${{ github.ref_name }}-macos
+            ./install.sh
+            ```
+
+            The installer builds the Finder right-click submenu ("File Converter"),
+            the native SwiftUI progress window, and File Converter.app.
+            Requires the Xcode Command Line Tools and Homebrew.
+
+            To remove later (both platforms):
 
             ```bash
             fileconverter --uninstall
             ```
 
-            **Power users:** the raw `fileconverter` binary is also attached if you want to manage placement yourself.
+            **Power users:** the raw Linux `fileconverter` binary is also attached if you want to manage placement yourself.
 
             ---
