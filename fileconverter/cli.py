@@ -1,4 +1,4 @@
-"""CLI entry point — mirrors the original's interface plus --install/--uninstall for Linux."""
+"""CLI entry point — mirrors the original's interface plus --install/--uninstall."""
 
 from __future__ import annotations
 import argparse
@@ -18,7 +18,7 @@ from fileconverter.jobs.factory import create_job
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         prog="fileconverter",
-        description="File Converter for Linux — convert files from the command line or context menu.",
+        description="File Converter for Linux and macOS — convert files from the command line or context menu.",
     )
     p.add_argument("--version", action="version", version=f"fileconverter {__version__}")
     p.add_argument("--conversion-preset", dest="preset_name",
@@ -80,7 +80,7 @@ def _collect_files(args: argparse.Namespace) -> list[str]:
 
 
 def _run_headless(jobs: list[ConversionJob], max_workers: int) -> None:
-    """Run conversions without GUI (fallback if GTK unavailable)."""
+    """Run conversions without GUI (fallback when no toolkit is available)."""
     def _worker(job: ConversionJob) -> None:
         try:
             job.prepare()
@@ -95,6 +95,7 @@ def _run_headless(jobs: list[ConversionJob], max_workers: int) -> None:
             f.result()
 
     failed = [j for j in jobs if j.state == ConversionState.FAILED]
+    _notify_headless_result(jobs, failed)
     if failed:
         for j in failed:
             print(_("FAILED: {name} — {error}").format(
@@ -104,6 +105,31 @@ def _run_headless(jobs: list[ConversionJob], max_workers: int) -> None:
         for j in jobs:
             print(_("Done: {name} → {path}").format(
                 name=j.input_filename, path=j.output_path))
+
+
+def _notify_headless_result(jobs: list[ConversionJob], failed: list[ConversionJob]) -> None:
+    """Desktop notification when launched without a terminal (e.g. from the
+    file manager with no GUI toolkit) — otherwise the user gets no feedback."""
+    if sys.stdout.isatty():
+        return
+    try:
+        from fileconverter.ui import notify
+        if failed:
+            notify("File Converter",
+                   _("{done}/{total} completed, {failed} failed").format(
+                       done=len(jobs) - len(failed), total=len(jobs),
+                       failed=len(failed)))
+        else:
+            done = len(jobs)
+            if done == 1:
+                notify("File Converter", _("Done: {name} → {path}").format(
+                    name=jobs[0].input_filename,
+                    path=os.path.basename(jobs[0].output_path)))
+            else:
+                notify("File Converter",
+                       _("{done}/{total} completed").format(done=done, total=done))
+    except Exception:
+        pass
 
 
 def _apply_language_from_settings() -> None:
@@ -126,33 +152,34 @@ def main() -> None:
 
     # --install
     if args.install:
-        from fileconverter.integration.install import run_install
+        from fileconverter.integration import run_install
         run_install()
         return
 
     # --uninstall
     if args.uninstall:
-        from fileconverter.integration.install import run_uninstall
+        from fileconverter.integration import run_uninstall
         run_uninstall()
         return
 
     # --settings
     if args.settings:
+        from fileconverter.ui import UINotAvailable, run_settings_auto
         try:
-            from fileconverter.ui.settings_window import run_settings
-            run_settings()
-        except (ImportError, ValueError):
-            print(_("GTK 4 is required for the settings window."), file=sys.stderr)
+            run_settings_auto()
+        except UINotAvailable:
+            print(_("A GUI toolkit (GTK 4 or tkinter) is required for the settings window."),
+                  file=sys.stderr)
             sys.exit(1)
         return
 
     # No arguments at all → first-run check, then show help or run install
     if not args.preset_name and not args.files:
-        from fileconverter.integration.install import is_installed
+        from fileconverter.integration import is_installed
         if not is_installed():
             print(_("File Converter is not set up yet. Running setup..."))
             print()
-            from fileconverter.integration.install import run_install
+            from fileconverter.integration import run_install
             run_install()
             return
         else:
@@ -204,12 +231,12 @@ def main() -> None:
 
     jobs = [create_job(preset, f, hw_accel=hw_accel) for f in files]
 
+    from fileconverter.ui import UINotAvailable, run_with_progress_auto
     try:
-        from fileconverter.ui.progress_window import run_with_progress
-        run_with_progress(jobs, settings)
-    except (ImportError, ValueError):
+        run_with_progress_auto(jobs, settings)
+    except UINotAvailable:
         if args.verbose:
-            print(_("GTK not available, running headless."), file=sys.stderr)
+            print(_("No GUI toolkit available, running headless."), file=sys.stderr)
         _run_headless(jobs, settings.max_simultaneous_conversions)
 
 

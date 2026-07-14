@@ -3,10 +3,14 @@
 from __future__ import annotations
 import os
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
 
 _DATE_RE = re.compile(r"\(d:(?P<format>[^)]+)\)")
+
+# macOS calls the videos folder "Movies"; everywhere else it's "Videos".
+_VIDEOS_DIR = Path.home() / ("Movies" if sys.platform == "darwin" else "Videos")
 
 
 def generate_output_path(
@@ -45,8 +49,8 @@ def generate_output_path(
     out = out.replace("(p:documents)", str(Path.home() / "Documents") + os.sep)
     out = out.replace("(p:m)", str(Path.home() / "Music") + os.sep)
     out = out.replace("(p:music)", str(Path.home() / "Music") + os.sep)
-    out = out.replace("(p:v)", str(Path.home() / "Videos") + os.sep)
-    out = out.replace("(p:videos)", str(Path.home() / "Videos") + os.sep)
+    out = out.replace("(p:v)", str(_VIDEOS_DIR) + os.sep)
+    out = out.replace("(p:videos)", str(_VIDEOS_DIR) + os.sep)
     out = out.replace("(p:p)", str(Path.home() / "Pictures") + os.sep)
     out = out.replace("(p:pictures)", str(Path.home() / "Pictures") + os.sep)
 

@@ -4,12 +4,13 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import zipfile
 
 from fileconverter.helpers import LIBREOFFICE_OUTPUTS
 from fileconverter.i18n import _
-from fileconverter.integration.install import install_hint
+from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.jobs.imagemagick import ImageMagickJob
 from fileconverter.presets import ConversionPreset
@@ -37,6 +38,14 @@ class LibreOfficeJob(ConversionJob):
             path = shutil.which(cmd)
             if path:
                 return path
+        if sys.platform == "darwin":
+            # LibreOffice.app isn't on PATH; look inside the app bundle.
+            for p in (
+                "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+                os.path.expanduser("~/Applications/LibreOffice.app/Contents/MacOS/soffice"),
+            ):
+                if os.path.exists(p) and os.access(p, os.X_OK):
+                    return p
         raise FileNotFoundError(
             f"LibreOffice not found. {install_hint('libreoffice')}"
         )

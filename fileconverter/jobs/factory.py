@@ -46,6 +46,15 @@ def create_job(preset: ConversionPreset, input_path: str, hw_accel: str = "off")
     if out_type == "ico":
         return FFmpegJob(preset, input_path, hw_accel="off")
 
+    # JP2 needs the OpenJPEG delegate, which some ImageMagick builds lack
+    # (e.g. Homebrew's) — and magick then silently writes the wrong format.
+    # ffmpeg's native JPEG-2000 encoder covers those builds. PDF input still
+    # goes to ImageMagick, which rasterises pages and chains to ffmpeg itself.
+    if out_type == "jp2" and ext != "pdf":
+        from fileconverter.jobs.imagemagick import magick_write_formats
+        if "JP2" not in magick_write_formats():
+            return FFmpegJob(preset, input_path, hw_accel="off")
+
     # Raster image outputs → ImageMagick
     if out_type in _IMAGEMAGICK_OUTPUTS:
         return ImageMagickJob(preset, input_path)

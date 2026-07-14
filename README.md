@@ -1,6 +1,6 @@
-# File Converter for Linux
+# File Converter for Linux & macOS
 
-Linux port of [File Converter](https://github.com/Tichau/FileConverter) by Tichau. Right-click files in your file manager, pick a format, convert.
+Linux and macOS port of [File Converter](https://github.com/Tichau/FileConverter) by Tichau. Right-click files in your file manager, pick a format, convert.
 
 ## Support the project :D
 
@@ -8,7 +8,7 @@ If you find this useful, you can [buy me a coffee](https://paypal.me/alextrysh).
 
 ## Quick Start
 
-### Download the release tarball
+### Linux — download the release tarball
 
 1. Grab `fileconverter-vX.Y.Z-linux-x86_64.tar.gz` from the [Releases page](https://github.com/AlexDevFlow/Media-Converter/releases).
 2. Open a terminal in your downloads folder and run:
@@ -21,7 +21,7 @@ cd fileconverter-v*
 
 The installer detects your file manager and sets up the right-click "File Converter" submenu. The bare `fileconverter` binary is also attached to each release for power users who want to manage placement themselves (`chmod +x fileconverter && ./fileconverter`).
 
-### Run from source
+### Linux — run from source
 
 ```bash
 git clone https://github.com/AlexDevFlow/Media-Converter.git
@@ -29,7 +29,53 @@ cd Media-Converter
 ./install.sh
 ```
 
-Requires Python 3.10+ and PyYAML (`python3-yaml` on most distros).
+Requires Python 3.9+ and PyYAML (`python3-yaml` on most distros).
+
+### macOS
+
+```bash
+git clone https://github.com/AlexDevFlow/Media-Converter.git
+cd Media-Converter
+./install.sh
+```
+
+The installer copies the tool into `~/.local/share/fileconverter` with its own
+private venv (no PyInstaller binary, no Gatekeeper trouble), offers to install
+the media tools via [Homebrew](https://brew.sh) if they're missing, and builds
+a **Finder Sync extension** that puts a real submenu in the right-click menu —
+the same UX as the Dolphin/Nemo submenu on Linux:
+
+```
+Right-click video.mkv >
+  File Converter
+  ├── To Mp4
+  ├── To Mp4 (low quality)
+  ├── To Gif
+  ├── To Mp3
+  ├── ...
+  └── Configure presets...
+```
+
+The submenu only lists presets compatible with every selected file (filtering
+happens per-extension in the extension itself). If the Swift toolchain isn't
+available, the installer falls back to one **UTI-filtered Quick Action per
+preset** instead — same conversions, flatter menu.
+
+Conversions show a **native SwiftUI progress window** with per-file progress,
+ETA and cancel — compiled on the spot by the installer, with a tkinter
+fallback. The settings editor is native too: double-click
+**File Converter.app** (in `~/Applications`) or run `fileconverter --settings`.
+Video encodes can use Apple **VideoToolbox** hardware acceleration — enable
+"Auto-detect" under GPU accel in the settings.
+
+Requirements: macOS 13+, the Xcode Command Line Tools
+(`xcode-select --install` — provides Python 3.9+ and the Swift compiler),
+Homebrew for the media tools. If the submenu doesn't appear right away,
+relaunch Finder (`killall Finder`) or check the extension is enabled under
+System Settings → General → Login Items & Extensions. Note for the tkinter
+fallback: Apple's bundled Tk 8.5 draws blank windows on recent macOS —
+`brew install python-tk` gives the fallback a working Tk if you need it.
+To remove everything: `fileconverter --uninstall`.
 
 ## How It Works
 
@@ -88,7 +134,13 @@ The installer checks for these and tells you what to install.
 | **Ghostscript** | PDF processing | Recommended |
 | **LibreOffice** | Office documents (docx, xlsx, pptx) | Optional |
 
-### Install commands by distro
+### Install commands by platform
+
+**macOS (Homebrew):**
+```bash
+brew install ffmpeg imagemagick ghostscript
+brew install --cask libreoffice   # optional, for document presets
+```
 
 **Ubuntu / Debian:**
 ```bash

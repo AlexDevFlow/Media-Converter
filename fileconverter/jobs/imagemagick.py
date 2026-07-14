@@ -4,13 +4,50 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import tempfile
 
 from fileconverter.i18n import _
-from fileconverter.integration.install import install_hint
+from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.presets import ConversionPreset
 
 BASE_DPI_FOR_PDF = 200
+
+# What `identify -format %m` should report per output type. ImageMagick
+# builds missing a write delegate can exit 0 while silently writing the
+# *input* format under the requested extension — validate instead of trusting.
+_EXPECTED_FORMAT = {
+    "avif": "AVIF", "bmp": "BMP", "jp2": "JP2", "jpg": "JPEG", "png": "PNG",
+    "tga": "TGA", "tiff": "TIFF", "webp": "WEBP", "pdf": "PDF",
+}
+
+_write_formats_cache = None
+
+
+def magick_write_formats() -> set:
+    """Formats the local ImageMagick can encode (from `magick -list format`).
+
+    Cached per process. Empty set when ImageMagick is missing entirely.
+    """
+    global _write_formats_cache
+    if _write_formats_cache is None:
+        formats = set()
+        try:
+            cmd = ImageMagickJob._find_convert()
+            args = [cmd, "-list", "format"] if cmd.endswith("magick") \
+                else [cmd.replace("convert", "identify"), "-list", "format"]
+            out = subprocess.run(args, capture_output=True, text=True,
+                                 timeout=30).stdout
+            for line in out.splitlines():
+                #      "     JP2* JP2       rw-   JPEG-2000 ..." — mode has
+                # r=read, w=write; strip the native-blob marker '*'.
+                parts = line.split()
+                if len(parts) >= 3 and "w" in parts[2] and parts[2][0] in "rw-":
+                    formats.add(parts[0].rstrip("*"))
+        except (FileNotFoundError, subprocess.SubprocessError, OSError):
+            pass
+        _write_formats_cache = formats
+    return _write_formats_cache
 
 
 class ImageMagickJob(ConversionJob):
@@ -68,6 +105,12 @@ class ImageMagickJob(ConversionJob):
         scale = self.preset.get_setting_float("image_scale", 1.0)
         dpi = int(BASE_DPI_FOR_PDF * scale) if abs(scale - 1.0) >= 0.005 else BASE_DPI_FOR_PDF
 
+        # Builds without the OpenJPEG delegate can't write JP2 (and would
+        # silently keep another format) — rasterise the page to PNG, then wrap
+        # it with ffmpeg's native JPEG-2000 encoder instead.
+        jp2_via_ffmpeg = (self.preset.output_type == "jp2"
+                          and "JP2" not in magick_write_formats())
+
         num_pages = len(self.output_paths)
         for i, out_path in enumerate(self.output_paths):
             if self.cancel_requested:
@@ -79,21 +122,50 @@ class ImageMagickJob(ConversionJob):
             if self._convert_cmd.endswith("magick"):
                 args.append("convert")
             args += ["-density", str(dpi), f"{self.input_path}[{i}]"]
-            args += self._quality_args()
-            args += [out_path]
 
-            result = subprocess.run(args, capture_output=True, text=True, timeout=300)
-            if result.returncode != 0:
-                raise RuntimeError(f"ImageMagick error: {result.stderr}")
+            if jp2_via_ffmpeg:
+                with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
+                    tmp_png = os.path.join(tmpdir, f"page-{i}.png")
+                    result = subprocess.run(args + [tmp_png], capture_output=True,
+                                            text=True, timeout=300)
+                    if result.returncode != 0:
+                        raise RuntimeError(f"ImageMagick error: {result.stderr}")
+                    self._png_to_jp2(tmp_png, out_path)
+            else:
+                args += self._quality_args()
+                args += [out_path]
+                result = subprocess.run(args, capture_output=True, text=True, timeout=300)
+                if result.returncode != 0:
+                    raise RuntimeError(f"ImageMagick error: {result.stderr}")
 
             self.current_output_index = i
+
+    def _png_to_jp2(self, png_path: str, out_path: str) -> None:
+        from fileconverter.jobs.ffmpeg import FFmpegJob, jp2_quality_to_qv
+        ffmpeg = FFmpegJob._find_ffmpeg()
+        quality = self.preset.get_setting_int("image_quality", 85)
+        result = subprocess.run(
+            [ffmpeg, "-y", "-i", png_path, "-c:v", "jpeg2000", "-format", "jp2",
+             "-q:v", str(jp2_quality_to_qv(quality)), out_path],
+            capture_output=True, text=True, timeout=300)
+        if result.returncode != 0:
+            raise RuntimeError(f"ffmpeg error (JP2): {result.stderr[-400:]}")
 
     def _convert_image(self, input_path: str, output_path: str) -> None:
         """Convert a single image file."""
         args = [self._convert_cmd]
         if self._convert_cmd.endswith("magick"):
             args.append("convert")
-        args += [input_path]
+
+        # Animated inputs (gif) to a still format would otherwise explode into
+        # out-0.png, out-1.png, ... and leave the expected output path empty —
+        # take the first frame instead.
+        in_ext = os.path.splitext(input_path)[1].lower().lstrip(".")
+        out_ext = os.path.splitext(output_path)[1].lower().lstrip(".")
+        if in_ext == "gif" and out_ext not in ("gif", "webp", "avif"):
+            args += [f"{input_path}[0]"]
+        else:
+            args += [input_path]
 
         # Scale
         scale = self.preset.get_setting_float("image_scale", 1.0)
@@ -113,6 +185,32 @@ class ImageMagickJob(ConversionJob):
         result = subprocess.run(args, capture_output=True, text=True, timeout=300)
         if result.returncode != 0:
             raise RuntimeError(f"ImageMagick error: {result.stderr}")
+        self._validate_output_format(output_path)
+
+    def _validate_output_format(self, output_path: str) -> None:
+        """Reject outputs whose actual format doesn't match the extension —
+        a build without the needed write delegate exits 0 but keeps the input
+        format (e.g. PNG bytes in a .jp2 file)."""
+        expected = _EXPECTED_FORMAT.get(self.preset.output_type)
+        if not expected:
+            return
+        try:
+            args = [self._convert_cmd]
+            if self._convert_cmd.endswith("magick"):
+                args.append("identify")
+            else:
+                args = [self._convert_cmd.replace("convert", "identify")]
+            out = subprocess.run(args + ["-format", "%m\n", output_path],
+                                 capture_output=True, text=True, timeout=60)
+            actual = out.stdout.strip().splitlines()[0] if out.stdout.strip() else ""
+        except (subprocess.SubprocessError, OSError, IndexError):
+            return  # can't verify — don't fail a conversion that may be fine
+        if actual and actual != expected:
+            raise RuntimeError(
+                f"ImageMagick wrote {actual} data instead of {expected} — this "
+                f"build lacks the {expected} write delegate. "
+                f"{install_hint('imagemagick')}"
+            )
 
     def _quality_args(self) -> list[str]:
         out = self.preset.output_type

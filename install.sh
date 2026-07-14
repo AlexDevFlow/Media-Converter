@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# File Converter for Linux — installer
-# Works on any distro: Ubuntu, Fedora, Arch, openSUSE, etc.
-# Can be run from source or will use PyInstaller binary if built.
+# File Converter — installer
+# Linux: works on any distro (Ubuntu, Fedora, Arch, openSUSE, ...).
+# macOS: dispatches to install-macos.sh (Finder Quick Actions).
+# Can be run from source or will use PyInstaller binary if built (Linux only).
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# macOS gets its own installer (venv + Finder Quick Actions)
+if [ "$(uname -s)" = "Darwin" ]; then
+    exec bash "$SCRIPT_DIR/install-macos.sh" "$@"
+fi
 
 # Check if there's a built binary
 if [ -f "$SCRIPT_DIR/dist/fileconverter" ]; then

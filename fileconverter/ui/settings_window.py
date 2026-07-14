@@ -234,8 +234,9 @@ class SettingsWindow(Gtk.ApplicationWindow):
         self.exit_check.connect("toggled", self._on_exit_toggled)
         global_box.append(self.exit_check)
 
-        # Hardware acceleration
-        hw_labels = [_("Off"), _("Auto-detect"), _("NVENC (NVIDIA)"), _("VAAPI (AMD/Intel)")]
+        # Hardware acceleration (labels index-aligned with HWACCEL_MODES)
+        from fileconverter.config import HWACCEL_LABELS
+        hw_labels = [_(label) for label in HWACCEL_LABELS]
         self.hw_combo = Gtk.DropDown.new_from_strings(hw_labels)
         if settings.hardware_acceleration in HWACCEL_MODES:
             self.hw_combo.set_selected(HWACCEL_MODES.index(settings.hardware_acceleration))

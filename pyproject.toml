@@ -4,13 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fileconverter"
-version = "1.3.0"
-description = "Linux port of File Converter — right-click context menu file conversion"
+version = "1.4.0"
+description = "Linux and macOS port of File Converter — right-click context menu file conversion"
 license = "GPL-3.0-or-later"
-requires-python = ">=3.10"
+# 3.9 floor so the macOS system Python (Command Line Tools) works out of the box.
+requires-python = ">=3.9"
 dependencies = [
     "PyYAML>=6.0",
-    "PyGObject>=3.42",
+    # GTK bindings are only used (and only installable sanely) on Linux;
+    # macOS uses tkinter from the standard library.
+    'PyGObject>=3.42; sys_platform == "linux"',
 ]
 
 [project.scripts]

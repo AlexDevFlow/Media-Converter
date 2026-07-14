@@ -19,7 +19,12 @@ _BASE_DIR = Path(getattr(sys, '_MEIPASS', Path(__file__).parent.parent))
 DEFAULT_PRESETS_FILE = _BASE_DIR / "resources" / "default_presets.yaml"
 
 
-HWACCEL_MODES = ["off", "auto", "nvenc", "vaapi"]
+HWACCEL_MODES = ["off", "auto", "nvenc", "vaapi", "videotoolbox"]
+
+# Human-readable labels for HWACCEL_MODES, index-aligned — shared by the GTK
+# and tkinter settings windows so the dropdowns can't drift apart.
+HWACCEL_LABELS = ["Off", "Auto-detect", "NVENC (NVIDIA)", "VAAPI (AMD/Intel)",
+                  "VideoToolbox (Apple)"]
 
 
 CURRENT_VERSION = 2

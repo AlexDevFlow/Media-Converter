@@ -147,14 +147,41 @@ def _identify(args):
                           capture_output=True, text=True)
 
 
+# ffprobe codec_name → ImageMagick format code, for builds whose identify
+# lacks a *read* delegate for a format the converter can still produce
+# (e.g. Homebrew ImageMagick has no OpenJPEG, so JP2 goes via ffmpeg).
+_FFPROBE_FORMAT_CODES = {
+    "jpeg2000": "JP2", "png": "PNG", "mjpeg": "JPEG", "webp": "WEBP",
+    "tiff": "TIFF", "bmp": "BMP", "targa": "TGA", "gif": "GIF",
+}
+
+
 def image_format(path):
     """Return the ImageMagick format code of the first frame, e.g. 'JP2'."""
     out = _identify(["-format", "%m\n", str(path)])
-    return out.stdout.strip().splitlines()[0] if out.stdout.strip() else ""
+    if out.stdout.strip():
+        return out.stdout.strip().splitlines()[0]
+    if HAS_FFPROBE:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=codec_name", "-of", "csv=p=0", str(path)],
+            capture_output=True, text=True)
+        codec = probe.stdout.strip().splitlines()[0] if probe.stdout.strip() else ""
+        return _FFPROBE_FORMAT_CODES.get(codec, codec.upper())
+    return ""
 
 
 def image_dims(path):
     out = _identify(["-format", "%w %h\n", str(path)])
-    first = out.stdout.strip().splitlines()[0]
-    w, h = first.split()
-    return int(w), int(h)
+    if out.stdout.strip():
+        w, h = out.stdout.strip().splitlines()[0].split()
+        return int(w), int(h)
+    if HAS_FFPROBE:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height", "-of", "csv=p=0", str(path)],
+            capture_output=True, text=True)
+        if probe.stdout.strip():
+            w, h = probe.stdout.strip().splitlines()[0].split(",")
+            return int(w), int(h)
+    raise AssertionError(f"could not determine image dimensions of {path}")
