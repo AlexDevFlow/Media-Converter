@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from fileconverter.i18n import _
 from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
+from fileconverter.jobs.proc import system_env
 from fileconverter.path_helpers import generate_unique_path
 from fileconverter.presets import ConversionPreset
 
@@ -93,7 +94,7 @@ def available_encoders() -> set:
             try:
                 out = subprocess.run(
                     [ffmpeg, "-hide_banner", "-encoders"],
-                    capture_output=True, text=True, timeout=15,
+                    capture_output=True, text=True, timeout=15, env=system_env(),
                 ).stdout
                 for line in out.splitlines():
                     parts = line.split()
@@ -159,7 +160,8 @@ def detect_hwaccel(encoder: str) -> bool:
         return False
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10,
+                                env=system_env())
         works = result.returncode == 0
     except (subprocess.TimeoutExpired, OSError):
         works = False
@@ -706,7 +708,7 @@ class FFmpegJob(ConversionJob):
                 cmd = [ffmpeg] + p.arguments
                 proc = subprocess.Popen(
                     cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
-                    text=True, bufsize=1,
+                    text=True, bufsize=1, env=system_env(),
                 )
                 last_lines = []
                 try:

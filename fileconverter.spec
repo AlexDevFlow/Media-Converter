@@ -76,6 +76,9 @@ a = Analysis(
         'fileconverter.jobs.gif',
         'fileconverter.jobs.imagemagick',
         'fileconverter.jobs.libreoffice',
+        # Sanitises the environment of external tool subprocesses so they
+        # don't inherit the bundle's LD_LIBRARY_PATH (GH #6).
+        'fileconverter.jobs.proc',
         'fileconverter.ui',
         'fileconverter.ui.progress_window',
         'fileconverter.ui.preset_picker',

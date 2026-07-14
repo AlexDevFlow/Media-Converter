@@ -13,6 +13,7 @@ from fileconverter.i18n import _
 from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.jobs.imagemagick import ImageMagickJob
+from fileconverter.jobs.proc import system_env
 from fileconverter.presets import ConversionPreset
 
 # Explicit LibreOffice export filters. For docx/odt/xlsx/ods/pptx/odp/txt/csv,
@@ -83,7 +84,7 @@ class LibreOfficeJob(ConversionJob):
         with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
             result = subprocess.run(
                 [lo, "--headless", "--convert-to", convert_to, "--outdir", tmpdir, self.input_path],
-                capture_output=True, text=True, timeout=600,
+                capture_output=True, text=True, timeout=600, env=system_env(),
             )
             produced = os.path.join(
                 tmpdir,
@@ -126,7 +127,7 @@ class LibreOfficeJob(ConversionJob):
         out_dir = os.path.dirname(self.output_path)
         result = subprocess.run(
             [lo, "--headless", "--convert-to", "pdf", "--outdir", out_dir, self.input_path],
-            capture_output=True, text=True, timeout=600,
+            capture_output=True, text=True, timeout=600, env=system_env(),
         )
         if result.returncode != 0:
             raise RuntimeError(f"LibreOffice error: {result.stderr}")
@@ -150,7 +151,7 @@ class LibreOfficeJob(ConversionJob):
 
             result = subprocess.run(
                 [lo, "--headless", "--convert-to", "pdf", "--outdir", tmpdir, self.input_path],
-                capture_output=True, text=True, timeout=600,
+                capture_output=True, text=True, timeout=600, env=system_env(),
             )
             if result.returncode != 0:
                 raise RuntimeError(f"LibreOffice error: {result.stderr}")

@@ -9,6 +9,7 @@ import tempfile
 from fileconverter.i18n import _
 from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
+from fileconverter.jobs.proc import system_env
 from fileconverter.presets import ConversionPreset
 
 BASE_DPI_FOR_PDF = 200
@@ -37,7 +38,7 @@ def magick_write_formats() -> set:
             args = [cmd, "-list", "format"] if cmd.endswith("magick") \
                 else [cmd.replace("convert", "identify"), "-list", "format"]
             out = subprocess.run(args, capture_output=True, text=True,
-                                 timeout=30).stdout
+                                 timeout=30, env=system_env()).stdout
             for line in out.splitlines():
                 #      "     JP2* JP2       rw-   JPEG-2000 ..." — mode has
                 # r=read, w=write; strip the native-blob marker '*'.
@@ -82,13 +83,13 @@ class ImageMagickJob(ConversionJob):
             if "magick" in cmd_name:
                 result = subprocess.run(
                     [cmd_name, "identify", self.input_path],
-                    capture_output=True, text=True, timeout=30,
+                    capture_output=True, text=True, timeout=30, env=system_env(),
                 )
             else:
                 identify_cmd = shutil.which("identify") or "identify"
                 result = subprocess.run(
                     [identify_cmd, self.input_path],
-                    capture_output=True, text=True, timeout=30,
+                    capture_output=True, text=True, timeout=30, env=system_env(),
                 )
             return max(1, result.stdout.count("\n"))
         except Exception:
@@ -127,14 +128,15 @@ class ImageMagickJob(ConversionJob):
                 with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
                     tmp_png = os.path.join(tmpdir, f"page-{i}.png")
                     result = subprocess.run(args + [tmp_png], capture_output=True,
-                                            text=True, timeout=300)
+                                            text=True, timeout=300, env=system_env())
                     if result.returncode != 0:
                         raise RuntimeError(f"ImageMagick error: {result.stderr}")
                     self._png_to_jp2(tmp_png, out_path)
             else:
                 args += self._quality_args()
                 args += [out_path]
-                result = subprocess.run(args, capture_output=True, text=True, timeout=300)
+                result = subprocess.run(args, capture_output=True, text=True,
+                                        timeout=300, env=system_env())
                 if result.returncode != 0:
                     raise RuntimeError(f"ImageMagick error: {result.stderr}")
 
@@ -147,7 +149,7 @@ class ImageMagickJob(ConversionJob):
         result = subprocess.run(
             [ffmpeg, "-y", "-i", png_path, "-c:v", "jpeg2000", "-format", "jp2",
              "-q:v", str(jp2_quality_to_qv(quality)), out_path],
-            capture_output=True, text=True, timeout=300)
+            capture_output=True, text=True, timeout=300, env=system_env())
         if result.returncode != 0:
             raise RuntimeError(f"ffmpeg error (JP2): {result.stderr[-400:]}")
 
@@ -182,7 +184,8 @@ class ImageMagickJob(ConversionJob):
         args += self._quality_args()
         args += [output_path]
 
-        result = subprocess.run(args, capture_output=True, text=True, timeout=300)
+        result = subprocess.run(args, capture_output=True, text=True, timeout=300,
+                                env=system_env())
         if result.returncode != 0:
             raise RuntimeError(f"ImageMagick error: {result.stderr}")
         self._validate_output_format(output_path)
@@ -201,7 +204,8 @@ class ImageMagickJob(ConversionJob):
             else:
                 args = [self._convert_cmd.replace("convert", "identify")]
             out = subprocess.run(args + ["-format", "%m\n", output_path],
-                                 capture_output=True, text=True, timeout=60)
+                                 capture_output=True, text=True, timeout=60,
+                                 env=system_env())
             actual = out.stdout.strip().splitlines()[0] if out.stdout.strip() else ""
         except (subprocess.SubprocessError, OSError, IndexError):
             return  # can't verify — don't fail a conversion that may be fine

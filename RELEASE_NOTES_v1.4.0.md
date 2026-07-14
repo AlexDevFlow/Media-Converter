@@ -1,6 +1,6 @@
-# v1.4.0 — macOS support
+# v1.4.0 — macOS support + Linux fixes
 
-File Converter now runs on macOS, kept 1:1 with the Linux version: same conversion engine, same 46 presets, same CLI, same YAML config and 29-language i18n. **No changes for Linux users** — the GTK UI, file-manager integrations and presets are untouched (the engine only *gained* fallbacks, see below).
+File Converter now runs on macOS, kept 1:1 with the Linux version: same conversion engine, same 46 presets, same CLI, same YAML config and 29-language i18n. **Linux gets fixes too** — the three open bug reports (#5, #6, #7) are addressed, see *Linux fixes* below.
 
 ## Finder integration
 
@@ -12,6 +12,12 @@ File Converter now runs on macOS, kept 1:1 with the Linux version: same conversi
 
 - Progress window, preset picker and the full settings editor are **native SwiftUI**, compiled on the spot by the installer. The Swift binary is a pure renderer: conversions, ETA math, auto-close timing and all translations stay in Python.
 - A feature-parity **tkinter** fallback covers systems without the Swift toolchain — and now also serves as the **GTK fallback on Linux**, so a missing GTK never crashes a conversion again (#5).
+
+## Linux fixes
+
+- **Prebuilt binary broke every ImageMagick conversion on Arch** (#6, reported by @cypress-exe). The onefile bundle ships its own HarfBuzz/Fontconfig/FreeType and PyInstaller points `LD_LIBRARY_PATH` at them — and every child process inherited it, so the system's `/usr/bin/magick` loaded *our* HarfBuzz and died with `undefined symbol: hb_ft_font_get_ft_face` against the distro's newer `libraqm`. The same leak produced the Fontconfig warning wall, exactly as the report suspected. External tools (ffmpeg, ImageMagick, Ghostscript, LibreOffice) now run with the loader environment the user's shell would have given them, so they use system libraries again. Running from source was never affected — which is precisely why it worked.
+- **Dolphin offered every preset on every file type** (#7, reported by @cypress-exe): a single service-menu file with `MimeType=application/octet-stream` meant an mkv was offered "To Jpg". Presets are now grouped by their input types, one `.desktop` per group with its own `MimeType` (media category globs, explicit MIME types for documents). All groups keep the same `X-KDE-Submenu`, so KIO still merges them into a single "File Converter" menu — the design proposed in the issue. Installs, reinstalls and uninstalls glob `fileconverter*.desktop`, so renamed or deleted presets no longer leave ghost entries.
+- **A missing GTK 4 no longer means no UI** (#5, reported by @bedokaram187): the UI chain is now GTK → tkinter → headless, so systems without GTK get a working progress window instead of a traceback.
 
 ## Engine
 
@@ -28,10 +34,10 @@ CI now builds and tests both platforms: the Linux binary tarball as before, plus
 
 ## Credits
 
-This release owes a lot to the people who took the time to report real-world breakage on the Linux version — the macOS port was designed around their findings:
+This release owes a lot to the people who took the time to report real-world breakage — their findings drove both the Linux fixes and the design of the macOS port:
 
-- **@cypress-exe** — for #7 (type-aware context menus, including the proposed per-type grouping this port adopts) and #6 (prebuilt-binary library breakage, which motivated the no-binary install design)
-- **@bedokaram187** — for #5 (GTK crash and execution-policy reports that shaped the no-GTK, fallback-chain UI)
-- **@goofie45** — for #3 (Nemo/Debian testing and the unoconv removal that made the LibreOffice backend portable in the first place)
+- **@cypress-exe** — for #7 and #6. The per-type grouping of KDE service menus is the design proposed in #7, and the diagnosis in #6 (bundled HarfBuzz/Fontconfig vs. rolling-release libraries) pointed straight at the environment leak fixed here.
+- **@bedokaram187** — for #5: the GTK crash and execution-policy reports that shaped the toolkit fallback chain.
+- **@goofie45** — for #3: Nemo/Debian testing and the unoconv removal that made the LibreOffice backend portable in the first place.
 
 Thank you! 🍻

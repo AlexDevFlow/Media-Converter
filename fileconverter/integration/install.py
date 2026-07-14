@@ -293,11 +293,42 @@ Extensions={mimetypes};
 
 # ── Dolphin service menu ──
 
-def _install_dolphin_service_menu() -> bool:
-    service_dirs = [
+def _dolphin_service_dirs() -> list[Path]:
+    return [
         Path.home() / ".local" / "share" / "kio" / "servicemenus",
         Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus",
     ]
+
+
+def _clean_dolphin_service_menus() -> list[str]:
+    """Remove every service menu we ever generated — the old monolithic
+    fileconverter.desktop included, plus any stale per-type group from a
+    previous preset set (GH #7)."""
+    removed = []
+    for service_dir in _dolphin_service_dirs():
+        if not service_dir.exists():
+            continue
+        for f in service_dir.glob("fileconverter*.desktop"):
+            try:
+                f.unlink()
+                removed.append(str(f))
+            except OSError:
+                pass
+    return removed
+
+
+def _install_dolphin_service_menu() -> bool:
+    """Generate KDE service menus, one .desktop per group of presets sharing
+    the same input types (GH #7).
+
+    Dolphin filters a service menu by its MimeType= line, but has no
+    per-action filter — a single file listing every preset therefore offers
+    "To Jpg" on an mkv. Grouping presets by their input_types set and giving
+    each group its own MimeType makes the menu type-aware. Every group keeps
+    the same X-KDE-Submenu, and KIO merges same-named submenus, so the user
+    still sees a single "File Converter" menu.
+    """
+    from fileconverter.helpers import mime_types_for_extensions
 
     try:
         from fileconverter.config import load_settings
@@ -308,32 +339,52 @@ def _install_dolphin_service_menu() -> bool:
 
     fc = _find_self() or shutil.which("fileconverter") or "fileconverter"
 
-    for service_dir in service_dirs:
-        service_dir.mkdir(parents=True, exist_ok=True)
-        desktop_file = service_dir / "fileconverter.desktop"
+    # Group presets by the set of extensions they accept — presets with
+    # identical inputs share one .desktop (and therefore one MimeType line).
+    groups: dict[frozenset, list] = {}
+    for preset in settings.presets:
+        key = frozenset(e.lower().lstrip(".") for e in preset.input_types)
+        if not key:
+            continue
+        groups.setdefault(key, []).append(preset)
 
-        actions = ";".join(f"action{i}" for i in range(len(settings.presets)))
-        lines = [
-            "[Desktop Entry]",
-            "Type=Service",
-            "ServiceTypes=KonqPopupMenu/Plugin",
-            "MimeType=application/octet-stream;",
-            "X-KDE-Submenu=File Converter",
-            f"Actions={actions}",
-            "",
-        ]
-        for i, preset in enumerate(settings.presets):
-            lines += [
-                f"[Desktop Action action{i}]",
-                f"Name={preset.short_name}",
-                f'Exec={fc} --conversion-preset "{preset.name}" %F',
+    _clean_dolphin_service_menus()
+
+    installed = False
+    for service_dir in _dolphin_service_dirs():
+        service_dir.mkdir(parents=True, exist_ok=True)
+
+        for idx, (exts, presets) in enumerate(sorted(
+                groups.items(), key=lambda kv: sorted(kv[0]))):
+            mimes = mime_types_for_extensions(exts)
+            if not mimes:
+                continue
+
+            actions = ";".join(f"action{i}" for i in range(len(presets)))
+            lines = [
+                "[Desktop Entry]",
+                "Type=Service",
+                "ServiceTypes=KonqPopupMenu/Plugin",
+                f"MimeType={';'.join(mimes)};",
+                "X-KDE-Submenu=File Converter",
+                f"Actions={actions}",
                 "",
             ]
+            for i, preset in enumerate(presets):
+                lines += [
+                    f"[Desktop Action action{i}]",
+                    f"Name={preset.short_name}",
+                    f'Exec={fc} --conversion-preset "{preset.name}" %F',
+                    "",
+                ]
 
-        desktop_file.write_text("\n".join(lines))
-        desktop_file.chmod(0o755)
-        _print(f"  [OK] Dolphin service menu installed", "green")
-        return True
+            desktop_file = service_dir / f"fileconverter-group{idx}.desktop"
+            desktop_file.write_text("\n".join(lines))
+            desktop_file.chmod(0o755)
+
+        installed = True
+        _print(f"  [OK] Dolphin service menus: {len(groups)} type groups", "green")
+        return installed
 
     return False
 
@@ -396,16 +447,19 @@ def is_installed() -> bool:
         # Nautilus
         Path.home() / ".local" / "share" / "nautilus-python" / "extensions" / "fileconverter_nautilus.py",
         Path.home() / ".local" / "share" / "nautilus" / "python-extensions" / "fileconverter_nautilus.py",
-        # Dolphin
-        Path.home() / ".local" / "share" / "kio" / "servicemenus" / "fileconverter.desktop",
-        Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus" / "fileconverter.desktop",
     ]
-    # Nemo generates one action file per preset — check if any exist
+    # Nemo generates one action file per preset, Dolphin one .desktop per
+    # input-type group — both are globs, and must match what install and
+    # uninstall use (GH #7).
     nemo_dir = Path.home() / ".local" / "share" / "nemo" / "actions"
     has_nemo = nemo_dir.exists() and any(nemo_dir.glob("fileconverter-*.nemo_action"))
+    has_dolphin = any(
+        d.exists() and any(d.glob("fileconverter*.desktop"))
+        for d in _dolphin_service_dirs()
+    )
 
     has_config = CONFIG_FILE.exists()
-    has_integration = has_nemo or any(f.exists() for f in integration_files)
+    has_integration = has_nemo or has_dolphin or any(f.exists() for f in integration_files)
     has_bin = shutil.which("fileconverter") is not None
     return has_config and (has_integration or has_bin)
 
@@ -524,14 +578,9 @@ def run_uninstall() -> None:
             f.unlink()
             removed.append(str(f))
 
-    # Dolphin service menus
-    for d in [
-        Path.home() / ".local" / "share" / "kio" / "servicemenus" / "fileconverter.desktop",
-        Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus" / "fileconverter.desktop",
-    ]:
-        if d.exists():
-            d.unlink()
-            removed.append(str(d))
+    # Dolphin service menus (glob: the monolithic file from older versions
+    # and every per-type group — GH #7)
+    removed += _clean_dolphin_service_menus()
 
     # Desktop entry
     desktop = Path.home() / ".local" / "share" / "applications" / "fileconverter-settings.desktop"
