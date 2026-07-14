@@ -18,8 +18,10 @@ dependencies = [
 
 [project.scripts]
 fileconverter = "fileconverter.cli:main"
-fileconverter-pick = "fileconverter.ui.preset_picker:main"
-fileconverter-install = "fileconverter.integration.install:main"
+# Both dispatch on the platform: the picker falls back from GTK/native to
+# tkinter, and the installer must not run the Linux flow on macOS.
+fileconverter-pick = "fileconverter.ui.picker:main"
+fileconverter-install = "fileconverter.integration:main"
 
 [tool.setuptools.packages.find]
 include = ["fileconverter*"]

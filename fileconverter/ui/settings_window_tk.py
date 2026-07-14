@@ -387,13 +387,16 @@ class SettingsWindow:
     def _on_save(self):
         save_settings(self.settings)
         self._modified = False
-        if sys.platform == "darwin":
-            # Keep the Finder context menu in sync with the presets (GH #7).
-            try:
+        # Keep the context menu in sync with the presets (GH #7).
+        try:
+            if sys.platform == "darwin":
                 from fileconverter.integration.macos import refresh_services
                 refresh_services(quiet=True)
-            except Exception:
-                pass
+            else:
+                from fileconverter.integration.install import refresh_menus
+                refresh_menus()
+        except Exception:
+            pass
         self.root.title(_("File Converter — Settings (saved)"))
         self.root.after(2000,
                         lambda: self.root.title(_("File Converter — Settings")))

@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 
 from fileconverter.i18n import _
+from fileconverter.jobs.proc import Cancelled
 from fileconverter.path_helpers import generate_output_path, generate_unique_path
 from fileconverter.presets import ConversionPreset
 
@@ -33,6 +34,7 @@ class ConversionJob:
         self.error_message: str = ""
         self.user_state: str = _("Preparing...")
         self._cancel_requested = False
+        self._cancel_parent: ConversionJob | None = None
         self._lock = threading.Lock()
 
     @property
@@ -48,10 +50,20 @@ class ConversionJob:
 
     @property
     def cancel_requested(self) -> bool:
-        return self._cancel_requested
+        if self._cancel_requested:
+            return True
+        # Sub-jobs (GIF's two-step pipeline, document → PDF → image) are
+        # separate objects; without following the link, cancelling the visible
+        # job would leave the inner tool running.
+        parent = self._cancel_parent
+        return parent.cancel_requested if parent is not None else False
 
     def request_cancel(self) -> None:
         self._cancel_requested = True
+
+    def link_cancel(self, parent: ConversionJob) -> None:
+        """Make this (internal) job cancel together with the user-facing one."""
+        self._cancel_parent = parent
 
     def prepare(self) -> None:
         """Generate output paths and validate.
@@ -98,12 +110,22 @@ class ConversionJob:
 
     def run(self) -> None:
         """Execute the conversion. Called from a worker thread."""
+        # A cancelled job that is still queued must not start: closing the
+        # window on a 50-file batch used to convert every remaining file
+        # anyway (and then delete the results).
+        if self.cancel_requested:
+            self.state = ConversionState.FAILED
+            self.error_message = _("Cancelled")
+            self.user_state = _("Cancelled")
+            self._cleanup_outputs()
+            return
+
         self.state = ConversionState.IN_PROGRESS
         self.start_time = time.time()
         self.user_state = _("Converting...")
         try:
             self._convert()
-            if self._cancel_requested:
+            if self.cancel_requested:
                 self.state = ConversionState.FAILED
                 self.error_message = _("Cancelled")
                 self._cleanup_outputs()
@@ -112,6 +134,11 @@ class ConversionJob:
                 self.state = ConversionState.DONE
                 self.user_state = _("Done")
                 self._post_conversion()
+        except Cancelled:
+            self.state = ConversionState.FAILED
+            self.error_message = _("Cancelled")
+            self.user_state = _("Cancelled")
+            self._cleanup_outputs()
         except Exception as e:
             self.state = ConversionState.FAILED
             self.error_message = str(e)

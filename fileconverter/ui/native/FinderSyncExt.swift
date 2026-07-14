@@ -32,7 +32,13 @@ final class FinderSync: FIFinderSync {
     // MARK: menu.json
 
     private var menuConfigURL: URL {
-        FileManager.default.homeDirectoryForCurrentUser
+        // App extensions run sandboxed, where homeDirectoryForCurrentUser
+        // (and NSHomeDirectory) return the extension's *container*, not the
+        // user's home — menu.json would never be found and the submenu would
+        // silently never appear. getpwuid gives the real home; the bundle's
+        // home-relative read-only entitlement is what grants access to it.
+        let home = String(cString: getpwuid(getuid())!.pointee.pw_dir)
+        return URL(fileURLWithPath: home)
             .appendingPathComponent(".local/share/fileconverter/menu.json")
     }
 

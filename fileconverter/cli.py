@@ -27,6 +27,8 @@ def _parse_args() -> argparse.Namespace:
                     help="Path to a text file containing input file paths (one per line)")
     p.add_argument("--settings", action="store_true",
                     help="Open the settings window")
+    p.add_argument("--pick", action="store_true",
+                    help="Open the preset picker for the given files")
     p.add_argument("--install", action="store_true",
                     help="Set up context menu integration and dependencies")
     p.add_argument("--uninstall", action="store_true",
@@ -171,6 +173,19 @@ def main() -> None:
             print(_("A GUI toolkit (GTK 4 or tkinter) is required for the settings window."),
                   file=sys.stderr)
             sys.exit(1)
+        return
+
+    # --pick (the frozen binary has no separate fileconverter-pick executable,
+    # so the picker has to be reachable through this flag — it is what the
+    # Thunar/PCManFM custom actions call)
+    if args.pick:
+        files = _collect_files(args)
+        if not files:
+            print(_("Error: no input files specified."), file=sys.stderr)
+            sys.exit(1)
+        from fileconverter.ui.picker import main as pick_main
+        sys.argv = [sys.argv[0]] + files
+        pick_main()
         return
 
     # No arguments at all → first-run check, then show help or run install

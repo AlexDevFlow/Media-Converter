@@ -13,7 +13,7 @@ from fileconverter.i18n import _
 from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
 from fileconverter.jobs.imagemagick import ImageMagickJob
-from fileconverter.jobs.proc import system_env
+from fileconverter.jobs.proc import run_cancellable
 from fileconverter.presets import ConversionPreset
 
 # Explicit LibreOffice export filters. For docx/odt/xlsx/ods/pptx/odp/txt/csv,
@@ -32,6 +32,20 @@ _LO_EXPORT_FILTERS = {
 class LibreOfficeJob(ConversionJob):
     def __init__(self, preset: ConversionPreset, input_path: str):
         super().__init__(preset, input_path)
+
+    @staticmethod
+    def _profile_args(tmpdir: str) -> list[str]:
+        """Give this invocation its own LibreOffice user profile.
+
+        Two `soffice --headless` processes sharing the default profile do not
+        both convert: the second one hands its request to the first instance
+        and exits 0 having produced nothing. With max_simultaneous_conversions
+        > 1 (the default is 2), a batch of documents silently lost half its
+        outputs — the jobs reported success with no file on disk. A private
+        profile per invocation makes them fully independent.
+        """
+        profile = os.path.join(tmpdir, "loprofile")
+        return [f"-env:UserInstallation=file://{profile}"]
 
     @staticmethod
     def _find_libreoffice() -> str:
@@ -82,9 +96,10 @@ class LibreOfficeJob(ConversionJob):
 
         convert_to = _LO_EXPORT_FILTERS.get(out_type, out_type)
         with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
-            result = subprocess.run(
-                [lo, "--headless", "--convert-to", convert_to, "--outdir", tmpdir, self.input_path],
-                capture_output=True, text=True, timeout=600, env=system_env(),
+            result = run_cancellable(
+                [lo] + self._profile_args(tmpdir)
+                + ["--headless", "--convert-to", convert_to, "--outdir", tmpdir,
+                   self.input_path], self, timeout=600,
             )
             produced = os.path.join(
                 tmpdir,
@@ -120,25 +135,36 @@ class LibreOfficeJob(ConversionJob):
                 )
 
     def _convert_to_pdf(self, lo: str) -> None:
-        """Direct conversion to PDF."""
+        """Direct conversion to PDF.
+
+        Converts into a temp dir (like _convert_direct) rather than straight
+        into the input's folder: LibreOffice names its output after the input
+        basename, so a pdf → pdf conversion would otherwise overwrite the
+        source. The produced file is verified — LibreOffice can exit 0 having
+        written nothing at all.
+        """
         self.user_state = _("Converting document...")
         self.progress = 0.1
 
-        out_dir = os.path.dirname(self.output_path)
-        result = subprocess.run(
-            [lo, "--headless", "--convert-to", "pdf", "--outdir", out_dir, self.input_path],
-            capture_output=True, text=True, timeout=600, env=system_env(),
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"LibreOffice error: {result.stderr}")
+        with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
+            result = run_cancellable(
+                [lo] + self._profile_args(tmpdir)
+                + ["--headless", "--convert-to", "pdf", "--outdir", tmpdir,
+                   self.input_path], self, timeout=600,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(f"LibreOffice error: {result.stderr}")
 
-        # LibreOffice names the output based on the input filename
-        expected = os.path.join(
-            out_dir,
-            os.path.splitext(os.path.basename(self.input_path))[0] + ".pdf",
-        )
-        if expected != self.output_path and os.path.exists(expected):
-            shutil.move(expected, self.output_path)
+            produced = os.path.join(
+                tmpdir,
+                os.path.splitext(os.path.basename(self.input_path))[0] + ".pdf",
+            )
+            if not os.path.exists(produced) or os.path.getsize(produced) == 0:
+                raise RuntimeError(
+                    "LibreOffice produced no PDF. "
+                    f"{result.stdout.strip()} {result.stderr.strip()}".strip()
+                )
+            shutil.move(produced, self.output_path)
 
         self.progress = 1.0
 
@@ -149,9 +175,10 @@ class LibreOfficeJob(ConversionJob):
             self.user_state = _("Exporting to PDF...")
             self.progress = 0.1
 
-            result = subprocess.run(
-                [lo, "--headless", "--convert-to", "pdf", "--outdir", tmpdir, self.input_path],
-                capture_output=True, text=True, timeout=600, env=system_env(),
+            result = run_cancellable(
+                [lo] + self._profile_args(tmpdir)
+                + ["--headless", "--convert-to", "pdf", "--outdir", tmpdir,
+                   self.input_path], self, timeout=600,
             )
             if result.returncode != 0:
                 raise RuntimeError(f"LibreOffice error: {result.stderr}")
@@ -160,7 +187,7 @@ class LibreOfficeJob(ConversionJob):
                 tmpdir,
                 os.path.splitext(os.path.basename(self.input_path))[0] + ".pdf",
             )
-            if not os.path.exists(tmp_pdf):
+            if not os.path.exists(tmp_pdf) or os.path.getsize(tmp_pdf) == 0:
                 raise RuntimeError("LibreOffice did not produce expected PDF output")
 
             self.progress = 0.4
@@ -168,6 +195,7 @@ class LibreOfficeJob(ConversionJob):
             # Step 2: PDF → target format via ImageMagick
             self.user_state = _("Converting to image...")
             img_job = ImageMagickJob(self.preset, tmp_pdf)
+            img_job.link_cancel(self)
             img_job.output_paths = self.output_paths
             img_job._convert_cmd = ImageMagickJob._find_convert()
             img_job._is_pdf_input = True

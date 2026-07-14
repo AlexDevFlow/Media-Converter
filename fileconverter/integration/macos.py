@@ -457,7 +457,11 @@ def refresh_services(quiet: bool = False) -> int:
     picker = shlex.quote(str(LOCAL_BIN / "fileconverter-pick"))
 
     count = 0
-    if not _extension_enabled():
+    # Quick Actions are the fallback for when the submenu extension isn't
+    # actually there. Checking pluginkit alone isn't enough: its registration
+    # DB outlives a deleted or never-rebuilt app bundle, and we'd then ship
+    # *no* per-preset menu at all.
+    if not (_extension_enabled() and HOST_APP.exists()):
         all_exts = set()
         for preset in settings.presets:
             all_exts.update(e.lower().lstrip(".") for e in preset.input_types)
@@ -537,6 +541,19 @@ def _extension_enabled() -> bool:
     return any(line.strip().startswith("+") for line in out.splitlines())
 
 
+def _unregister_extension() -> None:
+    """Drop the extension from pluginkit's database, so a stale registration
+    can't make us think a submenu exists when the app bundle is gone."""
+    try:
+        subprocess.run(["/usr/bin/pluginkit", "-e", "ignore", "-i", EXT_BUNDLE_ID],
+                       capture_output=True, timeout=15)
+        appex = HOST_APP / "Contents" / "PlugIns" / "FileConverterSync.appex"
+        subprocess.run(["/usr/bin/pluginkit", "-r", str(appex)],
+                       capture_output=True, timeout=15)
+    except (subprocess.SubprocessError, OSError):
+        pass
+
+
 def build_finder_extension(quiet: bool = False) -> str:
     """Build File Converter.app with the embedded Finder Sync extension.
 
@@ -549,6 +566,11 @@ def build_finder_extension(quiet: bool = False) -> str:
     host_src = src_dir / "HostApp.swift"
     ext_src = src_dir / "FinderSyncExt.swift"
     if not swiftc or not host_src.exists() or not ext_src.exists():
+        # Leave no ghost behind: a previous install may have registered an
+        # extension that we can no longer rebuild (e.g. the Command Line Tools
+        # went away with a macOS upgrade). Unregister it, so refresh_services
+        # falls back to Quick Actions instead of trusting a dead registration.
+        _unregister_extension()
         if not quiet:
             _print("  [NOTE] Swift toolchain not available — Finder submenu skipped,", "yellow")
             _print("         Quick Actions remain the context-menu integration.", "yellow")
@@ -623,6 +645,7 @@ def build_finder_extension(quiet: bool = False) -> str:
                 for line in tail:
                     _print(f"         {line}", "yellow")
             shutil.rmtree(app, ignore_errors=True)
+            _unregister_extension()
             return "unavailable"
 
     # Ad-hoc sign inside-out, then register and try to enable. pkd only

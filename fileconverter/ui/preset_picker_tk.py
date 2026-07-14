@@ -113,7 +113,7 @@ def main():
         if ext:
             extensions.add(ext.lower().lstrip("."))
     compatible = [p.to_dict() for p in settings.presets
-                  if all(ext in p.input_types for ext in extensions)]
+                  if p.accepts_all_extensions(sorted(extensions))]
 
     root = tk.Tk()
     if sys.platform == "darwin":

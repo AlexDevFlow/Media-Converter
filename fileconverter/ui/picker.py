@@ -60,13 +60,20 @@ def main() -> None:
     settings = load_settings()
     i18n.init(settings.language)
 
+    # A file with no extension can't be converted by any preset. Including it
+    # in the selection would otherwise queue a job that is guaranteed to fail,
+    # so treat the whole selection as unconvertible (the Finder submenu is
+    # conservative in exactly the same way).
     extensions = set()
     for f in file_paths:
         ext = os.path.splitext(f)[1]
-        if ext:
-            extensions.add(ext.lower().lstrip("."))
+        if not ext:
+            extensions = set()
+            break
+        extensions.add(ext.lower().lstrip("."))
+
     compatible = [p.to_dict() for p in settings.presets
-                  if all(ext in p.input_types for ext in extensions)]
+                  if p.accepts_all_extensions(sorted(extensions))]
 
     if sys.platform == "darwin":
         try:
@@ -85,6 +92,15 @@ def main() -> None:
                 return
         except Exception:
             pass  # fall through to tkinter
+    else:
+        # Linux: GTK is the native look; tkinter only when it's unavailable
+        # (GH #5 — a missing GTK must never mean a traceback).
+        try:
+            from fileconverter.ui import preset_picker
+            preset_picker.main()
+            return
+        except (ImportError, ValueError):
+            pass
 
     from fileconverter.ui import preset_picker_tk
     preset_picker_tk.main()

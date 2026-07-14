@@ -132,7 +132,7 @@ class PickerApp(Adw.Application):
                 extensions.add(ext.lower().lstrip("."))
         compatible = []
         for p in settings.presets:
-            if all(ext in p.input_types for ext in extensions):
+            if p.accepts_all_extensions(sorted(extensions)):
                 compatible.append(p.to_dict())
 
         if not compatible:

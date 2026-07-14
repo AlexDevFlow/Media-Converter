@@ -50,6 +50,100 @@ def is_frozen() -> bool:
     return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 
 
+class Cancelled(RuntimeError):
+    """The user cancelled while an external tool was running."""
+
+
+def run_cancellable(cmd, job, timeout: float = 600.0, poll: float = 0.1):
+    """Run an external tool, killing it if the job is cancelled.
+
+    subprocess.run() blocks until the tool exits, so a cancel (window closed,
+    Cancel clicked) could not stop ImageMagick or LibreOffice: the batch kept
+    converting with no window, and the results were then deleted as a
+    cancelled job.
+
+    Reader threads drain stdout/stderr (a tool that fills a pipe buffer would
+    otherwise deadlock), while the main loop polls for exit, cancellation and
+    the timeout. Note communicate(timeout=...) cannot be used in a poll loop:
+    a retry after TimeoutExpired blocks until the process exits.
+
+    Returns a CompletedProcess; raises Cancelled if the tool was killed.
+    """
+    import os
+    import signal
+    import subprocess
+    import threading
+    import time
+
+    if job is not None and job.cancel_requested:
+        raise Cancelled()
+
+    # Own process group: the tools we drive spawn children (soffice is a shell
+    # wrapper around soffice.bin), and killing only the parent would leave the
+    # real worker running — still holding the pipes open, so we'd block anyway.
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        text=True, env=system_env(), start_new_session=True,
+    )
+
+    def _kill_tree() -> None:
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        except (OSError, ProcessLookupError):
+            try:
+                proc.kill()
+            except OSError:
+                pass
+
+    chunks: dict = {"out": [], "err": []}
+
+    def _drain(stream, key):
+        try:
+            for line in stream:
+                chunks[key].append(line)
+        except (OSError, ValueError):
+            pass
+        finally:
+            try:
+                stream.close()
+            except OSError:
+                pass
+
+    readers = [
+        threading.Thread(target=_drain, args=(proc.stdout, "out"), daemon=True),
+        threading.Thread(target=_drain, args=(proc.stderr, "err"), daemon=True),
+    ]
+    for t in readers:
+        t.start()
+
+    deadline = time.monotonic() + timeout
+    killed_reason = None
+    try:
+        while proc.poll() is None:
+            if job is not None and job.cancel_requested:
+                killed_reason = "cancelled"
+                break
+            if time.monotonic() > deadline:
+                killed_reason = "timeout"
+                break
+            time.sleep(poll)
+    finally:
+        if killed_reason is not None or proc.poll() is None:
+            _kill_tree()
+        proc.wait()
+        for t in readers:
+            t.join(timeout=5)
+
+    if killed_reason == "cancelled":
+        raise Cancelled()
+    if killed_reason == "timeout":
+        raise subprocess.TimeoutExpired(cmd, timeout)
+
+    return subprocess.CompletedProcess(
+        cmd, proc.returncode, "".join(chunks["out"]), "".join(chunks["err"])
+    )
+
+
 def system_env(extra: dict | None = None) -> dict | None:
     """Environment for running a *system* tool (ffmpeg, magick, gs, soffice).
 

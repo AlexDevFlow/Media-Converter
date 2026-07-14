@@ -9,7 +9,7 @@ import tempfile
 from fileconverter.i18n import _
 from fileconverter.integration import install_hint
 from fileconverter.jobs.base import ConversionJob
-from fileconverter.jobs.proc import system_env
+from fileconverter.jobs.proc import run_cancellable, system_env
 from fileconverter.presets import ConversionPreset
 
 BASE_DPI_FOR_PDF = 200
@@ -127,16 +127,14 @@ class ImageMagickJob(ConversionJob):
             if jp2_via_ffmpeg:
                 with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
                     tmp_png = os.path.join(tmpdir, f"page-{i}.png")
-                    result = subprocess.run(args + [tmp_png], capture_output=True,
-                                            text=True, timeout=300, env=system_env())
+                    result = run_cancellable(args + [tmp_png], self, timeout=300)
                     if result.returncode != 0:
                         raise RuntimeError(f"ImageMagick error: {result.stderr}")
                     self._png_to_jp2(tmp_png, out_path)
             else:
                 args += self._quality_args()
                 args += [out_path]
-                result = subprocess.run(args, capture_output=True, text=True,
-                                        timeout=300, env=system_env())
+                result = run_cancellable(args, self, timeout=300)
                 if result.returncode != 0:
                     raise RuntimeError(f"ImageMagick error: {result.stderr}")
 
@@ -146,10 +144,9 @@ class ImageMagickJob(ConversionJob):
         from fileconverter.jobs.ffmpeg import FFmpegJob, jp2_quality_to_qv
         ffmpeg = FFmpegJob._find_ffmpeg()
         quality = self.preset.get_setting_int("image_quality", 85)
-        result = subprocess.run(
+        result = run_cancellable(
             [ffmpeg, "-y", "-i", png_path, "-c:v", "jpeg2000", "-format", "jp2",
-             "-q:v", str(jp2_quality_to_qv(quality)), out_path],
-            capture_output=True, text=True, timeout=300, env=system_env())
+             "-q:v", str(jp2_quality_to_qv(quality)), out_path], self, timeout=300)
         if result.returncode != 0:
             raise RuntimeError(f"ffmpeg error (JP2): {result.stderr[-400:]}")
 
@@ -184,8 +181,7 @@ class ImageMagickJob(ConversionJob):
         args += self._quality_args()
         args += [output_path]
 
-        result = subprocess.run(args, capture_output=True, text=True, timeout=300,
-                                env=system_env())
+        result = run_cancellable(args, self, timeout=300)
         if result.returncode != 0:
             raise RuntimeError(f"ImageMagick error: {result.stderr}")
         self._validate_output_format(output_path)

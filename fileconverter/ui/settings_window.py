@@ -380,6 +380,13 @@ class SettingsWindow(Gtk.ApplicationWindow):
     def _on_save(self, _btn):
         save_settings(self.settings)
         self._modified = False
+        # Keep the file-manager menus in sync with the presets — they encode
+        # preset names and input-type groups, so a save changes them.
+        try:
+            from fileconverter.integration.install import refresh_menus
+            refresh_menus()
+        except Exception:
+            pass
         self.set_title(_("File Converter — Settings (saved)"))
         GLib.timeout_add(2000, lambda: self.set_title(_("File Converter — Settings")) or False)
 

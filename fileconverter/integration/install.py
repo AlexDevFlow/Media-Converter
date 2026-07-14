@@ -227,6 +227,18 @@ def _create_launcher_script() -> bool:
             shutil.copy2(target, link)
             link.chmod(0o755)
             _print(f"  [OK] Copied binary to {link}", "green")
+
+        # The frozen build is a single binary, so the picker lives behind
+        # --pick. Thunar/PCManFM custom actions (and run_install's own
+        # instructions) call `fileconverter-pick`, so it must exist.
+        picker = local_bin / "fileconverter-pick"
+        if picker.exists() or picker.is_symlink():
+            picker.unlink()
+        picker.write_text(f"""#!/bin/sh
+exec "{link}" --pick "$@"
+""")
+        picker.chmod(0o755)
+        _print(f"  [OK] Picker: {picker}", "green")
         return True
 
     # Source install: create wrapper scripts
@@ -245,9 +257,11 @@ exec {python} -m fileconverter "$@"
     _print(f"  [OK] Launcher: {launcher}", "green")
 
     picker = local_bin / "fileconverter-pick"
+    # fileconverter.ui.picker (not preset_picker) — it falls back to tkinter
+    # when GTK is missing, instead of crashing (GH #5).
     picker.write_text(f"""#!/bin/sh
 export PYTHONPATH="{project_root}:$PYTHONPATH"
-exec {python} -m fileconverter.ui.preset_picker "$@"
+exec {python} -m fileconverter.ui.picker "$@"
 """)
     picker.chmod(0o755)
     _print(f"  [OK] Picker: {picker}", "green")
@@ -294,10 +308,35 @@ Extensions={mimetypes};
 # ── Dolphin service menu ──
 
 def _dolphin_service_dirs() -> list[Path]:
+    """Both locations — for cleaning and for detection, never both for writing."""
     return [
         Path.home() / ".local" / "share" / "kio" / "servicemenus",
         Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus",
     ]
+
+
+def _dolphin_target_dir() -> Path:
+    """The ONE directory to write service menus into.
+
+    KIO ≥ 5.85 (Plasma 5.22+/6) scans both `kio/servicemenus` and the legacy
+    `kservices5/ServiceMenus`, so writing to both would show every action
+    twice. Older KIO scans only the legacy dir. Detect which world we're in
+    from the system-wide directories, defaulting to the modern one.
+    """
+    modern = Path.home() / ".local" / "share" / "kio" / "servicemenus"
+    legacy = Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus"
+
+    system_modern = any(
+        Path(p).is_dir() for p in
+        ("/usr/share/kio/servicemenus", "/usr/local/share/kio/servicemenus")
+    )
+    system_legacy = any(
+        Path(p).is_dir() for p in
+        ("/usr/share/kservices5/ServiceMenus", "/usr/local/share/kservices5/ServiceMenus")
+    )
+    if system_legacy and not system_modern:
+        return legacy
+    return modern
 
 
 def _clean_dolphin_service_menus() -> list[str]:
@@ -350,46 +389,72 @@ def _install_dolphin_service_menu() -> bool:
 
     _clean_dolphin_service_menus()
 
-    installed = False
-    for service_dir in _dolphin_service_dirs():
-        service_dir.mkdir(parents=True, exist_ok=True)
+    service_dir = _dolphin_target_dir()
+    service_dir.mkdir(parents=True, exist_ok=True)
 
-        for idx, (exts, presets) in enumerate(sorted(
-                groups.items(), key=lambda kv: sorted(kv[0]))):
-            mimes = mime_types_for_extensions(exts)
-            if not mimes:
-                continue
+    written = 0
+    for idx, (exts, presets) in enumerate(sorted(
+            groups.items(), key=lambda kv: sorted(kv[0]))):
+        mimes = mime_types_for_extensions(exts)
+        if not mimes:
+            continue
 
-            actions = ";".join(f"action{i}" for i in range(len(presets)))
-            lines = [
-                "[Desktop Entry]",
-                "Type=Service",
-                "ServiceTypes=KonqPopupMenu/Plugin",
-                f"MimeType={';'.join(mimes)};",
-                "X-KDE-Submenu=File Converter",
-                f"Actions={actions}",
+        actions = ";".join(f"action{i}" for i in range(len(presets)))
+        lines = [
+            "[Desktop Entry]",
+            "Type=Service",
+            "ServiceTypes=KonqPopupMenu/Plugin",
+            f"MimeType={';'.join(mimes)};",
+            "X-KDE-Submenu=File Converter",
+            f"Actions={actions}",
+            "",
+        ]
+        for i, preset in enumerate(presets):
+            lines += [
+                f"[Desktop Action action{i}]",
+                f"Name={preset.short_name}",
+                f'Exec="{fc}" --conversion-preset "{preset.name}" %F',
                 "",
             ]
-            for i, preset in enumerate(presets):
-                lines += [
-                    f"[Desktop Action action{i}]",
-                    f"Name={preset.short_name}",
-                    f'Exec={fc} --conversion-preset "{preset.name}" %F',
-                    "",
-                ]
 
-            desktop_file = service_dir / f"fileconverter-group{idx}.desktop"
-            desktop_file.write_text("\n".join(lines))
-            desktop_file.chmod(0o755)
+        desktop_file = service_dir / f"fileconverter-group{idx}.desktop"
+        desktop_file.write_text("\n".join(lines))
+        desktop_file.chmod(0o755)
+        written += 1
 
-        installed = True
-        _print(f"  [OK] Dolphin service menus: {len(groups)} type groups", "green")
-        return installed
+    if not written:
+        _print("  [WARN] No preset had a recognisable input type — no menu written",
+               "yellow")
+        return False
 
-    return False
+    _print(f"  [OK] Dolphin service menus: {written} type groups → {service_dir}",
+           "green")
+    return True
 
 
 # ── Desktop entry ──
+
+def refresh_menus(quiet: bool = True) -> None:
+    """Regenerate the file-manager menus from the current presets.
+
+    Called after the settings window saves. Without this, adding, renaming or
+    deleting a preset leaves the Nemo actions and the Dolphin service menus
+    (which encode whole preset groups) stale until the user re-runs --install.
+    Only touches integrations that are already installed.
+    """
+    import contextlib
+    import io
+
+    sink = io.StringIO()
+    with contextlib.redirect_stdout(sink) if quiet else contextlib.nullcontext():
+        nemo_dir = Path.home() / ".local" / "share" / "nemo" / "actions"
+        if nemo_dir.exists() and any(nemo_dir.glob("fileconverter-*.nemo_action")):
+            _install_nemo_actions()
+
+        if any(d.exists() and any(d.glob("fileconverter*.desktop"))
+               for d in _dolphin_service_dirs()):
+            _install_dolphin_service_menu()
+
 
 def _install_desktop_entry() -> None:
     desktop_dir = Path.home() / ".local" / "share" / "applications"

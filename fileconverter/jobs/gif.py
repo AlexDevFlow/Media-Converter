@@ -41,6 +41,7 @@ class GifJob(ConversionJob):
                     settings=self.preset.settings.copy(),
                 )
                 img_job = ImageMagickJob(png_preset, self.input_path)
+                img_job.link_cancel(self)
                 img_job.output_paths = [tmp_png]
                 img_job._convert_cmd = ImageMagickJob._find_convert()
                 img_job._convert()
@@ -50,6 +51,7 @@ class GifJob(ConversionJob):
                 # Step 2: PNG → GIF via FFmpeg
                 self.user_state = _("Creating GIF...")
                 ff_job = FFmpegJob(self.preset, tmp_png)
+                ff_job.link_cancel(self)
                 ff_job.output_paths = self.output_paths
                 ff_job._build_arguments()
                 ff_job._convert()
@@ -62,6 +64,7 @@ class GifJob(ConversionJob):
             # Video or PNG → GIF directly via FFmpeg
             self.user_state = _("Creating GIF...")
             ff_job = FFmpegJob(self.preset, self.input_path)
+            ff_job.link_cancel(self)
             ff_job.output_paths = self.output_paths
             ff_job._build_arguments()
             ff_job._convert()

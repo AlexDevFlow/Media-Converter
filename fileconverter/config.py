@@ -35,9 +35,13 @@ class Settings:
     max_simultaneous_conversions: int = 2
     exit_when_done: bool = True
     exit_delay_seconds: int = 3
-    hardware_acceleration: str = "off"  # off | auto | nvenc | vaapi
+    hardware_acceleration: str = "off"  # off | auto | nvenc | vaapi | videotoolbox
     language: str = "auto"  # auto (system) | locale code like "it_IT"
     presets: list[ConversionPreset] = field(default_factory=list)
+    # Bundled presets the user deleted. Without this, the additive merge in
+    # load_settings() would re-add them on the very next load, making "Remove"
+    # in the settings window impossible.
+    removed_presets: list[str] = field(default_factory=list)
     version: int = CURRENT_VERSION
 
     def to_dict(self) -> dict:
@@ -48,6 +52,7 @@ class Settings:
             "exit_delay_seconds": self.exit_delay_seconds,
             "hardware_acceleration": self.hardware_acceleration,
             "language": self.language,
+            "removed_presets": list(self.removed_presets),
             "presets": [p.to_dict() for p in self.presets],
         }
 
@@ -56,6 +61,7 @@ class Settings:
         hw = data.get("hardware_acceleration", "off")
         if hw not in HWACCEL_MODES:
             hw = "off"
+        removed = data.get("removed_presets") or []
         return cls(
             max_simultaneous_conversions=data.get("max_simultaneous_conversions", 2),
             exit_when_done=data.get("exit_when_done", True),
@@ -63,6 +69,7 @@ class Settings:
             hardware_acceleration=hw,
             language=data.get("language", "auto"),
             presets=[ConversionPreset.from_dict(p) for p in data.get("presets", [])],
+            removed_presets=[str(n) for n in removed],
             version=data.get("version", 1),
         )
 
@@ -103,8 +110,11 @@ def load_settings() -> Settings:
         if defaults is not None:
             changed = False
             existing = {p.name: p for p in settings.presets}
+            removed = set(settings.removed_presets)
 
             for d in defaults.presets:
+                if d.name in removed:
+                    continue          # the user deleted it — stay deleted
                 if d.name not in existing:
                     settings.presets.append(d)
                     changed = True
@@ -132,7 +142,19 @@ def load_settings() -> Settings:
 
 
 def save_settings(settings: Settings) -> None:
-    """Save settings to YAML config file."""
+    """Save settings to YAML config file.
+
+    Records which bundled presets are currently absent, so the additive merge
+    in load_settings() doesn't resurrect the ones the user removed. Deleting a
+    preset and re-adding it by name later simply clears it from the list.
+    """
+    defaults = _load_default_settings()
+    if defaults is not None:
+        present = {p.name for p in settings.presets}
+        settings.removed_presets = sorted(
+            {d.name for d in defaults.presets} - present
+        )
+
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     with open(CONFIG_FILE, "w") as f:
         yaml.dump(settings.to_dict(), f, default_flow_style=False, sort_keys=False, allow_unicode=True)

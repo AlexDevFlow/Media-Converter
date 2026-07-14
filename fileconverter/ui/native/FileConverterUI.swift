@@ -487,6 +487,15 @@ final class SettingsVM: ObservableObject {
 
     func addPreset() {
         let p = PresetVM(newPresetTemplate)
+        // Names identify presets everywhere downstream (the CLI resolves the
+        // first match, the Finder menu derives file names from them), so two
+        // "New Preset"s would make the second unreachable.
+        let taken = Set(presets.map { $0.name })
+        if taken.contains(p.name) {
+            var n = 2
+            while taken.contains("\(p.name) \(n)") { n += 1 }
+            p.name = "\(p.name) \(n)"
+        }
         presets.append(p)
         selection = p.id
         markModified()

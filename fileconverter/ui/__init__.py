@@ -98,7 +98,14 @@ def run_settings_auto() -> None:
 
 
 def notify(title: str, message: str) -> None:
-    """Best-effort desktop notification (used by headless Finder launches)."""
+    """Best-effort desktop notification (used by headless file-manager launches).
+
+    notify-send is a system binary linked against glib/pango/harfbuzz — the
+    very libraries a frozen build bundles — so it needs the sanitised
+    environment too, or it dies with the GH #6 symbol-lookup error and the
+    user silently never sees the notification.
+    """
+    from fileconverter.jobs.proc import system_env
     try:
         if sys.platform == "darwin":
             def esc(s: str) -> str:
@@ -106,10 +113,10 @@ def notify(title: str, message: str) -> None:
             subprocess.run(
                 ["osascript", "-e",
                  f'display notification "{esc(message)}" with title "{esc(title)}"'],
-                capture_output=True, timeout=10,
+                capture_output=True, timeout=10, env=system_env(),
             )
         else:
             subprocess.run(["notify-send", title, message],
-                           capture_output=True, timeout=10)
+                           capture_output=True, timeout=10, env=system_env())
     except (subprocess.SubprocessError, OSError, FileNotFoundError):
         pass

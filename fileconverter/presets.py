@@ -45,6 +45,14 @@ class ConversionPreset:
         return ext.lower().lstrip(".") in self.input_types
 
     def accepts_all_extensions(self, extensions: list[str]) -> bool:
+        """True only if every given extension is accepted.
+
+        An empty list means the selection had no usable extension (a file
+        named `README`, a folder): nothing can be converted, so no preset
+        accepts it. Plain `all([])` would be True and offer every preset.
+        """
+        if not extensions:
+            return False
         return all(self.accepts_extension(e) for e in extensions)
 
     def to_dict(self) -> dict:

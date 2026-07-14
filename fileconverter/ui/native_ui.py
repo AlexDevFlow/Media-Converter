@@ -386,6 +386,11 @@ def run_settings() -> None:
                     refresh_services(quiet=True)
                 except Exception:
                     pass
+                # The window keeps its own copy of the presets; if the merge
+                # in load_settings() changed anything on disk (a preset the
+                # user removed, a default re-added), re-init so the UI can't
+                # drift from what is actually stored.
+                settings = load_settings()
                 if settings.language != old_lang:
                     i18n.init(settings.language)
                     # Full re-init so every label picks up the new language
