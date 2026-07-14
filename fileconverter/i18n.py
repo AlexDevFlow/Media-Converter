@@ -56,7 +56,9 @@ def _candidates() -> list[Path]:
     if meipass:
         paths.append(Path(meipass) / "locales")
 
-    # Dev checkout: locales/ next to the package
+    # Shipped inside the package (works for source checkouts and pip installs)
+    paths.append(here / "locales")
+    # Older layouts kept locales/ next to the package
     paths.append(here.parent / "locales")
 
     # User install

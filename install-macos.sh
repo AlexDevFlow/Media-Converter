@@ -40,8 +40,15 @@ for cand in "${CANDIDATES[@]}"; do
     [ -n "$cand" ] && [ -x "$cand" ] || continue
     "$cand" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)' 2>/dev/null || continue
     TK_VER="$("$cand" -c 'import tkinter; print(tkinter.TkVersion)' 2>/dev/null || echo 0)"
-    if [ -z "$PYTHON" ] || [ "$(printf '%s\n%s\n' "$BEST_TK" "$TK_VER" | sort -g | tail -1)" = "$TK_VER" ] \
-       && [ "$TK_VER" != "$BEST_TK" ]; then
+
+    # Take the first usable candidate, then only trade up for a strictly newer
+    # Tk. A Python WITHOUT tkinter (TK_VER=0) is still perfectly usable — the
+    # main UI is the native SwiftUI one — so it must not be rejected.
+    if [ -z "$PYTHON" ]; then
+        PYTHON="$cand"
+        BEST_TK="$TK_VER"
+    elif [ "$TK_VER" != "$BEST_TK" ] \
+         && [ "$(printf '%s\n%s\n' "$BEST_TK" "$TK_VER" | sort -g | tail -1)" = "$TK_VER" ]; then
         PYTHON="$cand"
         BEST_TK="$TK_VER"
     fi
@@ -60,11 +67,8 @@ echo "Using Python: $PYTHON ($("$PYTHON" -c 'import platform; print(platform.pyt
 
 # ── 2. Copy the payload ──
 mkdir -p "$PAYLOAD"
-rsync -a --delete \
-    "$SCRIPT_DIR/fileconverter" \
-    "$SCRIPT_DIR/resources" \
-    "$SCRIPT_DIR/locales" \
-    "$PAYLOAD/"
+# resources/ and locales/ live inside the package now
+rsync -a --delete "$SCRIPT_DIR/fileconverter" "$PAYLOAD/"
 
 # ── 3. Private venv with PyYAML (rebuilt if the chosen Python changed) ──
 MARKER="$APP_DIR/.venv-python"

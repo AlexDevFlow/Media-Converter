@@ -15,7 +15,7 @@ from fileconverter.jobs.imagemagick import ImageMagickJob
 from fileconverter.jobs.libreoffice import LibreOfficeJob
 from fileconverter.presets import ConversionPreset
 
-_DEFAULTS = yaml.safe_load(open("resources/default_presets.yaml"))["presets"]
+_DEFAULTS = yaml.safe_load(open("fileconverter/resources/default_presets.yaml"))["presets"]
 _BACKENDS = (FFmpegJob, GifJob, ImageMagickJob, LibreOfficeJob)
 
 

@@ -26,6 +26,15 @@ fileconverter-install = "fileconverter.integration:main"
 [tool.setuptools.packages.find]
 include = ["fileconverter*"]
 
+# The presets and translations live inside the package; without this they are
+# not installed and the tool starts with no presets at all.
+[tool.setuptools.package-data]
+fileconverter = [
+    "resources/*.yaml",
+    "resources/*.desktop",
+    "locales/*/LC_MESSAGES/*.mo",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = [".", "tests"]

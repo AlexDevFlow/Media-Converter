@@ -157,7 +157,7 @@ jobs:
           VERSION="${GITHUB_REF_NAME}"
           PKG_DIR="fileconverter-${VERSION}-macos"
           mkdir -p "${PKG_DIR}"
-          cp -R fileconverter resources locales "${PKG_DIR}/"
+          cp -R fileconverter "${PKG_DIR}/"
           cp install.sh install-macos.sh LICENSE "${PKG_DIR}/"
           find "${PKG_DIR}" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 

@@ -14,8 +14,10 @@ from fileconverter.presets import ConversionPreset
 CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "fileconverter"
 CONFIG_FILE = CONFIG_DIR / "settings.yaml"
 
-# PyInstaller bundles data files into sys._MEIPASS; source installs use relative path
-_BASE_DIR = Path(getattr(sys, '_MEIPASS', Path(__file__).parent.parent))
+# resources/ lives INSIDE the package so a pip install ships it too (outside,
+# it was simply not installed and the tool started with zero presets).
+# PyInstaller bundles data files into sys._MEIPASS.
+_BASE_DIR = Path(getattr(sys, '_MEIPASS', Path(__file__).parent))
 DEFAULT_PRESETS_FILE = _BASE_DIR / "resources" / "default_presets.yaml"
 
 

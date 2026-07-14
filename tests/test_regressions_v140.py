@@ -270,6 +270,41 @@ def test_dolphin_writes_to_a_single_service_dir(tmp_path, monkeypatch):
 
 # --- CLI entry points --------------------------------------------------------
 
+def test_menu_entries_use_an_absolute_quoted_command(tmp_path, monkeypatch):
+    """File managers launch menu entries with the login PATH, which usually
+    does NOT contain ~/.local/bin — so a bare `Exec=fileconverter` silently
+    did nothing. The path must also be quoted: a HOME with a space in it would
+    otherwise split into two shell words."""
+    from fileconverter.integration import install
+
+    home = tmp_path / "user name"          # a space, on purpose
+    (home / ".local" / "bin").mkdir(parents=True)
+    (home / ".local" / "bin" / "fileconverter").write_text("#!/bin/sh\n")
+    monkeypatch.setattr(install.Path, "home", staticmethod(lambda: home))
+    monkeypatch.setattr(install, "LOCAL_BIN", home / ".local" / "bin")
+    monkeypatch.setenv("PATH", "/usr/bin:/bin")   # ~/.local/bin NOT on PATH
+
+    settings = config.Settings(presets=[
+        ConversionPreset(name="To Mp4", output_type="mp4", input_types=["mkv"]),
+    ])
+    monkeypatch.setattr(config, "load_settings", lambda: settings)
+
+    install._install_nemo_actions()
+    install._install_dolphin_service_menu()
+    install._install_desktop_entry()
+
+    written = [
+        next((home / ".local/share/nemo/actions").glob("*.nemo_action")),
+        next((home / ".local/share/kio/servicemenus").glob("*.desktop")),
+        home / ".local/share/applications/fileconverter-settings.desktop",
+    ]
+    for path in written:
+        exec_line = next(l for l in path.read_text().splitlines()
+                         if l.startswith("Exec="))
+        assert exec_line.startswith('Exec="/'), (
+            f"{path.name} does not exec an absolute, quoted path: {exec_line}")
+
+
 def test_cli_exposes_the_picker():
     """The frozen build is a single binary: without --pick there is no way to
     reach the picker, yet the installer tells Thunar/PCManFM users to call it."""
@@ -277,6 +312,22 @@ def test_cli_exposes_the_picker():
                          capture_output=True, text=True, cwd=REPO,
                          env={**os.environ, "PYTHONPATH": str(REPO)})
     assert "--pick" in out.stdout
+
+
+def test_presets_and_translations_ship_inside_the_package():
+    """resources/ and locales/ used to live outside the package, so a pip
+    install produced a tool with zero presets and no translations."""
+    import fileconverter
+    from fileconverter.config import DEFAULT_PRESETS_FILE
+
+    package_dir = Path(fileconverter.__file__).parent
+    assert (package_dir / "resources" / "default_presets.yaml").exists()
+    assert any((package_dir / "locales").glob("*/LC_MESSAGES/fileconverter.mo"))
+    assert DEFAULT_PRESETS_FILE.exists()
+
+    pyproject = (REPO / "pyproject.toml").read_text()
+    assert "[tool.setuptools.package-data]" in pyproject, (
+        "package data is not declared — pip install would not ship the presets")
 
 
 def test_declared_entry_points_are_importable():

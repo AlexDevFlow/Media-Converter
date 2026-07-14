@@ -3,7 +3,7 @@
 import glob
 import os
 
-_locale_datas = [(p, f"locales/{p.split('/')[-3]}/LC_MESSAGES") for p in glob.glob('locales/*/LC_MESSAGES/fileconverter.mo')]
+_locale_datas = [(p, f"locales/{p.split('/')[-3]}/LC_MESSAGES") for p in glob.glob('fileconverter/locales/*/LC_MESSAGES/fileconverter.mo')]
 
 # GIR typelibs — PyInstaller's auto-discovery fails on Ubuntu 24.04 with
 # libgirepository-2.0 installed, leaving the bundle without GLib/Gtk/Adw
@@ -57,8 +57,8 @@ a = Analysis(
     pathex=[],
     binaries=_gi_binaries + _extra_binaries,
     datas=[
-        ('resources/default_presets.yaml', 'resources'),
-        ('resources/fileconverter.desktop', 'resources'),
+        ('fileconverter/resources/default_presets.yaml', 'resources'),
+        ('fileconverter/resources/fileconverter.desktop', 'resources'),
         ('fileconverter/integration/nautilus_extension.py', 'fileconverter/integration'),
     ] + _locale_datas + _gi_typelib_datas,
     hiddenimports=[

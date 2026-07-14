@@ -178,18 +178,31 @@ def _install_nautilus_extension() -> bool:
 
 # ── Binary / launcher setup ──
 
+APP_DIR = Path.home() / ".local" / "share" / "fileconverter"
+LOCAL_BIN = Path.home() / ".local" / "bin"
+
+
 def _find_self() -> str:
-    """Find the path to the fileconverter executable (PyInstaller binary or source)."""
-    # PyInstaller frozen binary
-    if getattr(sys, 'frozen', False):
+    """Absolute path of the command the menus should exec.
+
+    Always an absolute path: menu entries are launched by the file manager,
+    whose PATH is the login environment — which typically does NOT yet contain
+    ~/.local/bin (the installer warns about exactly this). A bare
+    "fileconverter" in an Exec= line would simply do nothing when clicked.
+    """
+    launcher = LOCAL_BIN / "fileconverter"
+    if launcher.exists():
+        return str(launcher)
+
+    if getattr(sys, "frozen", False):
         return sys.executable
 
-    # Installed via pip or in ~/.local/bin
     fc = shutil.which("fileconverter")
     if fc:
         return fc
 
-    return ""
+    # Not installed yet — this is the path _create_launcher_script() will write.
+    return str(launcher)
 
 
 def _save_binary_path() -> None:
@@ -198,9 +211,8 @@ def _save_binary_path() -> None:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
     binary = _find_self()
-    if binary:
-        (CONFIG_DIR / ".binary_path").write_text(binary)
-        _print(f"  [OK] Binary path saved: {binary}", "green")
+    (CONFIG_DIR / ".binary_path").write_text(binary)
+    _print(f"  [OK] Binary path saved: {binary}", "green")
 
     # Also save project root for source installs
     if not getattr(sys, 'frozen', False):
@@ -211,31 +223,39 @@ def _save_binary_path() -> None:
 def _create_launcher_script() -> bool:
     """Create a shell wrapper in ~/.local/bin/ (only for source installs, not PyInstaller)."""
     if getattr(sys, 'frozen', False):
-        # For PyInstaller, symlink the binary instead
-        local_bin = Path.home() / ".local" / "bin"
-        local_bin.mkdir(parents=True, exist_ok=True)
-        link = local_bin / "fileconverter"
-        target = Path(sys.executable)
+        # Copy the binary into our own directory rather than symlinking into
+        # the extracted tarball: menus embed this path, and the user will
+        # eventually delete ~/Downloads/fileconverter-v1.4.0/ — which used to
+        # break every context-menu entry at once.
+        LOCAL_BIN.mkdir(parents=True, exist_ok=True)
+        bin_dir = APP_DIR / "bin"
+        bin_dir.mkdir(parents=True, exist_ok=True)
 
+        source = Path(sys.executable)
+        installed = bin_dir / "fileconverter"
+        if source.resolve() != installed.resolve():
+            shutil.copy2(source, installed)
+            installed.chmod(0o755)
+        _print(f"  [OK] Binary installed: {installed}", "green")
+
+        link = LOCAL_BIN / "fileconverter"
         if link.exists() or link.is_symlink():
             link.unlink()
         try:
-            link.symlink_to(target)
-            _print(f"  [OK] Symlink: {link} → {target}", "green")
+            link.symlink_to(installed)
         except OSError:
-            # Symlink failed (cross-device?), copy instead
-            shutil.copy2(target, link)
+            shutil.copy2(installed, link)
             link.chmod(0o755)
-            _print(f"  [OK] Copied binary to {link}", "green")
+        _print(f"  [OK] Command: {link}", "green")
 
         # The frozen build is a single binary, so the picker lives behind
         # --pick. Thunar/PCManFM custom actions (and run_install's own
         # instructions) call `fileconverter-pick`, so it must exist.
-        picker = local_bin / "fileconverter-pick"
+        picker = LOCAL_BIN / "fileconverter-pick"
         if picker.exists() or picker.is_symlink():
             picker.unlink()
         picker.write_text(f"""#!/bin/sh
-exec "{link}" --pick "$@"
+exec "{installed}" --pick "$@"
 """)
         picker.chmod(0o755)
         _print(f"  [OK] Picker: {picker}", "green")
@@ -295,7 +315,7 @@ def _install_nemo_actions() -> bool:
         action_file.write_text(f"""[Nemo Action]
 Name=File Converter: {preset.short_name}
 Comment=Convert to {preset.output_type.upper()}
-Exec={fc} --conversion-preset "{preset.name}" %F
+Exec="{fc}" --conversion-preset "{preset.name}" %F
 Selection=Any
 Extensions={mimetypes};
 """)
@@ -467,7 +487,7 @@ def _install_desktop_entry() -> None:
 Type=Application
 Name=File Converter Settings
 Comment=Configure File Converter conversion presets
-Exec={fc} --settings
+Exec="{fc}" --settings
 Icon=preferences-system
 Categories=Utility;Settings;
 Terminal=false
