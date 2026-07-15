@@ -39,11 +39,11 @@ cd Media-Converter
 ./install.sh
 ```
 
-The installer copies the tool into `~/.local/share/fileconverter` with its own
-private venv (no PyInstaller binary, no Gatekeeper trouble), offers to install
-the media tools via [Homebrew](https://brew.sh) if they're missing, and builds
-a **Finder Sync extension** that puts a real submenu in the right-click menu —
-the same UX as the Dolphin/Nemo submenu on Linux:
+The installer puts the tool in `~/.local/share/fileconverter` in its own venv
+(no PyInstaller binary, so no Gatekeeper headaches), installs the media tools
+with [Homebrew](https://brew.sh) if you don't have them, and builds a Finder
+Sync extension that adds a real submenu to the right-click menu, just like the
+Dolphin/Nemo submenu on Linux:
 
 ```
 Right-click video.mkv >
@@ -56,26 +56,24 @@ Right-click video.mkv >
   └── Configure presets...
 ```
 
-The submenu only lists presets compatible with every selected file (filtering
-happens per-extension in the extension itself). If the Swift toolchain isn't
-available, the installer falls back to one **UTI-filtered Quick Action per
-preset** instead — same conversions, flatter menu.
+The submenu only shows presets that work for every file you selected. If you
+don't have the Swift toolchain, it falls back to one Quick Action per preset
+instead (same conversions, just a flatter menu).
 
-Conversions show a **native SwiftUI progress window** with per-file progress,
-ETA and cancel — compiled on the spot by the installer, with a tkinter
-fallback. The settings editor is native too: double-click
-**File Converter.app** (in `~/Applications`) or run `fileconverter --settings`.
-Video encodes can use Apple **VideoToolbox** hardware acceleration — enable
-"Auto-detect" under GPU accel in the settings.
+Conversions open a native progress window (per-file progress, ETA, cancel),
+built by the installer with a tkinter fallback. Settings are native too:
+double-click **File Converter.app** in `~/Applications`, or run
+`fileconverter --settings`. Video encoding can use Apple's VideoToolbox
+hardware acceleration if you turn on "Auto-detect" under GPU accel.
 
-Requirements: macOS 13+, the Xcode Command Line Tools
-(`xcode-select --install` — provides Python 3.9+ and the Swift compiler),
-Homebrew for the media tools. If the submenu doesn't appear right away,
-relaunch Finder (`killall Finder`) or check the extension is enabled under
-System Settings → General → Login Items & Extensions. Note for the tkinter
-fallback: Apple's bundled Tk 8.5 draws blank windows on recent macOS —
-`brew install python-tk` gives the fallback a working Tk if you need it.
-To remove everything: `fileconverter --uninstall`.
+You'll need macOS 13 or newer, the Xcode Command Line Tools
+(`xcode-select --install`, which give you Python 3.9+ and the Swift compiler),
+and Homebrew for the media tools. If the submenu doesn't show up right away,
+restart Finder with `killall Finder`, or check that the extension is enabled in
+System Settings → General → Login Items & Extensions. One gotcha with the
+tkinter fallback: the Tk that ships with macOS is ancient and draws blank
+windows, so `brew install python-tk` if you end up needing it. Uninstall with
+`fileconverter --uninstall`.
 
 ## How It Works
 
