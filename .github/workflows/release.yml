@@ -257,6 +257,46 @@ jobs:
             fileconverter --uninstall
             ```
 
+            **Arch Linux:** `yay -S fileconverter` (or `fileconverter-git` for the latest `main`).
+
             **Power users:** the raw Linux `fileconverter` binary is also attached if you want to manage placement yourself.
 
             ---
+
+  # Publishes the stable AUR package on each tagged release. No-op (skipped)
+  # until the AUR_SSH_PRIVATE_KEY secret is configured — see
+  # packaging/aur/README.md for the one-time setup.
+  publish-aur:
+    runs-on: ubuntu-24.04
+    needs: release
+    if: ${{ !contains(github.ref_name, '-') }}   # skip prereleases
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check whether the AUR key is configured
+        id: gate
+        run: echo "enabled=${{ secrets.AUR_SSH_PRIVATE_KEY != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Set pkgver from the tag
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^pkgver=.*/pkgver=${VERSION}/" packaging/aur/fileconverter/PKGBUILD
+
+      - name: Publish fileconverter to the AUR
+        if: steps.gate.outputs.enabled == 'true'
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.2
+        with:
+          pkgname: fileconverter
+          pkgbuild: packaging/aur/fileconverter/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to ${{ github.ref_name }}"
+          # Downloads the source tarball and fills in sha256sums; also
+          # regenerates .SRCINFO before pushing.
+          updpkgsums: true
+
+      - name: AUR publish skipped
+        if: steps.gate.outputs.enabled != 'true'
+        run: echo "AUR_SSH_PRIVATE_KEY not set — skipping AUR publish (see packaging/aur/README.md)."
