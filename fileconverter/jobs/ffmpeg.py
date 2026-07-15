@@ -200,6 +200,18 @@ def resolve_hwaccel(setting: str) -> str:
     return "off"
 
 
+def _kill_group(proc) -> None:
+    """SIGKILL the process and any child it spawned."""
+    import signal
+    try:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    except (OSError, ProcessLookupError):
+        try:
+            proc.kill()
+        except OSError:
+            pass
+
+
 @dataclass
 class _FFmpegPass:
     name: str
@@ -710,15 +722,18 @@ class FFmpegJob(ConversionJob):
                     return
                 self.user_state = p.name
                 cmd = [ffmpeg] + p.arguments
+                # Own process group so cancel kills ffmpeg and any child it
+                # spawned, matching run_cancellable.
                 proc = subprocess.Popen(
                     cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
                     text=True, bufsize=1, env=system_env(),
+                    start_new_session=True,
                 )
                 last_lines = []
                 try:
                     for line in proc.stderr:
                         if self.cancel_requested:
-                            proc.kill()
+                            _kill_group(proc)
                             proc.wait()
                             return
                         last_lines.append(line.rstrip())
@@ -727,9 +742,14 @@ class FFmpegJob(ConversionJob):
                         self._parse_output(last_lines[-1])
                     proc.wait()
                 except Exception:
-                    proc.kill()
+                    _kill_group(proc)
                     proc.wait()
                     raise
+                finally:
+                    # for-loop over proc.stderr can exit without closing it
+                    # (cancel path); reclaim the fd promptly instead of at GC.
+                    if proc.stderr and not proc.stderr.closed:
+                        proc.stderr.close()
 
                 if proc.returncode != 0 and not self.cancel_requested:
                     err = "\n".join(last_lines)
