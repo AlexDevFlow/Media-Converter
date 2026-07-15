@@ -122,6 +122,15 @@ def jp2_quality_to_qv(quality: int) -> int:
     return max(2, min(31, round(31 - quality * 29 / 100)))
 
 
+def _quality_setting(preset, default: int) -> int:
+    """The preset's video_quality, clamped to the 0-63 range presets use.
+
+    Unclamped, a hand-edited value produced a negative CRF/qscale that either
+    hard-failed (h264/hevc) or, worse, was silently accepted (AVI's mpeg4)
+    and wrote a garbage file reported as Done."""
+    return max(0, min(63, preset.get_setting_int("video_quality", default)))
+
+
 def _vaapi_device() -> str:
     """Find the first available VAAPI render node."""
     nodes = sorted(glob.glob("/dev/dri/renderD*"))
@@ -312,30 +321,48 @@ class FFmpegJob(ConversionJob):
             return ["-c:a", "libopus", "-b:a", f"{bitrate}k"]
         return ["-c:a", "vorbis", "-strict", "-2", "-ac", "2", "-b:a", f"{bitrate}k"]
 
+    def _scale_factor(self) -> float:
+        """Clamped scale factor. A hand-edited 0 or negative value would
+        otherwise be read by ffmpeg's `iw*0` as "keep original size" and
+        silently no-op; clamp to a sane [0.01, 10] range."""
+        scale = self.preset.get_setting_float("video_scale", 1.0)
+        if scale <= 0:
+            return 1.0
+        return max(0.01, min(10.0, scale))
+
     # --- Video transform filter args ---
     def _transform_args(self, hw_mode: str = "off", pin_format: str | None = "yuv420p") -> str:
         parts = []
-        scale = self.preset.get_setting_float("video_scale", 1.0)
+        scale = self._scale_factor()
         out_type = self.preset.output_type
 
+        # Fixed precision, not %g: "{1.25:#.2g}" was "1.2", silently resizing
+        # to the wrong dimensions.
+        sf = f"{scale:.4f}"
         if out_type in ("mp4", "mkv", "mov"):
-            sf = f"{scale:#.2g}" if abs(scale - 1.0) >= 0.005 else "1"
+            if abs(scale - 1.0) < 0.005:
+                sf = "1"
             if hw_mode == "nvenc":
                 # CUDA scale filter includes format conversion
                 parts.append(f"scale_cuda=trunc(iw*{sf}/2)*2:trunc(ih*{sf}/2)*2:format=yuv420p")
             else:
                 parts.append(f"scale=trunc(iw*{sf}/2)*2:trunc(ih*{sf}/2)*2")
         elif abs(scale - 1.0) >= 0.005:
-            sf = f"{scale:#.2g}"
             parts.append(f"scale=iw*{sf}:ih*{sf}")
 
-        rotation = self.preset.get_setting_float("video_rotation", 0)
+        # Any angle, not just 90/180/270. A natural value like -90 ("rotate
+        # counterclockwise") or 45 used to be silently ignored — while the
+        # image paths honoured it, so the same field behaved differently.
+        rotation = self.preset.get_setting_float("video_rotation", 0) % 360
         if abs(rotation - 90) <= 0.05:
-            parts.append("transpose=2")
+            parts.append("transpose=1")       # clockwise
         elif abs(rotation - 180) <= 0.05:
             parts.append("vflip,hflip")
         elif abs(rotation - 270) <= 0.05:
-            parts.append("transpose=1")
+            parts.append("transpose=2")
+        elif rotation > 0.05:
+            rad = f"{rotation}*PI/180"
+            parts.append(f"rotate={rad}:ow=rotw({rad}):oh=roth({rad})")
 
         # For H.264/H.265 in MP4/MKV/MOV, force yuv420p for broad player
         # compatibility. NVENC/CUDA excluded: scale_cuda above already sets
@@ -360,7 +387,7 @@ class FFmpegJob(ConversionJob):
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_avi(self, base: list[str]) -> None:
-        vq = self.preset.get_setting_int("video_quality", 15)
+        vq = _quality_setting(self.preset, 15)
         bitrate = self.preset.get_setting_int("audio_bitrate", 165)
         tf = self._transform_args()
         audio = ["-an"]
@@ -368,7 +395,7 @@ class FFmpegJob(ConversionJob):
             mp3q = _find_closest(_MP3_VBR_MAP, bitrate)
             audio = ["-c:a", "libmp3lame", "-qscale:a", str(mp3q)]
         vf = ["-vf", tf] if tf else []
-        mpeg4q = 31 - vq
+        mpeg4q = max(1, min(31, 31 - vq))    # mpeg4 qscale is 1..31
         args = base + ["-i", self.input_path, "-c:v", "mpeg4", "-vtag", "xvid",
                         "-qscale:v", str(mpeg4q)] + audio + vf
         args += ["-id3v2_version", "3", "-write_id3v1", "1", self.output_path]
@@ -507,8 +534,16 @@ class FFmpegJob(ConversionJob):
         if codec == "h265":
             codec = "hevc"
 
+        # An unknown codec (typo, or a value from a newer version) must not be
+        # silently encoded as H.264 and reported as the requested format.
+        if codec not in _CODEC_CONTAINERS:
+            raise RuntimeError(
+                f"Unknown video codec '{codec}'. "
+                f"Choose one of: {', '.join(sorted(_CODEC_CONTAINERS))}."
+            )
+
         # Guard against codec/container combinations ffmpeg can't mux.
-        allowed = _CODEC_CONTAINERS.get(codec, {"mp4", "mkv", "mov"})
+        allowed = _CODEC_CONTAINERS[codec]
         if self.preset.output_type not in allowed:
             raise RuntimeError(
                 f"{codec.upper()} video cannot be stored in a "
@@ -535,10 +570,10 @@ class FFmpegJob(ConversionJob):
         family: "h264" or "hevc". The CRF/QP quality knob and hw-accel plumbing
         are identical; only the encoder names (and the Apple hvc1 tag) differ.
         """
-        vq = self.preset.get_setting_int("video_quality", 28)
+        vq = _quality_setting(self.preset, 28)
         speed = self.preset.get_setting("video_encoding_speed", "medium").lower()
         bitrate = self.preset.get_setting_int("audio_bitrate", 155)
-        crf = 51 - vq
+        crf = max(0, min(51, 51 - vq))
         hw = self._hw_accel
         out_type = self.preset.output_type
 
@@ -656,7 +691,7 @@ class FFmpegJob(ConversionJob):
                 "output is unavailable — Homebrew's ffmpeg dropped it. "
                 "Convert to WebM instead."
             )
-        vq = self.preset.get_setting_int("video_quality", 7)
+        vq = max(0, min(10, self.preset.get_setting_int("video_quality", 7)))
         bitrate = self.preset.get_setting_int("audio_bitrate", 128)
         vf = self._vf_args()
         audio = ["-an"]
@@ -675,10 +710,10 @@ class FFmpegJob(ConversionJob):
         self._passes.append(_FFmpegPass(_("Conversion"), args))
 
     def _build_webm(self, base: list[str]) -> None:
-        vq = self.preset.get_setting_int("video_quality", 30)
+        vq = _quality_setting(self.preset, 30)
         bitrate = self.preset.get_setting_int("audio_bitrate", 128)
-        crf = 63 - vq
-        if vq == 63:
+        crf = max(0, min(63, 63 - vq))
+        if vq >= 63:
             enc = ["-lossless", "1"]
         else:
             enc = ["-crf", str(crf), "-b:v", "0"]

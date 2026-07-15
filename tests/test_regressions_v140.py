@@ -177,6 +177,99 @@ def test_same_named_videos_produce_distinct_gifs(tmp_path):
     assert digests[0] != digests[1], "the two GIFs are byte-identical — palette collision"
 
 
+# --- Numeric / codec edge cases (silent-wrong output) -----------------------
+
+def _probe_dims(path):
+    out = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=width,height", "-of", "csv=p=0", path],
+        capture_output=True, text=True)
+    return out.stdout.strip()
+
+
+def test_unknown_codec_is_rejected_not_silently_h264():
+    """An unknown video_codec used to be silently encoded as H.264 and
+    reported as the requested format."""
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mp4"],
+                              settings={"video_codec": "h266"})
+    job = create_job(preset, "/tmp/whatever.mp4")
+    with pytest.raises(RuntimeError, match="Unknown video codec"):
+        job._build_arguments() if hasattr(job, "_build_arguments") else job._initialize()
+
+
+@pytest.mark.skipif(not fcutil.HAS_FFMPEG, reason="ffmpeg not available")
+def test_fractional_scale_is_not_truncated(tmp_path):
+    """video_scale 1.25 was formatted with %.2g → "1.2", silently resizing to
+    the wrong dimensions."""
+    src = tmp_path / "v.mp4"
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc=d=1:s=200x100:r=10",
+                    "-pix_fmt", "yuv420p", str(src)], check=True)
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mp4"],
+                              settings={"video_scale": 1.25, "video_codec": "h264"})
+    job = create_job(preset, str(src))
+    job.prepare(); job.run()
+    assert job.state == ConversionState.DONE, job.error_message
+    assert _probe_dims(job.output_path) == "250,100" or \
+        _probe_dims(job.output_path).startswith("250")
+
+
+@pytest.mark.skipif(not fcutil.HAS_FFMPEG, reason="ffmpeg not available")
+def test_arbitrary_and_negative_rotation_is_applied(tmp_path):
+    """video_rotation -90 was silently ignored (only 90/180/270 matched)."""
+    src = tmp_path / "v.mp4"
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc=d=1:s=200x100:r=10",
+                    "-pix_fmt", "yuv420p", str(src)], check=True)
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mp4"],
+                              settings={"video_rotation": -90, "video_codec": "h264"})
+    job = create_job(preset, str(src))
+    job.prepare(); job.run()
+    assert job.state == ConversionState.DONE, job.error_message
+    assert _probe_dims(job.output_path) == "100,200", "rotation was ignored"
+
+
+@pytest.mark.skipif(not fcutil.HAS_FFMPEG, reason="ffmpeg not available")
+def test_extreme_quality_never_yields_a_garbage_avi(tmp_path):
+    """AVI accepted a negative mpeg4 qscale from video_quality=63 and wrote a
+    garbage file reported as Done."""
+    src = tmp_path / "v.mp4"
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc=d=1:s=120x80:r=10",
+                    "-pix_fmt", "yuv420p", str(src)], check=True)
+    preset = ConversionPreset(name="x", output_type="avi", input_types=["mp4"],
+                              settings={"video_quality": 63})
+    job = create_job(preset, str(src))
+    job.prepare(); job.run()
+    assert job.state == ConversionState.DONE, job.error_message
+    # The produced AVI must be a valid, probeable file.
+    assert subprocess.run(["ffprobe", "-v", "error", job.output_path]).returncode == 0
+
+
+# --- Claimed-path lifecycle --------------------------------------------------
+
+def test_successful_output_claim_is_released(tmp_path, monkeypatch):
+    """The claim must be dropped once the file exists, or re-converting the
+    same input after deleting the result yields 'name (2).ext'."""
+    from fileconverter.path_helpers import _claimed_paths
+
+    src = tmp_path / "a.txt"
+    src.write_text("x")
+    preset = ConversionPreset(name="To Pdf", output_type="pdf", input_types=["txt"])
+    job = create_job(preset, str(src))
+    job.prepare()
+    out = job.output_paths[0]
+    assert out in _claimed_paths
+    # Simulate a successful conversion.
+    Path(out).write_text("pdf")
+    job.state = ConversionState.IN_PROGRESS
+    job._preexisting = set()
+    job._convert = lambda: None  # type: ignore[assignment]
+    job.run()
+    assert job.state == ConversionState.DONE
+    assert out not in _claimed_paths, "claim not released after success"
+
+
 # --- Hostile config ----------------------------------------------------------
 
 @pytest.mark.parametrize("data", [

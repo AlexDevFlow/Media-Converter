@@ -141,6 +141,13 @@ class ConversionJob:
                 self.state = ConversionState.DONE
                 self.user_state = _("Done")
                 self._post_conversion()
+                # The outputs now exist on disk, so os.path.exists() guards
+                # them from here on — drop the in-memory claims. Without this
+                # the set grows for the life of the process, and re-converting
+                # the same file after deleting its result (same session) would
+                # needlessly produce "name (2).ext".
+                for p in self.output_paths:
+                    release_path(p)
         except Cancelled:
             self.state = ConversionState.FAILED
             self.error_message = _("Cancelled")
