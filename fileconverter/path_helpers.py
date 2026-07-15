@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -74,17 +75,37 @@ def generate_output_path(
     return out
 
 
+# Every output path claimed by any job in this process. Checking os.path.exists
+# alone is not enough: jobs are prepared concurrently, so two of them (a.jpg
+# and a.gif, both converting to a.png) would each see a free path and claim the
+# same one — silently overwriting each other's output, and, with
+# input_post_action=delete, destroying both originals.
+_claimed_paths: set[str] = set()
+_claim_lock = threading.Lock()
+
+
 def generate_unique_path(path: str, reserved: set[str] | None = None) -> str:
-    """Return a path that collides with neither an existing file nor a path
-    already claimed in `reserved` (used when generating a batch of outputs in
-    one prepare() pass, before any of them exist on disk)."""
-    reserved = reserved or set()
-    if not os.path.exists(path) and path not in reserved:
-        return path
-    base, ext = os.path.splitext(path)
-    counter = 2
-    while True:
-        candidate = f"{base} ({counter}){ext}"
-        if not os.path.exists(candidate) and candidate not in reserved:
-            return candidate
-        counter += 1
+    """Return a path that collides with neither an existing file, nor a path
+    claimed by another job in this process, nor one already in `reserved`
+    (the outputs of this same job, e.g. one image per PDF page).
+
+    The returned path is claimed process-wide until release_path() frees it.
+    """
+    extra = reserved or set()
+    with _claim_lock:
+        candidate = path
+        counter = 2
+        while (os.path.exists(candidate)
+               or candidate in _claimed_paths
+               or candidate in extra):
+            base, ext = os.path.splitext(path)
+            candidate = f"{base} ({counter}){ext}"
+            counter += 1
+        _claimed_paths.add(candidate)
+        return candidate
+
+
+def release_path(path: str) -> None:
+    """Give up a claim (the job failed and removed its output)."""
+    with _claim_lock:
+        _claimed_paths.discard(path)

@@ -83,6 +83,137 @@ def test_document_job_fails_loudly_when_no_output_is_produced(tmp_path, monkeypa
     assert not os.path.exists(job.output_path)
 
 
+# --- Data loss: output-path collisions across concurrent jobs ---------------
+
+def test_two_inputs_never_share_an_output_path(tmp_path):
+    """a.jpg and a.gif both map to a.png with the default template. Prepared
+    concurrently, each used to find the path free and claim it — one output
+    silently overwrote the other, and with delete both inputs were destroyed."""
+    from fileconverter.jobs.base import prepare_all
+    from fileconverter.path_helpers import _claimed_paths
+
+    (tmp_path / "a.jpg").write_bytes(b"jpg")
+    (tmp_path / "a.gif").write_bytes(b"gif")
+    preset = ConversionPreset(name="To Png", output_type="png",
+                              input_types=["jpg", "gif"], output_template="(p)(f)")
+    jobs = [create_job(preset, str(tmp_path / n)) for n in ("a.jpg", "a.gif")]
+    try:
+        prepare_all(jobs)
+        outs = {j.output_paths[0] for j in jobs}
+        assert len(outs) == 2, f"two jobs claimed the same output: {outs}"
+    finally:
+        for j in jobs:
+            for p in j.output_paths:
+                _claimed_paths.discard(p)
+
+
+def test_input_is_never_deleted_when_no_output_was_produced(tmp_path, monkeypatch):
+    """input_post_action=delete must destroy the original only when the
+    conversion actually produced a file."""
+    src = tmp_path / "keep.mkv"
+    src.write_bytes(b"data")
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mkv"],
+                              input_post_action="delete")
+    job = create_job(preset, str(src))
+    job.prepare()
+    # A conversion that "succeeds" without writing anything.
+    job._convert = lambda: None  # type: ignore[assignment]
+    job.run()
+
+    assert src.exists(), "the original was deleted despite no output"
+    assert job.state == ConversionState.FAILED
+
+
+def test_failed_job_never_deletes_another_jobs_finished_output(tmp_path):
+    """The losing side of a path collision must not remove a file it did not
+    create — that used to delete a completed conversion whose input was
+    already gone."""
+    shared = tmp_path / "out.mp4"
+    shared.write_bytes(b"job A's finished output")
+
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mkv"])
+    job = create_job(preset, str(tmp_path / "b.mkv"))
+    job.output_paths = [str(shared)]
+    job._preexisting = {str(shared)}   # it was there before this job ran
+    job._cleanup_outputs()
+
+    assert shared.exists(), "cleanup deleted another job's pre-existing output"
+
+
+# --- Data loss: shared temp files across concurrent jobs --------------------
+
+@pytest.mark.skipif(not fcutil.HAS_FFMPEG, reason="ffmpeg not available")
+def test_same_named_videos_produce_distinct_gifs(tmp_path):
+    """Two files both called x.mp4 in different folders shared a palette temp
+    path derived from the basename, so one GIF was encoded with the other's
+    colours — and reported DONE."""
+    from fileconverter.jobs.base import prepare_all
+
+    d1, d2 = tmp_path / "d1", tmp_path / "d2"
+    d1.mkdir(); d2.mkdir()
+
+    def make(color, path):
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                        "-f", "lavfi", "-i", f"color={color}:s=32x32:d=1",
+                        "-pix_fmt", "yuv420p", str(path)], check=True)
+    make("green", d1 / "x.mp4")
+    make("red", d2 / "x.mp4")
+
+    preset = ConversionPreset(name="To Gif", output_type="gif",
+                              input_types=["mp4"], output_template="(p)(f)")
+    jobs = [create_job(preset, str(d / "x.mp4")) for d in (d1, d2)]
+    prepare_all(jobs)
+
+    def run(j):
+        j.run()
+
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(run, jobs))
+
+    import hashlib
+    digests = [hashlib.md5((d / "x.gif").read_bytes()).hexdigest()
+               for d in (d1, d2)]
+    assert digests[0] != digests[1], "the two GIFs are byte-identical — palette collision"
+
+
+# --- Hostile config ----------------------------------------------------------
+
+@pytest.mark.parametrize("data", [
+    "just a string", ["a", "list"], {"presets": None},
+    {"max_simultaneous_conversions": 0},
+    {"max_simultaneous_conversions": "two"},
+    {"max_simultaneous_conversions": 99999},
+    {"presets": [{"output_type": "mp4"}]},              # no name
+    {"presets": [{"name": "X", "output_type": "mp4", "settings": None}]},
+    {"presets": [{"name": "X", "output_type": "mp4", "input_types": None}]},
+    {"version": "abc", "exit_delay_seconds": "soon"},
+])
+def test_hostile_config_never_crashes_and_stays_in_bounds(data):
+    """A hand-edited or crash-truncated config must degrade gracefully, never
+    raise at startup, and never yield an out-of-range worker count."""
+    settings = config.Settings.from_dict(data)
+    assert 1 <= settings.max_simultaneous_conversions <= 16
+    for p in settings.presets:
+        assert isinstance(p.settings, dict)
+        assert isinstance(p.input_types, list)
+
+
+def test_corrupt_config_file_falls_back_to_defaults(tmp_path, monkeypatch):
+    """A corrupt settings.yaml is backed up and defaults are used, rather than
+    bricking the app with a YAML traceback."""
+    cfg_dir = tmp_path / "fileconverter"
+    cfg_dir.mkdir()
+    (cfg_dir / "settings.yaml").write_text("{ this is: not valid: yaml ]::")
+    monkeypatch.setattr(config, "CONFIG_DIR", cfg_dir)
+    monkeypatch.setattr(config, "CONFIG_FILE", cfg_dir / "settings.yaml")
+
+    settings = config.load_settings()
+
+    assert len(settings.presets) > 0, "did not fall back to bundled presets"
+    assert (cfg_dir / "settings.yaml.bak").exists(), "the bad file was not preserved"
+
+
 # --- Cancellation ------------------------------------------------------------
 
 def test_cancelled_job_never_starts(tmp_path):

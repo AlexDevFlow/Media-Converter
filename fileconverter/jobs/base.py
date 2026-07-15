@@ -10,7 +10,9 @@ from pathlib import Path
 
 from fileconverter.i18n import _
 from fileconverter.jobs.proc import Cancelled
-from fileconverter.path_helpers import generate_output_path, generate_unique_path
+from fileconverter.path_helpers import (
+    generate_output_path, generate_unique_path, release_path,
+)
 from fileconverter.presets import ConversionPreset
 
 
@@ -120,6 +122,11 @@ class ConversionJob:
             self._cleanup_outputs()
             return
 
+        # Files that were already on disk before this job ran. On failure we
+        # must not delete them: they belong to someone else (a previous run,
+        # or another job that already finished writing to the same name).
+        self._preexisting = {p for p in self.output_paths if os.path.exists(p)}
+
         self.state = ConversionState.IN_PROGRESS
         self.start_time = time.time()
         self.user_state = _("Converting...")
@@ -156,8 +163,31 @@ class ConversionJob:
         """Subclass must implement the actual conversion."""
         raise NotImplementedError
 
+    def _outputs_are_real(self) -> bool:
+        """Every declared output exists and is non-empty."""
+        if not self.output_paths:
+            return False
+        for p in self.output_paths:
+            try:
+                if os.path.getsize(p) <= 0:
+                    return False
+            except OSError:
+                return False
+        return True
+
     def _post_conversion(self) -> None:
         """Handle post-conversion actions (archive/delete original)."""
+        # NEVER touch the input unless the conversion really produced
+        # something. A backend that exits 0 without writing (or a job whose
+        # output was clobbered by another) would otherwise destroy the
+        # original and leave the user with nothing.
+        if self.preset.input_post_action in ("delete", "archive") \
+                and not self._outputs_are_real():
+            raise RuntimeError(
+                "conversion reported success but produced no output — "
+                "the original file was left untouched"
+            )
+
         # Grab timestamps before potentially removing the input file
         try:
             stat = os.stat(self.input_path)
@@ -190,15 +220,42 @@ class ConversionJob:
                     pass
 
     def _cleanup_outputs(self) -> None:
-        """Remove incomplete output files on failure."""
+        """Remove the incomplete output files THIS job created.
+
+        A path that already existed when the job started belongs to someone
+        else — a previous run, or a concurrent job that finished writing it
+        first. Deleting it here used to destroy a completed conversion (whose
+        own input had already been deleted) while reporting success for it.
+        """
+        preexisting = getattr(self, "_preexisting", set())
         for p in self.output_paths:
+            if p in preexisting:
+                continue
             try:
                 if os.path.exists(p):
                     os.remove(p)
             except OSError:
                 pass
+            release_path(p)
 
     def _fail(self, message: str) -> None:
         self.state = ConversionState.FAILED
         self.error_message = message
         self.user_state = _("Failed")
+
+
+def prepare_all(jobs: list) -> None:
+    """Prepare every job before any of them starts converting.
+
+    Output paths must be claimed one at a time: preparing inside the worker
+    threads let two jobs (a.jpg and a.gif, both → a.png) each find the path
+    free and claim it, so one silently overwrote the other. Failing to prepare
+    marks that job FAILED and leaves the rest of the batch alone.
+    """
+    for job in jobs:
+        try:
+            job.prepare()
+        except Exception as e:                    # noqa: BLE001 - reported per job
+            job.state = ConversionState.FAILED
+            job.error_message = str(e)
+            job.user_state = _("Failed")

@@ -6,6 +6,7 @@ For video inputs: FFmpeg handles it directly with palette generation.
 
 from __future__ import annotations
 import os
+import shutil
 import tempfile
 
 from fileconverter.helpers import IMAGE_EXTENSIONS, ANIMATED_IMAGE_EXTENSIONS
@@ -30,9 +31,10 @@ class GifJob(ConversionJob):
             self.user_state = _("Preparing image...")
             self.progress = 0.1
 
-            tmp_png = generate_unique_path(
-                os.path.join(tempfile.gettempdir(), os.path.basename(self.input_path) + ".png")
-            )
+            # Private temp dir: a name derived from the input basename is
+            # shared by two files called x.png in different folders.
+            tmpdir = tempfile.mkdtemp(prefix="fileconverter-gif-")
+            tmp_png = os.path.join(tmpdir, "frame.png")
             try:
                 png_preset = ConversionPreset(
                     name="_tmp_png",
@@ -58,8 +60,7 @@ class GifJob(ConversionJob):
 
                 self.progress = 1.0
             finally:
-                if os.path.exists(tmp_png):
-                    os.remove(tmp_png)
+                shutil.rmtree(tmpdir, ignore_errors=True)
         else:
             # Video or PNG → GIF directly via FFmpeg
             self.user_state = _("Creating GIF...")

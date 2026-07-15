@@ -60,19 +60,54 @@ class Settings:
 
     @classmethod
     def from_dict(cls, data: dict) -> Settings:
+        # Tolerate a hand-edited or crash-truncated config: coerce every field
+        # instead of trusting it. A wrong type here used to be a raw traceback
+        # at startup that bricked the app until the YAML was fixed by hand.
+        if not isinstance(data, dict):
+            data = {}
+
         hw = data.get("hardware_acceleration", "off")
         if hw not in HWACCEL_MODES:
             hw = "off"
-        removed = data.get("removed_presets") or []
+
+        def _int(key, default, lo, hi):
+            try:
+                return max(lo, min(hi, int(data.get(key, default))))
+            except (TypeError, ValueError):
+                return default
+
+        def _bool(key, default):
+            val = data.get(key, default)
+            return bool(val) if isinstance(val, (bool, int)) else default
+
+        raw_presets = data.get("presets")
+        if not isinstance(raw_presets, list):
+            raw_presets = []
+        presets = []
+        for p in raw_presets:
+            if not isinstance(p, dict) or not p.get("name") or not p.get("output_type"):
+                continue   # skip a malformed preset rather than crash the load
+            try:
+                presets.append(ConversionPreset.from_dict(p))
+            except (TypeError, ValueError, KeyError):
+                continue
+
+        removed = data.get("removed_presets")
+        removed = [str(n) for n in removed] if isinstance(removed, list) else []
+
+        lang = data.get("language", "auto")
+        if not isinstance(lang, str):
+            lang = "auto"
+
         return cls(
-            max_simultaneous_conversions=data.get("max_simultaneous_conversions", 2),
-            exit_when_done=data.get("exit_when_done", True),
-            exit_delay_seconds=data.get("exit_delay_seconds", 3),
+            max_simultaneous_conversions=_int("max_simultaneous_conversions", 2, 1, 16),
+            exit_when_done=_bool("exit_when_done", True),
+            exit_delay_seconds=_int("exit_delay_seconds", 3, 0, 3600),
             hardware_acceleration=hw,
-            language=data.get("language", "auto"),
-            presets=[ConversionPreset.from_dict(p) for p in data.get("presets", [])],
-            removed_presets=[str(n) for n in removed],
-            version=data.get("version", 1),
+            language=lang,
+            presets=presets,
+            removed_presets=removed,
+            version=_int("version", 1, 1, 9999),
         )
 
 
@@ -104,8 +139,25 @@ def load_settings() -> Settings:
     """
     ensure_config()
     if CONFIG_FILE.exists():
-        with open(CONFIG_FILE, "r") as f:
-            data = yaml.safe_load(f) or {}
+        try:
+            with open(CONFIG_FILE, "r") as f:
+                data = yaml.safe_load(f) or {}
+            if not isinstance(data, dict):
+                raise ValueError("settings.yaml is not a mapping")
+        except (yaml.YAMLError, ValueError, OSError) as e:
+            # A corrupt config (hand-edited, or truncated by a crash/power
+            # loss) must not brick the app. Preserve the bad file for the
+            # user, then fall back to bundled defaults.
+            try:
+                backup = CONFIG_FILE.with_suffix(".yaml.bak")
+                shutil.copy2(CONFIG_FILE, backup)
+                print(f"fileconverter: settings.yaml unreadable ({e}); "
+                      f"backed up to {backup}, using defaults", file=sys.stderr)
+            except OSError:
+                pass
+            defaults = _load_default_settings()
+            return defaults if defaults is not None else Settings()
+
         settings = Settings.from_dict(data)
 
         defaults = _load_default_settings()

@@ -67,11 +67,23 @@ class ConversionPreset:
 
     @classmethod
     def from_dict(cls, data: dict) -> ConversionPreset:
+        # Coerce container fields: a hand-edited config can carry `settings:`
+        # or `input_types:` as null, which would later raise deep in a
+        # conversion (get_setting on None, iterating None).
+        input_types = data.get("input_types")
+        if not isinstance(input_types, list):
+            input_types = []
+        settings = data.get("settings")
+        if not isinstance(settings, dict):
+            settings = {}
+        template = data.get("output_template")
+        if not isinstance(template, str) or not template:
+            template = "(p)(f)"
         return cls(
-            name=data["name"],
-            output_type=data["output_type"],
-            input_types=data.get("input_types", []),
+            name=str(data["name"]),
+            output_type=str(data["output_type"]),
+            input_types=[str(e).lower().lstrip(".") for e in input_types],
             input_post_action=data.get("input_post_action", "none"),
-            output_template=data.get("output_template", "(p)(f)"),
-            settings=data.get("settings", {}),
+            output_template=template,
+            settings=settings,
         )

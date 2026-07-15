@@ -16,7 +16,7 @@ from tkinter import ttk
 
 from fileconverter.config import Settings
 from fileconverter.i18n import _
-from fileconverter.jobs.base import ConversionJob, ConversionState
+from fileconverter.jobs.base import ConversionJob, ConversionState, prepare_all
 
 _POLL_MS = 200
 
@@ -167,18 +167,19 @@ class ProgressWindow:
         root.after(_POLL_MS, self._update_ui)
 
     def start_conversions(self) -> None:
-        def _prepare_and_run(job: ConversionJob):
+        def _run(job: ConversionJob):
             try:
-                job.prepare()
-                job.run()
+                if job.state != ConversionState.FAILED:
+                    job.run()
             except Exception as e:
                 job.state = ConversionState.FAILED
                 job.error_message = str(e)
 
         def _worker():
+            prepare_all(self.jobs)
             with ThreadPoolExecutor(
                     max_workers=self.settings.max_simultaneous_conversions) as pool:
-                pool.map(_prepare_and_run, self.jobs)
+                pool.map(_run, self.jobs)
 
         threading.Thread(target=_worker, daemon=True).start()
 

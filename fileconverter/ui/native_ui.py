@@ -23,7 +23,7 @@ from fileconverter.config import (
     HWACCEL_LABELS, HWACCEL_MODES, Settings, load_settings, save_settings,
 )
 from fileconverter.i18n import _
-from fileconverter.jobs.base import ConversionJob, ConversionState
+from fileconverter.jobs.base import ConversionJob, ConversionState, prepare_all
 
 UI_BIN = Path.home() / ".local" / "share" / "fileconverter" / "bin" / "fileconverter-ui"
 
@@ -180,18 +180,19 @@ def run_with_progress(jobs: list, settings: Settings) -> None:
     _handshake(proc, q, init)
 
     # UI confirmed — safe to start converting now.
-    def _prepare_and_run(job: ConversionJob):
+    def _run(job: ConversionJob):
         try:
-            job.prepare()
-            job.run()
+            if job.state != ConversionState.FAILED:
+                job.run()
         except Exception as e:
             job.state = ConversionState.FAILED
             job.error_message = str(e)
 
     def _worker():
+        prepare_all(jobs)
         with ThreadPoolExecutor(
                 max_workers=settings.max_simultaneous_conversions) as pool:
-            pool.map(_prepare_and_run, jobs)
+            pool.map(_run, jobs)
 
     threading.Thread(target=_worker, daemon=True).start()
 

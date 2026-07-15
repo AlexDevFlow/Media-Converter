@@ -11,7 +11,7 @@ from fileconverter import __version__
 from fileconverter.config import load_settings
 from fileconverter import i18n
 from fileconverter.i18n import _
-from fileconverter.jobs.base import ConversionJob, ConversionState
+from fileconverter.jobs.base import ConversionJob, ConversionState, prepare_all
 from fileconverter.jobs.factory import create_job
 
 
@@ -85,11 +85,14 @@ def _run_headless(jobs: list[ConversionJob], max_workers: int) -> None:
     """Run conversions without GUI (fallback when no toolkit is available)."""
     def _worker(job: ConversionJob) -> None:
         try:
-            job.prepare()
-            job.run()
+            if job.state != ConversionState.FAILED:   # prepare() may have failed
+                job.run()
         except Exception as e:
             job.error_message = str(e)
             job.state = ConversionState.FAILED
+
+    # Claim every output path before any conversion starts (see prepare_all).
+    prepare_all(jobs)
 
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = [pool.submit(_worker, j) for j in jobs]

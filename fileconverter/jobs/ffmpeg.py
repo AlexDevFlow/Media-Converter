@@ -212,7 +212,8 @@ class FFmpegJob(ConversionJob):
         super().__init__(preset, input_path)
         self._passes: list[_FFmpegPass] = []
         self._duration_seconds: float = 0.0
-        self._hw_accel: str = hw_accel  # "off", "nvenc", or "vaapi"
+        self._hw_accel: str = hw_accel  # off | nvenc | vaapi | videotoolbox
+        self._tmpdir: str | None = None  # per-job scratch (GIF palette)
 
     @staticmethod
     def _find_ffmpeg() -> str:
@@ -372,9 +373,12 @@ class FFmpegJob(ConversionJob):
         tf = self._transform_args()
         tf_fps = f"{tf},{f'fps={fps}'}" if tf else f"fps={fps}"
 
-        palette = generate_unique_path(
-            os.path.join(tempfile.gettempdir(), os.path.basename(self.input_path) + "-palette.png")
-        )
+        # A private temp dir per job. The palette path used to be derived from
+        # the input's BASENAME inside the shared temp dir, so two jobs
+        # converting d1/x.mp4 and d2/x.mp4 wrote to the same palette — one
+        # video was then encoded with the other's colours and reported Done.
+        self._tmpdir = tempfile.mkdtemp(prefix="fileconverter-gif-")
+        palette = os.path.join(self._tmpdir, "palette.png")
         # Pass 1: palette
         args1 = base + ["-i", self.input_path, "-vf", f"{tf_fps},palettegen", palette]
         self._passes.append(_FFmpegPass(_("Indexing colors"), args1))
@@ -734,6 +738,10 @@ class FFmpegJob(ConversionJob):
             for f in files_to_clean:
                 if os.path.exists(f):
                     os.remove(f)
+            tmpdir = getattr(self, "_tmpdir", None)
+            if tmpdir:
+                shutil.rmtree(tmpdir, ignore_errors=True)
+                self._tmpdir = None
 
     def _parse_output(self, line: str) -> None:
         m = _DURATION_RE.search(line)
