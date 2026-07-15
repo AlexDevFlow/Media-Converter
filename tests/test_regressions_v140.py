@@ -492,6 +492,75 @@ def test_dolphin_writes_to_a_single_service_dir(tmp_path, monkeypatch):
     assert len(written) == 1, f"service menus written to {len(written)} dirs — duplicates"
 
 
+# --- prepare() is atomic in its path claims ---------------------------------
+
+def test_failed_prepare_releases_its_path_claims(tmp_path):
+    """If prepare() raises after claiming an output path (an unknown codec
+    raising in _initialize), the claim must be released, or a same-name job
+    later in the batch is needlessly bumped to (2)."""
+    from fileconverter.path_helpers import _claimed_paths
+
+    src = tmp_path / "v.mp4"
+    src.write_bytes(b"x")
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mp4"],
+                              settings={"video_codec": "nope"})
+    job = create_job(preset, str(src))
+    before = set(_claimed_paths)
+    with pytest.raises(Exception):
+        job.prepare()
+    assert set(_claimed_paths) == before, "prepare() leaked a path claim on failure"
+
+
+# --- tkinter Keep-open must actually keep the window open --------------------
+
+def test_tk_keep_open_is_sticky():
+    """Clicking Keep open must not let the next poll restart the countdown."""
+    import types
+
+    from fileconverter.ui import progress_window_tk as m
+
+    # A stand-in window with just the auto-close state and methods.
+    w = types.SimpleNamespace(
+        _auto_close_job="job", _auto_closing=True, _kept_open=False,
+        keep_open_btn=types.SimpleNamespace(grid_remove=lambda: None),
+        auto_close_label=types.SimpleNamespace(configure=lambda **k: None),
+        _summary_status=lambda: "done",
+        root=types.SimpleNamespace(after_cancel=lambda j: None),
+    )
+    m.ProgressWindow._cancel_auto_close(w)
+    assert w._kept_open is True and w._auto_close_job is None
+
+    # The guard the poll uses must now block a restart.
+    all_done = True
+    should_restart = (all_done and w._auto_close_job is None
+                      and not w._auto_closing and not w._kept_open)
+    assert not should_restart, "Keep open did not stick — countdown would restart"
+
+
+def test_tk_add_preset_dedups_names():
+    """Adding presets without renaming must not create unreachable duplicates."""
+    import types
+
+    from fileconverter.ui import settings_window_tk as m
+
+    presets = [ConversionPreset(name="To Mp4", output_type="mp4", input_types=["mkv"])]
+    w = types.SimpleNamespace(
+        settings=types.SimpleNamespace(presets=presets),
+        _refresh_preset_list=lambda: None,
+        preset_list=types.SimpleNamespace(
+            selection_clear=lambda *a: None, selection_set=lambda *a: None,
+            see=lambda *a: None),
+        _on_preset_selected=lambda: None,
+        _mark_modified=lambda: None,
+    )
+    m.SettingsWindow._on_add_preset(w)
+    m.SettingsWindow._on_add_preset(w)
+    m.SettingsWindow._on_add_preset(w)
+
+    names = [p.name for p in presets]
+    assert len(names) == len(set(names)), f"duplicate preset names: {names}"
+
+
 # --- CLI entry points --------------------------------------------------------
 
 def test_menu_entries_use_an_absolute_quoted_command(tmp_path, monkeypatch):

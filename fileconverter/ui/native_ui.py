@@ -240,16 +240,23 @@ def run_with_progress(jobs: list, settings: Settings) -> None:
                                  "text": _summary_status(jobs),
                                  "show_keep_open": False})
 
-            if ui_gone:
-                # Window closed — stop pending/running jobs (their run loop
+            def _cancel_all_and_return():
+                # The UI is gone — stop pending/running jobs (their run loop
                 # kills the ffmpeg/magick subprocess) and give them a moment.
                 for job in jobs:
                     if job.state not in (ConversionState.DONE, ConversionState.FAILED):
                         job.request_cancel()
                 time.sleep(0.4)
+
+            if ui_gone:
+                _cancel_all_and_return()
                 return
 
+            # A failed write means the Swift process died before the reader
+            # thread saw EOF; cancel too, or the batch would keep converting
+            # invisibly with no window.
             if not _push_updates():
+                _cancel_all_and_return()
                 return
 
             all_done = all(j.state in (ConversionState.DONE, ConversionState.FAILED)

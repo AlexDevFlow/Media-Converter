@@ -90,25 +90,35 @@ class ConversionJob:
             differentiates = first != second
 
         reserved: set[str] = set()
-        for i in range(num_outputs):
-            path = generate_output_path(
-                self.input_path,
-                self.preset.output_type,
-                self.preset.output_template,
-                number_index=i,
-                number_max=num_outputs,
-            )
-            if num_outputs > 1 and not differentiates:
-                base, ext = os.path.splitext(path)
-                path = f"{base}-{i + 1}{ext}"
-            path = generate_unique_path(path, reserved=reserved)
-            reserved.add(path)
-            out_dir = os.path.dirname(path)
-            os.makedirs(out_dir, exist_ok=True)
-            self.output_paths.append(path)
+        try:
+            for i in range(num_outputs):
+                path = generate_output_path(
+                    self.input_path,
+                    self.preset.output_type,
+                    self.preset.output_template,
+                    number_index=i,
+                    number_max=num_outputs,
+                )
+                if num_outputs > 1 and not differentiates:
+                    base, ext = os.path.splitext(path)
+                    path = f"{base}-{i + 1}{ext}"
+                path = generate_unique_path(path, reserved=reserved)
+                reserved.add(path)
+                out_dir = os.path.dirname(path)
+                os.makedirs(out_dir, exist_ok=True)
+                self.output_paths.append(path)
 
-        self.state = ConversionState.READY
-        self._initialize()
+            self.state = ConversionState.READY
+            self._initialize()
+        except Exception:
+            # Preparation is atomic: if anything fails after we've claimed
+            # output paths (a blocked directory, an unknown codec raising in
+            # _initialize), release every claim so a same-name job later in
+            # the batch isn't needlessly bumped to "name (2).ext".
+            for p in reserved:
+                release_path(p)
+            self.output_paths = []
+            raise
 
     def run(self) -> None:
         """Execute the conversion. Called from a worker thread."""
@@ -215,7 +225,11 @@ class ConversionJob:
             try:
                 shutil.move(self.input_path, dest)
             except OSError:
-                pass
+                pass       # a failed archive must not fail a done conversion
+            finally:
+                # The dest now exists (or the move failed); either way the
+                # in-memory claim is no longer needed.
+                release_path(dest)
 
         # Match output timestamps to input timestamps
         if stat:

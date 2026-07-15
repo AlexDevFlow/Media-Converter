@@ -323,8 +323,18 @@ class SettingsWindow:
                                       self._mark_modified))
 
     def _on_add_preset(self):
+        # Unique name: two presets with the same name make the second
+        # unreachable (the CLI resolves the first match, the menus derive file
+        # names from it). The native editor dedups the same way.
+        base = _("New Preset")
+        taken = {p.name for p in self.settings.presets}
+        name = base
+        n = 2
+        while name in taken:
+            name = f"{base} {n}"
+            n += 1
         new_preset = ConversionPreset(
-            name=_("New Preset"),
+            name=name,
             output_type="mp4",
             input_types=["avi", "mkv", "mov", "mp4", "webm"],
             settings={"enable_audio": True, "video_quality": 28,

@@ -122,6 +122,7 @@ class ProgressWindow:
         self._auto_close_job = None
         self._auto_close_seconds = settings.exit_delay_seconds
         self._auto_closing = False
+        self._kept_open = False
 
         root.title("File Converter")
         root.geometry("560x420")
@@ -191,7 +192,8 @@ class ProgressWindow:
 
         all_done = all(j.state in (ConversionState.DONE, ConversionState.FAILED)
                        for j in self.jobs)
-        if all_done and self._auto_close_job is None and not self._auto_closing:
+        if (all_done and self._auto_close_job is None
+                and not self._auto_closing and not self._kept_open):
             self.auto_close_label.configure(text=self._summary_status())
             if self.settings.exit_when_done:
                 self._start_auto_close()
@@ -231,6 +233,9 @@ class ProgressWindow:
             self.root.after_cancel(self._auto_close_job)
             self._auto_close_job = None
         self._auto_closing = False
+        # Sticky: without this the next 200 ms poll sees all-done again and
+        # restarts the countdown, so "Keep open" only reset the timer once.
+        self._kept_open = True
         self.keep_open_btn.grid_remove()
         self.auto_close_label.configure(text=self._summary_status())
 
