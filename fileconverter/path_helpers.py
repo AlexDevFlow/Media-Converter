@@ -72,6 +72,13 @@ def generate_output_path(
     out = _DATE_RE.sub(_date_replace, out)
 
     out += f".{output_ext}"
+
+    # A template with no path token (e.g. "(f)") yields a bare filename, whose
+    # dirname is "" — that would put the output in the process's working
+    # directory (and crash os.makedirs("")). Anchor it to the input's folder,
+    # which is what a user writing "(f)" expects.
+    if not os.path.dirname(out):
+        out = os.path.join(os.path.dirname(input_path), out)
     return out
 
 

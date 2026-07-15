@@ -95,9 +95,21 @@ class ImageMagickJob(ConversionJob):
         except Exception:
             return 1
 
+    def _jp2_needs_ffmpeg(self) -> bool:
+        return (self.preset.output_type == "jp2"
+                and "JP2" not in magick_write_formats())
+
     def _convert(self) -> None:
         if self._is_pdf_input:
             self._convert_pdf()
+        elif self._jp2_needs_ffmpeg():
+            # This build can't write JP2 — let ImageMagick decode/rasterise the
+            # input (svg, raw, psd, ... which ffmpeg can't) to a temp PNG, then
+            # ffmpeg's native JPEG-2000 encoder produces the file.
+            with tempfile.TemporaryDirectory(prefix="fileconverter-") as tmpdir:
+                tmp_png = os.path.join(tmpdir, "raster.png")
+                self._convert_image(self.input_path, tmp_png)
+                self._png_to_jp2(tmp_png, self.output_path)
         else:
             self._convert_image(self.input_path, self.output_path)
 
@@ -132,6 +144,8 @@ class ImageMagickJob(ConversionJob):
                         raise RuntimeError(f"ImageMagick error: {result.stderr}")
                     self._png_to_jp2(tmp_png, out_path)
             else:
+                if out_path.lower().endswith(".ico"):
+                    args += ["-resize", "256x256>"]   # ICO caps at 256px
                 args += self._quality_args()
                 args += [out_path]
                 result = run_cancellable(args, self, timeout=300)
@@ -177,6 +191,11 @@ class ImageMagickJob(ConversionJob):
         if abs(rotation) >= 0.05:
             args += ["-rotate", str(rotation)]
 
+        # ICO tops out at 256x256 — shrink larger sources (only if bigger),
+        # keeping aspect ratio, or ImageMagick writes an invalid icon.
+        if os.path.splitext(output_path)[1].lower() == ".ico":
+            args += ["-resize", "256x256>"]
+
         # Quality and format-specific args
         args += self._quality_args()
         args += [output_path]
@@ -184,7 +203,10 @@ class ImageMagickJob(ConversionJob):
         result = run_cancellable(args, self, timeout=300)
         if result.returncode != 0:
             raise RuntimeError(f"ImageMagick error: {result.stderr}")
-        self._validate_output_format(output_path)
+        # The temp-PNG step of a JP2-via-ffmpeg conversion writes a PNG, not
+        # the final format — only validate real single-step outputs.
+        if not output_path.lower().endswith(".png") or self.preset.output_type == "png":
+            self._validate_output_format(output_path)
 
     def _validate_output_format(self, output_path: str) -> None:
         """Reject outputs whose actual format doesn't match the extension —

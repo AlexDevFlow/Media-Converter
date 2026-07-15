@@ -71,6 +71,10 @@ def _candidates() -> list[Path]:
     return paths
 
 
+# glibc locale @modifier → ISO-15924 script suffix we ship (sr@latin → sr_Latn)
+_SCRIPT_MODIFIERS = {"latin": "Latn", "cyrillic": "Cyrl"}
+
+
 def detect_system_language() -> str | None:
     """Return the best-matching supported locale code for the current system,
     or None if the system language isn't one we ship.
@@ -79,17 +83,30 @@ def detect_system_language() -> str | None:
     component against our SUPPORTED_LANGUAGES list (full code first, then the
     two-letter prefix against any variant we ship).
     """
-    supported = {code for code in LANGUAGE_CODES if code != "auto"}
+    # An ordered list, not a set: for a bare prefix like "zh"/"pt"/"sr" the
+    # first shipped variant must win deterministically. A set iterates in a
+    # hash-randomised order, so "zh" flipped between Simplified and Traditional
+    # from launch to launch.
+    supported = [code for code in LANGUAGE_CODES if code != "auto"]
     for var in ("LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"):
         val = os.environ.get(var)
         if not val:
             continue
         for item in val.split(":"):
-            code = item.split(".")[0].split("@")[0]
+            base = item.split(".")[0]
+            # Honour a script modifier if we ship that exact variant
+            # (sr@latin → sr_Latn), else drop it.
+            modifier = base.split("@")[1] if "@" in base else ""
+            code = base.split("@")[0]
             if not code:
                 continue
             if code in supported:
                 return code
+            if modifier:
+                script = _SCRIPT_MODIFIERS.get(modifier.lower(), modifier.capitalize())
+                want = f"{code.split('_')[0]}_{script}"
+                if want in supported:
+                    return want
             prefix = code.split("_")[0]
             for s in supported:
                 if s.split("_")[0] == prefix:

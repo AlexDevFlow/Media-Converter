@@ -561,6 +561,72 @@ def test_tk_add_preset_dedups_names():
     assert len(names) == len(set(names)), f"duplicate preset names: {names}"
 
 
+# --- Routing: ICO/JP2 handle non-ffmpeg-decodable inputs --------------------
+
+@pytest.mark.skipif(not fcutil.HAS_IMAGEMAGICK, reason="ImageMagick not available")
+def test_ico_from_svg_via_imagemagick(tmp_path):
+    """To Ico used to route every input to ffmpeg, which cannot decode SVG/raw/
+    PDF; those files always failed while every other image preset handled
+    them."""
+    svg = tmp_path / "logo.svg"
+    svg.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="300" '
+                   'height="200"><rect width="300" height="200" fill="green"/></svg>')
+    preset = ConversionPreset(name="To Ico", output_type="ico",
+                              input_types=["svg", "png"])
+    job = create_job(preset, str(svg))
+    job.prepare(); job.run()
+    assert job.state == ConversionState.DONE, job.error_message
+    assert os.path.getsize(job.output_path) > 0
+
+
+@pytest.mark.skipif(not fcutil.HAS_IMAGEMAGICK, reason="ImageMagick not available")
+def test_jp2_from_svg_when_delegate_missing(tmp_path):
+    """JP2 without the OpenJPEG delegate (Homebrew) must still handle inputs
+    ffmpeg can't decode, by rasterising through ImageMagick first."""
+    svg = tmp_path / "logo.svg"
+    svg.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="200" '
+                   'height="200"><rect width="200" height="200" fill="blue"/></svg>')
+    preset = ConversionPreset(name="To Jp2", output_type="jp2",
+                              input_types=["svg", "png"])
+    job = create_job(preset, str(svg))
+    job.prepare(); job.run()
+    assert job.state == ConversionState.DONE, job.error_message
+    assert os.path.getsize(job.output_path) > 0
+
+
+# --- Output templates --------------------------------------------------------
+
+def test_template_without_path_token_anchors_to_input_dir(tmp_path):
+    """A template like "(f)" yields a bare filename; it must resolve next to
+    the input, not in the process CWD (and never crash os.makedirs(''))."""
+    from fileconverter.path_helpers import generate_output_path
+
+    src = tmp_path / "clip.mkv"
+    out = generate_output_path(str(src), "mp4", "(f)")
+    assert os.path.dirname(out) == str(tmp_path)
+
+    out2 = generate_output_path(str(src), "mp4", "converted_(f)")
+    assert os.path.dirname(out2) == str(tmp_path)
+    assert os.path.basename(out2) == "converted_clip.mp4"
+
+
+# --- Deterministic language detection ---------------------------------------
+
+@pytest.mark.parametrize("lang,expected", [
+    ("zh", "zh_CN"), ("pt", "pt_BR"), ("sr", "sr_Cyrl"),
+    ("sr@latin", "sr_Latn"), ("it_IT", "it_IT"), ("de", "de_DE"),
+])
+def test_language_detection_is_deterministic(lang, expected, monkeypatch):
+    """A bare prefix must resolve to the same shipped variant every launch
+    (the old set iteration flipped zh Simplified/Traditional per run)."""
+    from fileconverter import i18n
+
+    for var in ("LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("LANG", lang)
+    assert i18n.detect_system_language() == expected
+
+
 # --- CLI entry points --------------------------------------------------------
 
 def test_menu_entries_use_an_absolute_quoted_command(tmp_path, monkeypatch):

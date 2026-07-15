@@ -8,7 +8,10 @@ from fileconverter.presets import ConversionPreset
 from fileconverter.jobs.base import ConversionJob
 
 # Output types handled by ImageMagick (raster image outputs + pdf rasterisation).
-_IMAGEMAGICK_OUTPUTS = {"avif", "bmp", "jp2", "jpg", "png", "tga", "tiff", "webp", "pdf"}
+# ICO is here (not on ffmpeg): ImageMagick both writes ICO and decodes the
+# vector/raw/layered inputs (svg, psd, camera raw, pdf) that ffmpeg cannot,
+# and caps the size to the 256px ICO limit itself.
+_IMAGEMAGICK_OUTPUTS = {"avif", "bmp", "ico", "jp2", "jpg", "png", "tga", "tiff", "webp", "pdf"}
 
 # Video codecs that can use GPU acceleration (the others are CPU-only here).
 _HW_CAPABLE_CODECS = {"h264", "h265", "hevc"}
@@ -42,20 +45,9 @@ def create_job(preset: ConversionPreset, input_path: str, hw_accel: str = "off")
     if out_type == "gif":
         return GifJob(preset, input_path)
 
-    # ICO output → FFmpeg (no hw accel; tiny output)
-    if out_type == "ico":
-        return FFmpegJob(preset, input_path, hw_accel="off")
-
-    # JP2 needs the OpenJPEG delegate, which some ImageMagick builds lack
-    # (e.g. Homebrew's) — and magick then silently writes the wrong format.
-    # ffmpeg's native JPEG-2000 encoder covers those builds. PDF input still
-    # goes to ImageMagick, which rasterises pages and chains to ffmpeg itself.
-    if out_type == "jp2" and ext != "pdf":
-        from fileconverter.jobs.imagemagick import magick_write_formats
-        if "JP2" not in magick_write_formats():
-            return FFmpegJob(preset, input_path, hw_accel="off")
-
-    # Raster image outputs → ImageMagick
+    # Raster image outputs → ImageMagick (which handles the JP2-without-delegate
+    # case internally by rasterising, then chaining to ffmpeg's JPEG-2000
+    # encoder — so even svg/raw/pdf inputs work).
     if out_type in _IMAGEMAGICK_OUTPUTS:
         return ImageMagickJob(preset, input_path)
 
