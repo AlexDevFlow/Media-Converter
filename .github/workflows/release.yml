@@ -58,6 +58,52 @@ jobs:
       - name: Verify bundled presets load
         run: ./dist/fileconverter --self-check
 
+      # The steps above only prove the binary starts. This one proves it can
+      # actually convert, which is a different thing: the bundle ships its own
+      # HarfBuzz/Fontconfig and the loader path used to leak into the system
+      # ffmpeg/magick it spawns (#6). There is no display on the runner, so
+      # this also exercises the headless fallback.
+      - name: Convert real files with the frozen binary
+        run: |
+          sudo apt-get install -y ffmpeg imagemagick
+          mkdir -p /tmp/conv && cd /tmp/conv
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc=d=1:s=64x64:r=10 \
+            -f lavfi -i sine=d=1 -c:v libx264 -pix_fmt yuv420p -c:a aac -shortest clip.mp4
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc=d=1:s=64x64:r=10 \
+            -pix_fmt yuv420p silent.mkv
+          convert -size 64x64 xc:blue pic.png
+
+          B="$GITHUB_WORKSPACE/dist/fileconverter"
+          "$B" --conversion-preset "To Mp3" clip.mp4 --verbose
+          "$B" --conversion-preset "To Mkv" clip.mp4 --verbose
+          "$B" --conversion-preset "To Jpg" pic.png --verbose
+          for f in clip.mp3 clip.mkv pic.jpg; do
+            [ -s "$f" ] || { echo "::error::the frozen binary produced no $f"; exit 1; }
+            echo "  ok: $f ($(stat -c%s "$f") bytes)"
+          done
+
+          # A silent video converted to audio must fail with a message that
+          # says why, and must exit non-zero.
+          if "$B" --conversion-preset "To Mp3" silent.mkv 2>err.txt; then
+            echo "::error::converting a silent video to MP3 reported success"; exit 1
+          fi
+          grep -qi "no audio track" err.txt \
+            || { echo "::error::unhelpful error: $(cat err.txt)"; exit 1; }
+          echo "  ok: silent video rejected with '$(cat err.txt)'"
+
+      - name: Verify the file-manager integration installs
+        run: |
+          ./dist/fileconverter --install
+          test -f "$HOME/.local/bin/fileconverter" || { echo "::error::no launcher"; exit 1; }
+          test -f "$HOME/.local/bin/fileconverter-pick" || { echo "::error::no picker"; exit 1; }
+          test -s "$HOME/.config/fileconverter/settings.yaml" || { echo "::error::no config"; exit 1; }
+          # Menus embed an absolute path, or the file manager can't launch them.
+          grep -q '^Exec="/' "$HOME/.local/share/applications/fileconverter-settings.desktop"
+          "$HOME/.local/bin/fileconverter" --version
+          ./dist/fileconverter --uninstall
+          test ! -e "$HOME/.local/bin/fileconverter" || { echo "::error::uninstall left the launcher"; exit 1; }
+          echo "  ok: install + uninstall are clean"
+
       - name: Package release tarball
         run: |
           VERSION="${GITHUB_REF_NAME}"
@@ -151,6 +197,53 @@ jobs:
 
       - name: Verify bundled presets load
         run: PYTHONPATH=. .venv/bin/python -m fileconverter --self-check
+
+      # install.sh on a machine that isn't the developer's: builds the Swift UI
+      # and the Finder extension from scratch, sets up the venv and launchers.
+      - name: Install like a user would
+        run: |
+          ./install.sh
+          test -x "$HOME/.local/bin/fileconverter" || { echo "::error::no launcher"; exit 1; }
+          test -x "$HOME/.local/share/fileconverter/bin/fileconverter-ui" \
+            || { echo "::error::the native UI did not build"; exit 1; }
+          test -d "$HOME/Applications/File Converter.app" \
+            || { echo "::error::File Converter.app was not built"; exit 1; }
+          test -s "$HOME/.local/share/fileconverter/menu.json" \
+            || { echo "::error::no menu.json for the Finder submenu"; exit 1; }
+          "$HOME/.local/bin/fileconverter" --self-check
+
+      - name: Convert real files with the installed tool
+        run: |
+          mkdir -p /tmp/conv && cd /tmp/conv
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc=d=1:s=64x64:r=10 \
+            -f lavfi -i sine=d=1 -c:v libx264 -pix_fmt yuv420p -c:a aac -shortest clip.mp4
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i testsrc=d=1:s=64x64:r=10 \
+            -pix_fmt yuv420p silent.mkv
+          magick -size 64x64 xc:blue pic.png
+
+          B="$HOME/.local/bin/fileconverter"
+          "$B" --conversion-preset "To Mp3" clip.mp4 --verbose
+          "$B" --conversion-preset "To Jpg" pic.png --verbose
+          for f in clip.mp3 pic.jpg; do
+            [ -s "$f" ] || { echo "::error::produced no $f"; exit 1; }
+            echo "  ok: $f ($(stat -f%z "$f") bytes)"
+          done
+
+          if "$B" --conversion-preset "To Mp3" silent.mkv 2>err.txt; then
+            echo "::error::a silent video converted to MP3 reported success"; exit 1
+          fi
+          grep -qi "no audio track" err.txt \
+            || { echo "::error::unhelpful error: $(cat err.txt)"; exit 1; }
+          echo "  ok: silent video rejected with '$(cat err.txt)'"
+
+      - name: Uninstall cleanly
+        run: |
+          "$HOME/.local/bin/fileconverter" --uninstall
+          test ! -e "$HOME/Applications/File Converter.app" \
+            || { echo "::error::uninstall left the app behind"; exit 1; }
+          test ! -e "$HOME/.local/bin/fileconverter" \
+            || { echo "::error::uninstall left the launcher behind"; exit 1; }
+          echo "  ok: nothing left behind"
 
       - name: Package macOS tarball
         run: |
