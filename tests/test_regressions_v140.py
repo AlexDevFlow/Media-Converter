@@ -517,6 +517,9 @@ def test_tk_keep_open_is_sticky():
     """Clicking Keep open must not let the next poll restart the countdown."""
     import types
 
+    # tkinter is an optional dependency (absent on the macOS CI runner, and on
+    # any Python built without it) — the tk UI is only ever a fallback.
+    pytest.importorskip("tkinter", reason="tkinter not available")
     from fileconverter.ui import progress_window_tk as m
 
     # A stand-in window with just the auto-close state and methods.
@@ -541,6 +544,7 @@ def test_tk_add_preset_dedups_names():
     """Adding presets without renaming must not create unreachable duplicates."""
     import types
 
+    pytest.importorskip("tkinter", reason="tkinter not available")
     from fileconverter.ui import settings_window_tk as m
 
     presets = [ConversionPreset(name="To Mp4", output_type="mp4", input_types=["mkv"])]
