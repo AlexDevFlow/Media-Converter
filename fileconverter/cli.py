@@ -255,7 +255,18 @@ def main() -> None:
     except UINotAvailable:
         if args.verbose:
             print(_("No GUI toolkit available, running headless."), file=sys.stderr)
-        _run_headless(jobs, settings.max_simultaneous_conversions)
+        _run_headless(jobs, settings.max_simultaneous_conversions)   # exits 1 on failure
+        return
+
+    # The window reports failures visually, but a terminal or a script that
+    # called us gets nothing back — so mirror the headless behaviour: print
+    # what failed and exit non-zero.
+    failed = [j for j in jobs if j.state == ConversionState.FAILED]
+    if failed:
+        for j in failed:
+            print(_("FAILED: {name} — {error}").format(
+                name=j.input_filename, error=j.error_message), file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

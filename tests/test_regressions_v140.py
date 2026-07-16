@@ -631,6 +631,74 @@ def test_language_detection_is_deterministic(lang, expected, monkeypatch):
     assert i18n.detect_system_language() == expected
 
 
+# --- Silent input to an audio format ----------------------------------------
+
+@pytest.mark.skipif(not fcutil.HAS_FFMPEG, reason="ffmpeg not available")
+@pytest.mark.parametrize("out_type", ["mp3", "flac", "wav", "aac", "ogg", "aiff"])
+def test_silent_video_to_audio_fails_with_a_readable_message(tmp_path, out_type):
+    """Converting a video with no audio track (a screen recording, a clip made
+    from a GIF) to an audio format used to fail with whatever ffmpeg said —
+    "Error opening output file x.mp3" for MP3, "Error sending frames to
+    consumers" for FLAC. Neither mentions the real problem."""
+    from fileconverter.jobs.base import prepare_all
+
+    silent = tmp_path / "silent.mkv"
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc=d=1:s=64x64:r=10",
+                    "-pix_fmt", "yuv420p", str(silent)], check=True)
+
+    preset = ConversionPreset(name=f"To {out_type}", output_type=out_type,
+                              input_types=["mkv"])
+    job = create_job(preset, str(silent))
+    prepare_all([job])
+    job.run()
+
+    assert job.state == ConversionState.FAILED
+    assert "no audio track" in job.error_message.lower(), job.error_message
+    for p in job.output_paths:
+        assert not os.path.exists(p), "left a phantom output behind"
+
+
+@pytest.mark.skipif(not fcutil.HAS_FFMPEG, reason="ffmpeg not available")
+def test_video_with_audio_still_converts(tmp_path):
+    """Guard for the fix above: the ordinary case must be untouched."""
+    from fileconverter.jobs.base import prepare_all
+
+    src = tmp_path / "clip.mp4"
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                    "-f", "lavfi", "-i", "testsrc=d=1:s=64x64:r=10",
+                    "-f", "lavfi", "-i", "sine=d=1",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac",
+                    "-shortest", str(src)], check=True)
+
+    for out_type in ("mp3", "flac"):
+        preset = ConversionPreset(name=f"To {out_type}", output_type=out_type,
+                                  input_types=["mp4"])
+        job = create_job(preset, str(src))
+        prepare_all([job])
+        job.run()
+        assert job.state == ConversionState.DONE, job.error_message
+        assert os.path.getsize(job.output_path) > 0
+
+
+def test_run_refuses_a_job_whose_prepare_failed(tmp_path):
+    """run() on a job that failed to prepare must do nothing, not execute an
+    empty pass list and report DONE for a conversion that never ran."""
+    src = tmp_path / "v.mp4"
+    src.write_bytes(b"x")
+    preset = ConversionPreset(name="x", output_type="mp4", input_types=["mp4"],
+                              settings={"video_codec": "nope"})
+    job = create_job(preset, str(src))
+    try:
+        job.prepare()
+    except Exception as e:                      # unknown codec
+        job.state = ConversionState.FAILED
+        job.error_message = str(e)
+
+    job.run()
+    assert job.state == ConversionState.FAILED, "an unprepared job reported success"
+
+
 # --- CLI entry points --------------------------------------------------------
 
 def test_menu_entries_use_an_absolute_quoted_command(tmp_path, monkeypatch):

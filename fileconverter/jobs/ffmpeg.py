@@ -209,6 +209,53 @@ def resolve_hwaccel(setting: str) -> str:
     return "off"
 
 
+# ffmpeg reports the consequence ("Error opening output file x.mp3") on the
+# line *after* the cause ("Output file does not contain any stream"), and the
+# consequence is what used to reach the user. Map the causes we can recognise
+# onto something a person can act on. Checked against the last lines of
+# stderr, most specific first.
+_FRIENDLY_ERRORS = [
+    ("does not contain any stream",
+     "this file has no {kind} track to convert"),
+    ("Output file is empty, nothing was encoded",
+     "nothing was encoded — the input has no usable {kind} track"),
+    ("Invalid data found when processing input",
+     "the input file looks corrupt, or isn't really a {in_ext} file"),
+    ("Decoder (codec ", "no decoder for this file's format"),
+    ("Encoder (codec ", "this ffmpeg build has no encoder for that format"),
+    ("No space left on device", "the disk is full"),
+    ("Permission denied", "no permission to write the output file"),
+]
+
+# Output types that carry no video, used to word the message above.
+_AUDIO_ONLY_OUTPUTS = {"aac", "ac3", "aiff", "flac", "m4a", "mp3", "ogg",
+                       "opus", "wav", "wma"}
+
+
+def has_audio_stream(path: str):
+    """True / False, or None when we can't tell (no ffprobe, probe failed).
+
+    Used to reject an audio conversion of a silent file up front. Left to
+    ffmpeg, each output format fails differently and unhelpfully: MP3 says
+    "Error opening output file x.mp3", FLAC says "Error sending frames to
+    consumers: Invalid argument". Neither mentions the actual problem.
+    """
+    ffprobe = shutil.which("ffprobe")
+    if not ffprobe:
+        return None
+    try:
+        out = subprocess.run(
+            [ffprobe, "-v", "error", "-select_streams", "a",
+             "-show_entries", "stream=index", "-of", "csv=p=0", path],
+            capture_output=True, text=True, timeout=30, env=system_env(),
+        )
+        if out.returncode != 0:
+            return None
+        return bool(out.stdout.strip())
+    except (subprocess.SubprocessError, OSError):
+        return None
+
+
 def _kill_group(proc) -> None:
     """SIGKILL the process and any child it spawned."""
     import signal
@@ -260,6 +307,12 @@ class FFmpegJob(ConversionJob):
                 return
 
         out_type = preset.output_type
+
+        # Converting a silent file to an audio format can't work. Say so once,
+        # here, instead of letting each format fail with its own cryptic
+        # ffmpeg message. Skipped when we can't probe (has_audio_stream None).
+        if out_type in _AUDIO_ONLY_OUTPUTS and has_audio_stream(self.input_path) is False:
+            raise RuntimeError(_("This file has no audio track to convert."))
 
         if out_type == "aac":
             self._build_aac(base)
@@ -765,6 +818,7 @@ class FFmpegJob(ConversionJob):
                     start_new_session=True,
                 )
                 last_lines = []
+                self._recent_lines = last_lines
                 try:
                     for line in proc.stderr:
                         if self.cancel_requested:
@@ -787,6 +841,9 @@ class FFmpegJob(ConversionJob):
                         proc.stderr.close()
 
                 if proc.returncode != 0 and not self.cancel_requested:
+                    friendly = self._friendly_error()
+                    if friendly:
+                        raise RuntimeError(friendly)
                     err = "\n".join(last_lines)
                     raise RuntimeError(f"ffmpeg exited with code {proc.returncode}: {err}")
         finally:
@@ -797,6 +854,25 @@ class FFmpegJob(ConversionJob):
             if tmpdir:
                 shutil.rmtree(tmpdir, ignore_errors=True)
                 self._tmpdir = None
+
+    def _friendly_error(self) -> str:
+        """Turn the last lines of ffmpeg's stderr into a message that says what
+        is actually wrong, or "" if we don't recognise the failure.
+
+        The common one: converting a silent video (a screen recording, a clip
+        from a GIF) to MP3. ffmpeg's own last line is "Error opening output
+        file x.mp3", which tells the user nothing — the useful line, "Output
+        file does not contain any stream", came earlier.
+        """
+        lines = getattr(self, "_recent_lines", None) or []
+        out_type = self.preset.output_type
+        kind = "audio" if out_type in _AUDIO_ONLY_OUTPUTS else "video"
+        in_ext = os.path.splitext(self.input_path)[1].lstrip(".").upper() or "media"
+        blob = "\n".join(lines)
+        for needle, template in _FRIENDLY_ERRORS:
+            if needle in blob:
+                return template.format(kind=kind, in_ext=in_ext)
+        return ""
 
     def _parse_output(self, line: str) -> None:
         m = _DURATION_RE.search(line)
@@ -816,8 +892,8 @@ class FFmpegJob(ConversionJob):
         # Error detection (same logic as original, stripping file names to avoid false positives)
         clean = line.replace(self.input_path, "").replace(self.output_path, "")
         if any(k in clean for k in ("Exiting.", "Unsupported dimensions", "No such file or directory")):
-            raise RuntimeError(f"ffmpeg error: {line}")
+            raise RuntimeError(self._friendly_error() or f"ffmpeg error: {line}")
         if "Error" in clean:
             if clean.startswith("Error while decoding stream") and "Invalid data found" in clean:
                 return  # Normal for transport streams
-            raise RuntimeError(f"ffmpeg error: {line}")
+            raise RuntimeError(self._friendly_error() or f"ffmpeg error: {line}")

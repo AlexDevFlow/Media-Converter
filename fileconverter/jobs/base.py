@@ -122,6 +122,13 @@ class ConversionJob:
 
     def run(self) -> None:
         """Execute the conversion. Called from a worker thread."""
+        # prepare() already failed (bad codec, no audio track, unwritable
+        # directory): there is nothing to run. Without this, a caller that
+        # runs the job anyway would execute an empty pass list and report
+        # DONE for a conversion that never happened.
+        if self.state == ConversionState.FAILED:
+            return
+
         # A cancelled job that is still queued must not start: closing the
         # window on a 50-file batch used to convert every remaining file
         # anyway (and then delete the results).
