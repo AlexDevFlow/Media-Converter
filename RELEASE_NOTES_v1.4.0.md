@@ -1,6 +1,8 @@
-# v1.4.0 — macOS support (and a bunch of fixes)
+# v1.4.0 — macOS support (beta) and a bunch of fixes
 
 File Converter runs on macOS now. It's the same tool as on Linux: same engine, the same 46 presets, same CLI, same config format, same 29 languages.
+
+I'm calling macOS **beta** for this release. Everything here works and is tested (the whole suite runs on a macOS CI runner too), but it's had far less real-world mileage than the Linux side, and the Finder integration in particular touches parts of macOS that vary between setups. If something misbehaves, please open an issue — that's exactly what this phase is for. Linux is unaffected and stays stable.
 
 Linux users get something out of this release too. The three open bug reports (#5, #6, #7) are fixed, and while porting to macOS I found and fixed a handful of older bugs that affected Linux as well, including a few that could lose files. If you're on Linux, it's worth updating.
 

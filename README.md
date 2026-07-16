@@ -31,7 +31,11 @@ cd Media-Converter
 
 Requires Python 3.9+ and PyYAML (`python3-yaml` on most distros).
 
-### macOS
+### macOS (beta)
+
+macOS support is new as of v1.4.0. It's tested and CI runs the full suite on a
+macOS runner, but it hasn't seen nearly as much real-world use as the Linux
+side yet, so treat it as beta and please report anything odd.
 
 ```bash
 git clone https://github.com/AlexDevFlow/Media-Converter.git
