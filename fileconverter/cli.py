@@ -258,6 +258,19 @@ def main() -> None:
         _run_headless(jobs, settings.max_simultaneous_conversions)   # exits 1 on failure
         return
 
+    # The window closed without any job starting, and nobody cancelled: the UI
+    # failed in a way it couldn't tell us about (a GUI toolkit that swallows
+    # its own errors). Do the work rather than exit silently having converted
+    # nothing.
+    untouched = all(j.state in (ConversionState.UNKNOWN, ConversionState.READY)
+                    for j in jobs)
+    if untouched and not any(j.cancel_requested for j in jobs):
+        if args.verbose:
+            print(_("The progress window did not run the conversion; "
+                    "falling back to headless."), file=sys.stderr)
+        _run_headless(jobs, settings.max_simultaneous_conversions)
+        return
+
     # The window reports failures visually, but a terminal or a script that
     # called us gets nothing back — so mirror the headless behaviour: print
     # what failed and exit non-zero.

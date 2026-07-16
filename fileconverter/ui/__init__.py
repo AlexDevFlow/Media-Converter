@@ -54,7 +54,34 @@ def _try_tk(fn_name: str, *args):
         raise
 
 
+def _gtk_can_open_a_display() -> bool:
+    """Whether GTK can actually talk to a display server.
+
+    Importing GTK succeeds on a headless box (over SSH, in a container, from
+    cron) — it's opening the display that fails, and it fails *inside* the
+    Application's "activate" handler, where GObject prints the traceback and
+    swallows it. app.run() then returns as if all was well, so the batch was
+    reported as finished having converted nothing. Ask GTK up front instead.
+    """
+    try:
+        import gi
+        gi.require_version("Gtk", "4.0")
+        from gi.repository import Gtk
+    except (ImportError, ValueError):
+        return False
+    try:
+        ok = Gtk.init_check()
+    except Exception:
+        return False
+    # GTK 4 returns a bool; GTK 3 returned (ok, argv).
+    if isinstance(ok, tuple):
+        ok = ok[0]
+    return bool(ok)
+
+
 def _try_gtk(fn_name: str, *args):
+    if not _gtk_can_open_a_display():
+        raise UINotAvailable("GTK cannot open a display")
     try:
         if fn_name == "progress":
             from fileconverter.ui.progress_window import run_with_progress
@@ -62,7 +89,9 @@ def _try_gtk(fn_name: str, *args):
         else:
             from fileconverter.ui.settings_window import run_settings
             run_settings(*args)
-    except (ImportError, ValueError) as e:
+    except (ImportError, ValueError, RuntimeError) as e:
+        # RuntimeError: "Gtk couldn't be initialized" can still surface here
+        # if a display disappears between the check and the window.
         raise UINotAvailable(f"GTK not available: {e}")
 
 

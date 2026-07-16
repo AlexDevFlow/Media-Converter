@@ -699,6 +699,74 @@ def test_run_refuses_a_job_whose_prepare_failed(tmp_path):
     assert job.state == ConversionState.FAILED, "an unprepared job reported success"
 
 
+# --- Headless Linux: GTK must not silently swallow the batch ----------------
+
+def test_gtk_is_skipped_when_it_cannot_open_a_display(monkeypatch):
+    """On a headless box GTK imports fine but can't open a display, and the
+    failure happens inside the "activate" handler where GObject prints it and
+    carries on — so app.run() returned normally and the batch was reported
+    finished having converted nothing. Ask GTK up front instead."""
+    from fileconverter import ui
+
+    monkeypatch.setattr(ui, "_gtk_can_open_a_display", lambda: False)
+    called = []
+    monkeypatch.setattr(ui, "_try_tk",
+                        lambda fn, *a: called.append(("tk", fn)))
+
+    with pytest.raises(ui.UINotAvailable):
+        ui._try_gtk("progress", [], None)
+
+    # ... and the chain moves on to tkinter rather than dying.
+    monkeypatch.setattr(sys, "platform", "linux")
+    ui.run_with_progress_auto([], None)
+    assert called == [("tk", "progress")]
+
+
+def test_gtk_runtime_error_falls_back(monkeypatch):
+    """Belt and braces: if the display vanishes between the check and the
+    window, the RuntimeError must become UINotAvailable, not a traceback."""
+    from fileconverter import ui
+
+    monkeypatch.setattr(ui, "_gtk_can_open_a_display", lambda: True)
+
+    def boom(*a, **k):
+        raise RuntimeError("Gtk couldn't be initialized")
+
+    import fileconverter.ui as ui_mod
+    monkeypatch.setitem(sys.modules, "fileconverter.ui.progress_window",
+                        types_module_with(run_with_progress=boom))
+    with pytest.raises(ui.UINotAvailable):
+        ui._try_gtk("progress", [], None)
+
+
+def types_module_with(**attrs):
+    import types as _t
+    m = _t.ModuleType("stub")
+    for k, v in attrs.items():
+        setattr(m, k, v)
+    return m
+
+
+def test_cli_converts_anyway_if_the_window_ran_nothing(tmp_path, monkeypatch):
+    """If the GUI returns having started no job and nothing was cancelled, the
+    CLI must do the work headless instead of exiting silently."""
+    from fileconverter import cli
+
+    src = tmp_path / "a.wav"
+    src.write_bytes(b"x")
+
+    ran = []
+    monkeypatch.setattr(cli, "_run_headless", lambda jobs, workers: ran.append(jobs))
+    monkeypatch.setattr("fileconverter.ui.run_with_progress_auto",
+                        lambda jobs, settings: None)   # window that did nothing
+
+    monkeypatch.setattr(sys, "argv",
+                        ["fileconverter", "--conversion-preset", "To Mp3", str(src)])
+    cli.main()
+
+    assert ran, "the CLI exited without converting and without saying anything"
+
+
 # --- CLI entry points --------------------------------------------------------
 
 def test_menu_entries_use_an_absolute_quoted_command(tmp_path, monkeypatch):
