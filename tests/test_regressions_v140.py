@@ -457,6 +457,23 @@ def test_finder_extension_reads_the_real_home_not_its_container():
     assert "homeDirectoryForCurrentUser" not in code
 
 
+def test_submenu_click_survives_the_trip_through_finder():
+    """The menu is rebuilt in Finder's process before a click comes back, so
+    representedObject arrives empty and selectedItemURLs() can answer with
+    nothing. Both guards failed and both returned in silence: the submenu
+    listed every preset and converted exactly nothing."""
+    src = (REPO / "fileconverter/ui/native/FinderSyncExt.swift").read_text()
+    code = "\n".join(line for line in src.splitlines()
+                     if not line.strip().startswith("//"))
+    action = code.split("func convertAction")[1].split("func configureAction")[0]
+
+    assert "sender.tag" in action, "the preset must also travel as the item tag"
+    assert "menuSelection" in action, "use the selection captured when the menu was built"
+    assert "item.tag = tag + 1" in code, \
+        "tags must be 1-based: a tag lost in transit reads as 0, and 0 must " \
+        "not silently select the first preset"
+
+
 def test_quick_actions_are_written_when_the_host_app_is_missing(monkeypatch, tmp_path):
     """pluginkit's registration outlives a deleted app bundle. Trusting it
     alone left the user with neither a submenu nor Quick Actions."""
@@ -465,6 +482,9 @@ def test_quick_actions_are_written_when_the_host_app_is_missing(monkeypatch, tmp
     from fileconverter.integration import macos
 
     monkeypatch.setattr(macos, "SERVICES_DIR", tmp_path / "Services")
+    # refresh_services also rewrites menu.json — keep it off the real install.
+    monkeypatch.setattr(macos, "APP_DIR", tmp_path / "share")
+    monkeypatch.setattr(macos, "MENU_JSON", tmp_path / "share" / "menu.json")
     monkeypatch.setattr(macos, "HOST_APP", tmp_path / "Gone.app")   # not on disk
     monkeypatch.setattr(macos, "_extension_enabled", lambda: True)  # but registered
     monkeypatch.setattr(macos, "_pbs_flush", lambda: None)

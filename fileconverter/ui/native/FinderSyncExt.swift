@@ -18,10 +18,30 @@ import Foundation
 struct MenuPreset {
     let name: String
     let short: String
+    /// Folder the entry belongs in, "" for top level. Presets ship in families
+    /// ("Scale 720p", "Rotate left", ...) whose members share a short name, so
+    /// a flat menu would list "To Mp4" seven times over.
+    let folder: String
     let extensions: Set<String>
 }
 
 final class FinderSync: FIFinderSync {
+
+    /// What the last menu was built from.
+    ///
+    /// The menu crosses into Finder's process and what comes back on a click
+    /// is a rebuilt NSMenuItem: `representedObject` arrives empty, so the
+    /// preset name has to travel as the item's integer `tag`. The selection
+    /// makes the same trip — asking FIFinderSyncController for it again at
+    /// click time can answer with nothing. Both used to be read straight from
+    /// the sender, both failed a guard, and the guard returned in silence: the
+    /// submenu looked alive and simply converted nothing, ever.
+    ///
+    /// Tags are 1-based on purpose. A tag that did not survive reads as 0, and
+    /// 0 must not quietly select the first preset — converting with the wrong
+    /// preset is worse than not converting at all.
+    private var menuPresets: [String] = []
+    private var menuSelection: [URL] = []
 
     override init() {
         super.init()
@@ -52,6 +72,7 @@ final class FinderSync: FIFinderSync {
             let exts = (p["extensions"] as? [Any] ?? []).compactMap { ($0 as? String)?.lowercased() }
             return MenuPreset(name: name,
                               short: p["short"] as? String ?? name,
+                              folder: p["folder"] as? String ?? "",
                               extensions: Set(exts))
         }
         return (presets, strings)
@@ -76,15 +97,40 @@ final class FinderSync: FIFinderSync {
         let compatible = presets.filter { exts.isSubset(of: $0.extensions) }
         guard !compatible.isEmpty else { return nil }
 
+        menuSelection = selected
+        menuPresets = compatible.map { $0.name }
+
         let submenu = NSMenu(title: "")
-        for preset in compatible {
+
+        func makeItem(_ preset: MenuPreset, tag: Int) -> NSMenuItem {
             let item = NSMenuItem(title: preset.short,
                                   action: #selector(convertAction(_:)),
                                   keyEquivalent: "")
             item.target = self
+            item.tag = tag + 1
             item.representedObject = preset.name
-            submenu.addItem(item)
+            return item
         }
+
+        // Top-level entries keep their position in the list; each family folds
+        // into one submenu, placed where its first member appeared. Nautilus
+        // groups the same way, so both platforms read alike.
+        var folderMenus: [String: NSMenu] = [:]
+        for (index, preset) in compatible.enumerated() {
+            if preset.folder.isEmpty {
+                submenu.addItem(makeItem(preset, tag: index))
+                continue
+            }
+            if folderMenus[preset.folder] == nil {
+                let child = NSMenu(title: preset.folder)
+                folderMenus[preset.folder] = child
+                let holder = NSMenuItem(title: preset.folder, action: nil, keyEquivalent: "")
+                holder.submenu = child
+                submenu.addItem(holder)
+            }
+            folderMenus[preset.folder]?.addItem(makeItem(preset, tag: index))
+        }
+
         submenu.addItem(.separator())
         let configure = NSMenuItem(title: strings["configure"] ?? "Configure presets...",
                                    action: #selector(configureAction(_:)),
@@ -103,9 +149,22 @@ final class FinderSync: FIFinderSync {
     // MARK: Actions → fileconverter:// URL → host app
 
     @objc private func convertAction(_ sender: NSMenuItem) {
-        guard let preset = sender.representedObject as? String else { return }
-        let files = FIFinderSyncController.default().selectedItemURLs() ?? []
-        guard !files.isEmpty else { return }
+        let tagged = sender.tag - 1
+        let preset = (sender.representedObject as? String)
+            ?? (menuPresets.indices.contains(tagged) ? menuPresets[tagged] : nil)
+        guard let preset, !preset.isEmpty else {
+            NSLog("FileConverterSync: menu click carried no preset (tag %ld)",
+                  sender.tag)
+            return
+        }
+        var files = menuSelection
+        if files.isEmpty {
+            files = FIFinderSyncController.default().selectedItemURLs() ?? []
+        }
+        guard !files.isEmpty else {
+            NSLog("FileConverterSync: menu click carried no selection")
+            return
+        }
         var comps = URLComponents()
         comps.scheme = "fileconverter"
         comps.host = "convert"

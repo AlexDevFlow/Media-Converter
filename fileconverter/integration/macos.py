@@ -17,6 +17,7 @@ the issue tracker of the Linux version:
 """
 
 from __future__ import annotations
+import hashlib
 import json
 import os
 import plistlib
@@ -53,6 +54,20 @@ WORKFLOW_GLOB = "File Converter*.workflow"
 WORKFLOW_PREFIX = "File Converter - "
 PICKER_WORKFLOW_NAME = "File Converter….workflow"
 PICKER_MENU_ITEM = "File Converter…"
+
+# Rebuilding the host app re-signs it ad-hoc, which gives it a fresh cdhash —
+# and that is exactly what TCC keys a Full Disk Access grant to. An unchanged
+# reinstall would therefore revoke, silently, the permission the submenu needs.
+# The stamp lets an unchanged build keep its binaries, and its grant.
+BUILD_STAMP = APP_DIR / ".app-build-stamp"
+
+# Shown in the "would like to access files in your Downloads folder" prompts.
+# macOS asks in this app's name: it is the responsible process for the
+# converter it spawns. A prompt with nothing to explain itself is a prompt that
+# gets dismissed, after which every conversion started from the submenu stalls
+# forever on an open() the kernel never lets through.
+TCC_REASON = ("File Converter opens the files you pick in Finder and writes "
+              "the converted copy next to them.")
 
 _SOFFICE_APP_PATHS = [
     "/Applications/LibreOffice.app/Contents/MacOS/soffice",
@@ -439,11 +454,12 @@ def _clean_workflows() -> list[str]:
 def refresh_services(quiet: bool = False) -> int:
     """(Re)generate the Finder context-menu integration.
 
-    Always writes menu.json (feeding the Finder Sync submenu) and the generic
-    picker Quick Action. The per-preset Quick Actions are only generated when
-    the submenu extension is NOT active — otherwise the menu would list
-    everything twice. Called by --install and after every settings save, so
-    the Finder menu never drifts out of sync with the config.
+    Always writes menu.json, which feeds the Finder Sync submenu. Quick Actions
+    — the per-preset ones and the picker — are written only when that submenu
+    is NOT active: they are the fallback, and shipping both would list every
+    conversion twice, once at the top level and once a submenu deeper. Called
+    by --install and after every settings save, so the Finder menu never drifts
+    out of sync with the config.
     """
     from fileconverter.config import load_settings
     settings = load_settings()
@@ -474,26 +490,28 @@ def refresh_services(quiet: bool = False) -> int:
                        f"{shlex.quote(preset.name)} \"$@\" >/dev/null 2>&1 &")
             _write_workflow(
                 f"{WORKFLOW_PREFIX}{safe}.workflow",
-                preset.short_name,
+                # Services is one flat list with no nesting, so a foldered
+                # preset has to carry its folder in the label.
+                preset.menu_label,
                 _utis_for_preset(preset, system_utis),
                 command,
             )
             count += 1
 
-    # Generic entry: opens the preset picker with the full compatible list —
-    # the macOS twin of the fileconverter-pick fallback on Linux.
-    _write_workflow(
-        PICKER_WORKFLOW_NAME,
-        PICKER_MENU_ITEM,
-        ["public.data"],
-        f"nohup {picker} \"$@\" >/dev/null 2>&1 &",
-    )
-    count += 1
+        # Generic entry: opens the preset picker with the full compatible list —
+        # the macOS twin of the fileconverter-pick fallback on Linux.
+        _write_workflow(
+            PICKER_WORKFLOW_NAME,
+            PICKER_MENU_ITEM,
+            ["public.data"],
+            f"nohup {picker} \"$@\" >/dev/null 2>&1 &",
+        )
+        count += 1
 
     _pbs_flush()
     if not quiet:
-        if count == 1:
-            _print("  [OK] Finder submenu active — created 1 Quick Action (picker)", "green")
+        if count == 0:
+            _print("  [OK] Finder submenu active — no Quick Actions needed", "green")
         else:
             _print(f"  [OK] Created {count} Finder Quick Actions in {SERVICES_DIR}", "green")
     return count
@@ -524,6 +542,10 @@ def _write_menu_json(settings) -> None:
         "presets": [{
             "name": p.name,
             "short": p.short_name,
+            # The folder the entry belongs in, "" for top level. The extension
+            # nests a real submenu per folder — without it, the seven presets
+            # named "To Mp4" would sit in one flat list, indistinguishable.
+            "folder": "/".join(p.folder_path),
             "extensions": sorted({e.lower().lstrip(".") for e in p.input_types}),
             "out": p.output_type.upper(),
         } for p in settings.presets],
@@ -541,9 +563,44 @@ def _extension_enabled() -> bool:
     return any(line.strip().startswith("+") for line in out.splitlines())
 
 
+def _read_build_stamp() -> str:
+    try:
+        return BUILD_STAMP.read_text().strip()
+    except OSError:
+        return ""
+
+
+def _write_build_stamp(stamp: str) -> None:
+    try:
+        BUILD_STAMP.parent.mkdir(parents=True, exist_ok=True)
+        BUILD_STAMP.write_text(stamp + "\n")
+    except OSError:
+        pass   # the stamp only saves a rebuild; never fail the install over it
+
+
+def _register_extension(app: Path, ext: Path) -> None:
+    """Tell LaunchServices about the bundle and pluginkit about the extension.
+    Cheap and idempotent, so the keep-the-binaries path runs it too: the
+    registration DB can go stale (a Finder restart, a macOS upgrade) while the
+    app on disk is perfectly fine."""
+    lsregister = ("/System/Library/Frameworks/CoreServices.framework/Frameworks/"
+                  "LaunchServices.framework/Support/lsregister")
+    cmds = []
+    if os.path.exists(lsregister):
+        cmds.append([lsregister, "-f", str(app)])
+    cmds.append(["/usr/bin/pluginkit", "-a", str(ext)])
+    cmds.append(["/usr/bin/pluginkit", "-e", "use", "-i", EXT_BUNDLE_ID])
+    for cmd in cmds:
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        except (subprocess.SubprocessError, OSError):
+            pass
+
+
 def _unregister_extension() -> None:
     """Drop the extension from pluginkit's database, so a stale registration
     can't make us think a submenu exists when the app bundle is gone."""
+    BUILD_STAMP.unlink(missing_ok=True)
     try:
         subprocess.run(["/usr/bin/pluginkit", "-e", "ignore", "-i", EXT_BUNDLE_ID],
                        capture_output=True, timeout=15)
@@ -580,9 +637,6 @@ def build_finder_extension(quiet: bool = False) -> str:
     macos_dir = app / "Contents" / "MacOS"
     ext = app / "Contents" / "PlugIns" / "FileConverterSync.appex"
     ext_macos = ext / "Contents" / "MacOS"
-    shutil.rmtree(app, ignore_errors=True)
-    macos_dir.mkdir(parents=True, exist_ok=True)
-    ext_macos.mkdir(parents=True, exist_ok=True)
 
     # CFBundleSupportedPlatforms is not optional: LaunchServices records the
     # bundle without it, but pkd silently refuses to list the extension.
@@ -594,7 +648,7 @@ def build_finder_extension(quiet: bool = False) -> str:
         "CFBundleVersion": _app_version(),
         "LSMinimumSystemVersion": "13.0",
     }
-    (app / "Contents" / "Info.plist").write_bytes(plistlib.dumps({
+    host_plist = plistlib.dumps({
         **common,
         "CFBundleName": "File Converter",
         "CFBundleDisplayName": "File Converter",
@@ -607,8 +661,17 @@ def build_finder_extension(quiet: bool = False) -> str:
             "CFBundleURLName": HOST_BUNDLE_ID,
             "CFBundleURLSchemes": ["fileconverter"],
         }],
-    }))
-    (ext / "Contents" / "Info.plist").write_bytes(plistlib.dumps({
+        # The submenu hands this app paths, and it re-opens them from a plain
+        # child process — so the usual protected folders each need their TCC
+        # prompt to make sense. See TCC_REASON.
+        "NSDesktopFolderUsageDescription": TCC_REASON,
+        "NSDocumentsFolderUsageDescription": TCC_REASON,
+        "NSDownloadsFolderUsageDescription": TCC_REASON,
+        "NSRemovableVolumesUsageDescription": TCC_REASON,
+        "NSNetworkVolumesUsageDescription": TCC_REASON,
+        "NSFileProviderDomainUsageDescription": TCC_REASON,
+    })
+    ext_plist = plistlib.dumps({
         **common,
         "CFBundleName": "FileConverterSync",
         "CFBundleDisplayName": "File Converter",
@@ -619,7 +682,32 @@ def build_finder_extension(quiet: bool = False) -> str:
             "NSExtensionPointIdentifier": "com.apple.FinderSync",
             "NSExtensionPrincipalClass": "FileConverterSync.FinderSync",
         },
-    }))
+    })
+
+    # Same sources, same version, same bundle → keep the binaries that are
+    # already there. Re-signing would hand the app a new cdhash and drop its
+    # Full Disk Access grant on the floor (see BUILD_STAMP).
+    stamp = hashlib.sha256(
+        host_src.read_bytes() + ext_src.read_bytes() + host_plist + ext_plist
+    ).hexdigest()
+    if app.exists() and _read_build_stamp() == stamp:
+        _register_extension(app, ext)
+        if _extension_enabled():
+            if not quiet:
+                _print(f"  [OK] Finder submenu extension unchanged: {app}", "green")
+            return "enabled"
+        if not quiet:
+            _print(f"  [OK] {app} unchanged — extension not enabled yet", "green")
+            _print("  [NOTE] Enable it under System Settings → General →", "yellow")
+            _print("         Login Items & Extensions → Finder, then re-run setup.", "yellow")
+        return "built"
+
+    shutil.rmtree(app, ignore_errors=True)
+    BUILD_STAMP.unlink(missing_ok=True)
+    macos_dir.mkdir(parents=True, exist_ok=True)
+    ext_macos.mkdir(parents=True, exist_ok=True)
+    (app / "Contents" / "Info.plist").write_bytes(host_plist)
+    (ext / "Contents" / "Info.plist").write_bytes(ext_plist)
 
     def _run(cmd: list) -> subprocess.CompletedProcess:
         return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
@@ -665,12 +753,8 @@ def build_finder_extension(quiet: bool = False) -> str:
         _run(["/usr/bin/codesign", "--force", "-s", "-", str(app)])
     finally:
         os.unlink(ent_path)
-    lsregister = ("/System/Library/Frameworks/CoreServices.framework/Frameworks/"
-                  "LaunchServices.framework/Support/lsregister")
-    if os.path.exists(lsregister):
-        _run([lsregister, "-f", str(app)])
-    _run(["/usr/bin/pluginkit", "-a", str(ext)])
-    _run(["/usr/bin/pluginkit", "-e", "use", "-i", EXT_BUNDLE_ID])
+    _register_extension(app, ext)
+    _write_build_stamp(stamp)
 
     if _extension_enabled():
         if not quiet:
@@ -842,6 +926,17 @@ def run_install() -> None:
     if ext_state == "enabled":
         _print("Right-click files in Finder → File Converter → choose a preset", "green")
         _print("(relaunch Finder once — killall Finder — if the submenu isn't there yet)", "green")
+        print()
+        # The submenu route runs conversions under File Converter.app, so the
+        # protected folders each ask once. Worth saying here, while the user is
+        # still looking: an unanswered prompt doesn't fail the conversion, it
+        # parks it, and a progress window that never moves reads as a bug.
+        _print("The first time you convert a file on your Desktop, in Documents", "yellow")
+        _print("or in Downloads, macOS asks for permission in File Converter's", "yellow")
+        _print("name. Answer it — an unanswered prompt leaves the conversion", "yellow")
+        _print("waiting rather than failing. To skip the prompts for good, add", "yellow")
+        _print("File Converter.app (in ~/Applications) to System Settings →", "yellow")
+        _print("Privacy & Security → Full Disk Access.", "yellow")
     else:
         _print("Right-click files in Finder → Quick Actions → choose a preset", "green")
         _print("(also under the Services submenu; first use may need a few seconds", "green")

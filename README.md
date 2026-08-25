@@ -70,6 +70,18 @@ double-click **File Converter.app** in `~/Applications`, or run
 `fileconverter --settings`. Video encoding can use Apple's VideoToolbox
 hardware acceleration if you turn on "Auto-detect" under GPU accel.
 
+**Folder permissions.** The submenu hands your files to *File Converter.app*,
+which opens them from an ordinary child process, so macOS asks for access the
+first time you convert something on the Desktop, in Documents or in Downloads —
+once per folder, in File Converter's name. Say yes and it stops asking. Leave
+the prompt unanswered and the conversion doesn't fail, it *waits*: ffmpeg and
+ImageMagick block inside `open()` until someone answers, and the progress
+window sits there looking stuck. To skip the prompts altogether, add
+**File Converter.app** — it lives in `~/Applications`, not `/Applications` — to
+System Settings → Privacy & Security → Full Disk Access, which covers external
+drives and iCloud Drive as well. Quick Actions are unaffected: they run inside
+Apple's Services runner, which already has the access.
+
 You'll need macOS 13 or newer, the Xcode Command Line Tools
 (`xcode-select --install`, which give you Python 3.9+ and the Swift compiler),
 and Homebrew for the media tools. If the submenu doesn't show up right away,
@@ -409,6 +421,16 @@ Use `/` in the preset name. `Video/To Mp4` creates a "Video" submenu containing 
 
 **Wayland support.**
 Yes. GTK 4 supports Wayland natively.
+
+**macOS: a conversion starts and the progress window never moves.**
+macOS is waiting for an answer to a folder-permission prompt that you may not
+have noticed — the converter is blocked until you give one. Answer it, or add
+**File Converter.app** (in `~/Applications`) to System Settings → Privacy &
+Security → Full Disk Access and it won't ask again.
+
+## Release notes
+
+Per-version notes live in [docs/releases/](docs/releases/).
 
 ## Credits
 
