@@ -313,7 +313,7 @@ def _install_nemo_actions() -> bool:
         action_file = nemo_dir / f"fileconverter-{safe_name}.nemo_action"
         mimetypes = ";".join(ext for ext in preset.input_types)
         action_file.write_text(f"""[Nemo Action]
-Name=File Converter: {preset.short_name}
+Name=File Converter: {preset.menu_label}
 Comment=Convert to {preset.output_type.upper()}
 Exec="{fc}" --conversion-preset "{preset.name}" %F
 Selection=Any
@@ -432,7 +432,9 @@ def _install_dolphin_service_menu() -> bool:
         for i, preset in enumerate(presets):
             lines += [
                 f"[Desktop Action action{i}]",
-                f"Name={preset.short_name}",
+                # Dolphin's X-KDE-Submenu nests one level only, so the folder
+                # has to live in the label or every family collapses together.
+                f"Name={preset.menu_label}",
                 f'Exec="{fc}" --conversion-preset "{preset.name}" %F',
                 "",
             ]

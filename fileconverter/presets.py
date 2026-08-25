@@ -24,6 +24,19 @@ class ConversionPreset:
         """Return the leaf name (e.g. 'Video/To Mp4' -> 'To Mp4')."""
         return self.name.split("/")[-1]
 
+    @property
+    def menu_label(self) -> str:
+        """Label for a menu that cannot nest (e.g. 'Scale 720p → To Mp4').
+
+        Nested menus should use folder_path and short_name and show the leaf on
+        its own. This is for the flat ones — Nemo actions, Dolphin's single-level
+        service submenu, macOS Quick Actions — where short_name alone would
+        print "To Mp4" seven times with nothing to tell the entries apart.
+        """
+        if not self.folder_path:
+            return self.short_name
+        return " → ".join(self.folder_path + [self.short_name])
+
     def get_setting(self, key: str, default=None):
         return self.settings.get(key, default)
 

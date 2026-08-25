@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fileconverter"
-version = "1.4.0"
+version = "1.4.1"
 description = "Linux and macOS port of File Converter — right-click context menu file conversion"
 license = "GPL-3.0-or-later"
 # 3.9 floor so the macOS system Python (Command Line Tools) works out of the box.
